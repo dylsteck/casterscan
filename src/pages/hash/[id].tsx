@@ -1,8 +1,18 @@
 import Layout from "@/components/Layout"
 import { supabase } from "@/lib/supabase"
 import Image from "next/image";
+import { Cast } from "@/interfaces/cast";
+import { GetServerSidePropsContext } from "next";
 
-const Card = ({ cast }) => {
+type CardProps = {
+  cast: Cast;
+};
+
+type HashProps = {
+  data: [Cast];
+};
+
+const Card = ({ cast }: CardProps) => {
     return (
     <center>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden w-[30vw] mt-[15vh]">
@@ -28,8 +38,7 @@ const Card = ({ cast }) => {
     );
   };
 
-function Page({ data }) {
-    console.log(data)
+function Hash({ data }: HashProps) {
     return(
     <Layout>
         <Card cast={data[0]} />
@@ -38,8 +47,8 @@ function Page({ data }) {
   }
   
   // This gets called on every request
-  export async function getServerSideProps(context) {
-    const id = context.params.id
+  export async function getServerSideProps(context: GetServerSidePropsContext) {
+    const id = context.params?.id
     // Fetch data from external API
     const { data, error } = await supabase
     .from('casts')
@@ -49,4 +58,4 @@ function Page({ data }) {
     return { props: { data } }
   }
   
-  export default Page
+  export default Hash
