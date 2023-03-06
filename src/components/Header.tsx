@@ -1,17 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import triggerSearch from '../lib/triggerSearch'
+import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import logo from '../assets/img/casterscanIcon.png'
 
-interface HeaderProps {
-  text: string;
-}
+const Header: React.FC = () => {
 
-const Header: React.FC<HeaderProps> = ({ text }) => {
+  const [input, setInput] = useState('')
+  const router = useRouter()
+
   return (
-    <div style={{ display: 'inline-block' }}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-person-fill" viewBox="0 0 16 16">
-        <path d="M7.908.217a2.962 2.962 0 0 1 4.183 0c.455.402.716.962.716 1.558v.006c0 2.295-1.01 3.817-1.654 4.646-.563.731-.872 1.13-.872 1.72v.25c0 .59.32.989.764 1.42.443.432.951.908.951 1.868v.444c0 1.341-.813 2.5-2.5 2.5h-3c-1.687 0-2.5-1.159-2.5-2.5v-.444c0-.96.508-1.436.952-1.868.443-.431.763-.83.763-1.42v-.25c0-.59-.308-.989-.872-1.72-.643-.83-1.654-2.35-1.654-4.646v-.006c0-.596.261-1.156.717-1.558zm4.183 1.52a1.414 1.414 0 1 0-2.83 0 1.414 1.414 0 0 0 2.83 0z"/>
-      </svg>
-      <span>{text}</span>
-    </div>
+    <nav className="bg-transparent border-gray-200 px-2 sm:px-4 py-2.5 sticky top-3">
+      <div className="container flex flex-wrap items-center justify-between mx-auto">
+        <Link href="/" className="flex items-center">
+            <Image className="inline-block" src={logo} width={35} height={35} alt="Casterscan logo"/>
+            <span className="self-center text-3xl font-semibold whitespace-nowrap dark:text-white ml-5">Casterscan</span>
+        </Link>
+        <div className="flex">
+          <label className="relative text-gray-400 block">
+            <input 
+              type="text" 
+              placeholder="Search by cast hash/ENS/address" 
+              value={input}
+              className="min-w-[30vw] form-input rounded-lg py-3 px-4 bg-white placeholder-gray-400 text-gray-500 appearance-none w-full block pl-5 focus:outline-none"
+              onChange={(e) => setInput(e.target.value)}/> 
+            <div 
+              className="bg-[#6F5B9C] rounded-md p-1.5 pointer-events-none w-8 h-8 absolute top-1/2 transform -translate-y-1/2 right-3"
+              onClick={() => triggerSearch(input, router)}>
+              <MagnifyingGlassIcon className="w-full h-full text-white" />
+            </div>
+          </label>
+          </div>
+      </div>
+    </nav>
   );
 };
 
