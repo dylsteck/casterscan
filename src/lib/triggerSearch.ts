@@ -1,5 +1,5 @@
-import { NextRouter } from "next/router";
+import type { NextRouter } from "next/router";
 
-export default function triggerSearch(input: string, router: NextRouter){
-    router.push(`/hash/${input}`)
+export default async function triggerSearch(input: string, router: NextRouter){
+    await router.push(`/hash/${input}`);
 }

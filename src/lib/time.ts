@@ -1,7 +1,7 @@
-export function getTimeDifference(timestamp) {
+export function getTimeDifference(timestamp: number) {
     const currentDate = new Date();
     const givenDate = new Date(timestamp);
-    const differenceInMs = currentDate - givenDate;
+    const differenceInMs = currentDate.getTime() - givenDate.getTime();
 
     const differenceInMinutes = Math.floor(differenceInMs / (1000 * 60));
     if (differenceInMinutes < 60) {

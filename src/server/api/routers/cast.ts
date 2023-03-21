@@ -2,7 +2,6 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
-import { env } from "../../../env.mjs";
 import { TRPCError } from "@trpc/server";
 
 export const castsRouter = createTRPCRouter({

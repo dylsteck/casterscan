@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.16",
+    "@reduxjs/toolkit": "^1.9.3",
     "@standard-crypto/farcaster-js": "^5.5.3",
     "@supabase/supabase-js": "^2.10.0",
     "@tanstack/react-query": "^4.20.2",

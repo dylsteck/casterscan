@@ -1,9 +1,6 @@
-import React, { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import Header from './Header'
-const inter = Inter({ subsets: ['latin'] })
 
 type LayoutProps = {
   children: ReactNode;

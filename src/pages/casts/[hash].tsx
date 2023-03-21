@@ -1,25 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import React from 'react';
 import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
-import { getTimeDifference } from '../../lib/time';
-
-import {
-  ArrowPathRoundedSquareIcon,
-  ChatBubbleBottomCenterIcon,
-  HeartIcon,
-} from '@heroicons/react/24/outline';
 
 const CastByHash = () => {
 
   const router = useRouter();
   const { hash } = router.query;
   const queryResult = api.casts.getCastByHash.useQuery(
-  { hash: hash },
-  { enabled: true }
-);
+    { hash: hash as string },
+    { enabled: true }
+  ); 
 
   return (
     <>
@@ -31,33 +23,34 @@ const CastByHash = () => {
                <div className="flex items-center">
                </div>
                <p className="ml-auto text-sm float-right text-md">Cast</p>
-               <p className="text-2xl">{queryResult.data.cast.text}</p>
+               <p className="text-2xl">{queryResult.data?.cast?.text || ''}</p>
             </div>
             <TableRow 
-                field="Cast Hash" 
-                image={false} 
-                result={queryResult.data.cast.hash} />
+              field="Cast Hash"
+              image={false}
+              result={queryResult.data?.cast?.hash as string} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Casted By" 
                 image={true} 
-                imageUrl={queryResult.data.cast.author_pfp_url} 
-                imageAlt={`@${queryResult.data.cast.author_username}'s PFP'`} 
-                result={`${queryResult.data.cast.author_display_name} · @${queryResult.data.cast.author_username}`} />
+                imageUrl={queryResult.data?.cast?.author_pfp_url as string || ''} 
+                imageAlt={`@${queryResult.data?.cast?.author_username as string || ''}'s PFP`} 
+                result={`${queryResult.data?.cast?.author_display_name as string || ''} · @${queryResult.data?.cast?.author_username as string || ''}`} />
             <TableRow 
                 field="Casted At" 
                 image={false} 
-                result={new Date(queryResult.data.cast.published_at).toLocaleString()} />
+                result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at as string).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Likes" 
                 image={false} 
-                result={queryResult.data.cast.reactions_count} />
+                result={String(queryResult.data?.cast?.reactions_count || 0)} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Recasts" 
                 image={false} 
-                result={queryResult.data.cast.recasts_count}
+                result={String(queryResult.data?.cast?.recasts_count || 0)} imageUrl={''} imageAlt={''} />
+            <TableRow 
                 field="Replies" 
                 image={false} 
-                result={queryResult.data.cast.replies_count} />
+                result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
           </div>
           <div className="w-2/3">
             <div className="pt-[3.5vh] p-5">

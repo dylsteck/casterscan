@@ -1,12 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
-
-import {
-  ArrowPathRoundedSquareIcon,
-  ChatBubbleBottomCenterIcon,
-  HeartIcon,
-} from '@heroicons/react/24/outline';
+import Image from 'next/image';
 
 const UserByFid = () => {
 
@@ -14,7 +9,7 @@ const UserByFid = () => {
   const { fid } = router.query;
 
   const queryResult = api.user.getUserPageData.useQuery(
-  { fid: fid },
+  { fid: fid as string },
   { enabled: !!fid }
 );
 
@@ -34,8 +29,10 @@ const UserByFid = () => {
           ">
             <article className='w-1/2'>
               <div className='flex flex-row m-2 '>
-                <img src={queryResult.data.user?.avatar_url || "/assets/img/casterScanIcon.png"}
+                <Image src={queryResult.data.user?.avatar_url as string}
                   alt="User pfp." 
+                  width={96}
+                  height={96}
                   className="
                     w-24 h-24
                 "/>

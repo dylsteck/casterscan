@@ -28,7 +28,9 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
           <p
             className="font-medium ml-2 overflow-x-auto whitespace-nowrap"
             onClick={() => {
-              navigator.clipboard.writeText(result);
+              void navigator.clipboard.writeText(result).catch(() => {
+                console.error('Failed to copy text to clipboard');
+              });
             }}
           >
             {/* If result is a hash, it truncates the hash */}

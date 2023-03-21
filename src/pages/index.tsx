@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import Filters from '../components/Filters';
 import Gallery from '../components/Gallery';
 
