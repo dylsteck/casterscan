@@ -4,30 +4,38 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 
+import { FlattenedProfile } from "~/types/indexer";
+
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
     .input(
       z.object({
-        fid: z.string()
+        fid: z.string().transform(f => z.coerce.number().parse(f))
       })
     )
     .query(async ({ input }) => {
+      console.log("initing query to supabase.");
       const { data: userData, error: userError } = await supabase
         .from('profile')
         .select('*')
         .eq('id', input.fid)
+        .limit(1)
         .single();
   
-      if (userError || !userData) throw new TRPCError({
-        message: "Invalid user.",
-        code: "NOT_FOUND",
-        cause: "User FID may not be registered."
-      });
+      if (userError || !userData) {
+        console.log(userError);
+        throw new TRPCError({
+          message: "Invalid user.",
+          code: "NOT_FOUND",
+          cause: "User FID may not be registered."
+        })
+      };
 
-      const user = userData;
+      const user = userData as FlattenedProfile;
 
       // TODO: Add list of user's most recent casts
       
+      console.log(user);
       return {
         user
       };
