@@ -1,23 +1,38 @@
-export function getTimeDifference(timestamp: number) {
-    const currentDate = new Date();
-    const givenDate = new Date(timestamp);
-    const differenceInMs = currentDate.getTime() - givenDate.getTime();
+/**
+  * Returns the relative time since cast was posted
+  * Eg: 5 months ago, 1 second ago, two weeks ago
+  * */
+export function getRelativeTime(castDate: Date) {
+  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
-    const differenceInMinutes = Math.floor(differenceInMs / (1000 * 60));
-    if (differenceInMinutes < 60) {
-        return `${differenceInMinutes}m`;
-    }
+  const now = new Date();
+  const diffMs = now.getTime() - castDate.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
 
-    const differenceInHours = Math.floor(differenceInMs / (1000 * 60 * 60));
-    if (differenceInHours < 24) {
-        return `${differenceInHours}h`;
-    }
+  if (Math.abs(diffSeconds) < 60) {
+    return rtf.format(-diffSeconds, 'second');
+  }
 
-    const differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
-    if (differenceInDays < 30) {
-        return `${differenceInDays}d`;
-    }
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (Math.abs(diffMinutes) < 60) {
+    return rtf.format(-diffMinutes, 'minute');
+  }
 
-    const differenceInMonths = Math.floor(differenceInMs / (1000 * 60 * 60 * 24 * 30));
-    return `${differenceInMonths}mo`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (Math.abs(diffHours) < 24) {
+    return rtf.format(-diffHours, 'hour');
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (Math.abs(diffDays) < 7) {
+    return rtf.format(-diffDays, 'day');
+  }
+
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (Math.abs(diffWeeks) < 4) {
+    return rtf.format(-diffWeeks, 'week');
+  }
+
+  const diffMonths = Math.floor(diffWeeks / 4);
+  return rtf.format(-diffMonths, 'month');
 }

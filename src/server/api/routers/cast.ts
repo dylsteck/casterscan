@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
+import { FlattenedCast } from "~/types/indexer";
 
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
@@ -23,7 +24,7 @@ export const castsRouter = createTRPCRouter({
         cause: "An error occurred while fetching the latest casts."
       });
 
-      const casts = castData;
+      const casts = castData as FlattenedCast[];
 
       return {
         casts
@@ -47,7 +48,7 @@ export const castsRouter = createTRPCRouter({
           cause: "An error occurred while fetching the cast."
         });
         
-        const cast = castData[0]
+        const cast = castData[0] as FlattenedCast;
         return {
           cast
         };
