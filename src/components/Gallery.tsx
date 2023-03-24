@@ -3,16 +3,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '~/utils/api';
 import { getRelativeTime } from '../lib/time';
+import localData from '../lib/localData.json';
 
 const Gallery: React.FC = () => {
-  const { data: latestCasts } = api.casts.getLatestCasts.useQuery(
-    { limit: 30 }, 
-    { refetchOnWindowFocus: false} // for development
-  );
-    
+  const isProd = false;
+  const queryResult = isProd ? api.casts.getLatestCasts.useQuery(
+    { limit:30 },
+    { refetchOnWindowFocus: false } // for development
+  ) : { data: { casts: localData.casts } }; 
   return (
     <div className="w-screen lg:w-full flex flex-wrap mt-[5vh] text-white">
-      {latestCasts?.casts.map((cast, index) => (
+      {queryResult.data?.casts.map((cast, index) => (
         <div key={cast.text.length / cast.author_fid} className={`w-full md:w-1/2 lg:w-1/3 ${index % 3 !== 0 ? 'border-l border-white' : ''}`}>
           <Link href={`casts/${cast.hash as string}`}>
               <div className={`border-t border-white ${index === 0 ? 'pt-1' : ''} p-2`}>

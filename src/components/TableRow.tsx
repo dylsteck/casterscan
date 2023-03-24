@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 interface TableRowProps {
   field: string;
@@ -10,6 +11,19 @@ interface TableRowProps {
 }
 
 const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, result }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    void navigator.clipboard.writeText(result).then(() => {
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    }).catch(() => {
+      console.error('Failed to copy text to clipboard');
+    });
+  }
+
   return (
     <>
       <div className="w-[100%] border-t border-white relative mt-[2.5vh]"></div>
@@ -25,19 +39,34 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
               className="rounded-sm w-10 h-10"
             />
           )}
-          <p
-            className="font-medium ml-2 overflow-x-auto whitespace-nowrap"
-            onClick={() => {
-              void navigator.clipboard.writeText(result).catch(() => {
-                console.error('Failed to copy text to clipboard');
-              });
-            }}
+          <motion.div
+            className="flex items-center"
+            onClick={handleCopy}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            {/* If result is a hash, it truncates the hash */}
-            {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
-          </p>
+            <p
+              className="font-medium ml-2 overflow-x-auto whitespace-nowrap"
+            >
+              {/* If result is a hash, it truncates the hash */}
+              {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
+            </p>
+          </motion.div>
         </div>
       </div>
+      {copied && (
+        <motion.div
+          className="bg-gray-500 text-white rounded-md px-2 py-1 absolute top-0 right-0 mr-5 mt-2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-sm">Copied to clipboard</p>
+        </motion.div>
+      )}
     </>
   );
 };
