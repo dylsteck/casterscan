@@ -1,5 +1,4 @@
 import React from 'react';
-import Filters  from '../../components/Filters';
 import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import { useRouter } from 'next/router';
@@ -25,7 +24,7 @@ const CastByHash = () => {
             <div className="pt-[3.5vh] p-5">
                <div className="flex items-center">
                </div>
-               <p className="text-2xl">{queryResult.data?.cast?.text || ''}</p>
+               <p className="text-2xl text-white">{queryResult.data?.cast?.text || ''}</p>
             </div>
             <TableRow 
               field="Cast Hash"
@@ -54,7 +53,9 @@ const CastByHash = () => {
                 image={false} 
                 result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
           </div>
-            <Gallery />
+          <div className="w-2/3">
+            <Gallery user={queryResult.data?.cast?.author_username as string} />
+          </div>
         </div>
       ))}
     </>
