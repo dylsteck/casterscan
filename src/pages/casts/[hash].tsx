@@ -17,8 +17,7 @@ const CastByHash = () => {
 
   return (
     <>
-      { isProd && queryResult.isFetching ? "Loading" : (
-        isProd && !queryResult.isSuccess ? "Invalid Hash" : (
+      { isProd && !queryResult.data ? "Loading" : (
         <div className="flex flex-col md:flex-row">
           <div className="border-r border-white mt-[1.25vh] w-full md:w-1/2">
             <div className="pt-[3.5vh] p-5">
@@ -39,7 +38,7 @@ const CastByHash = () => {
             <TableRow 
                 field="Casted At" 
                 image={false} 
-                result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at as string).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
+                result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Likes" 
                 image={false} 
@@ -57,7 +56,7 @@ const CastByHash = () => {
             <Gallery user={queryResult.data?.cast?.author_username as string} />
           </div>
         </div>
-      ))}
+      )}
     </>
 );
 }

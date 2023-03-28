@@ -29,7 +29,7 @@ const Header: React.FC = () => {
           <form className="relative text-gray-400 block"
             onSubmit={e => {
               e.preventDefault();
-              triggerSearch(input, router, supabaseAnonClient);
+              void triggerSearch(input, router, supabaseAnonClient);
           }}>
             <input 
               type="text" 

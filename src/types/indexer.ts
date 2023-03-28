@@ -29,7 +29,7 @@ export interface Profile {
   profile?: {
     bio: {
       text: string
-      mentions: any[]
+      mentions: ProfileCore[]
     }
   }
   followerCount?: number
@@ -69,7 +69,7 @@ export interface Cast {
   }
   recasts: {
     count: number
-    recasters: Array<any>
+    recasters: Array<ProfileCore>
   }
   watches: {
     count: number
@@ -111,7 +111,7 @@ export interface FlattenedCast {
   author_pfp_url: string | null
   author_pfp_verified: boolean | null
   text: string
-  published_at: Date
+  published_at: string
   mentions: ProfileCore[] | null
   replies_count: number
   reactions_count: number

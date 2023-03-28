@@ -4,7 +4,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 
-import { FlattenedProfile } from "~/types/indexer";
+import type { FlattenedProfile } from "~/types/indexer";
 
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
@@ -29,7 +29,7 @@ export const userRouter = createTRPCRouter({
           code: "NOT_FOUND",
           cause: "User FID may not be registered."
         })
-      };
+      }
 
       const user = userData as FlattenedProfile;
 

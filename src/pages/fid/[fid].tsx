@@ -2,6 +2,8 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
 import Image from 'next/image';
+import Link from 'next/link';
+
 
 const UserByFid = () => {
 
@@ -43,7 +45,7 @@ const UserByFid = () => {
             text-xl
           ">
             <p className='text-red-400 font-bold'>Invalid FID</p>
-            <a href="/" className='text-purple-800 font-semibold '>{"←"} Go home</a>
+            <Link href="/" className='text-purple-800 font-semibold '>{"←"} Go home</Link>
           </div>
         ) : (
 

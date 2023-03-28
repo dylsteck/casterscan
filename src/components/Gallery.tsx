@@ -5,11 +5,13 @@ import Filters from './Filters';
 import { api } from '~/utils/api';
 import { getRelativeTime } from '../lib/time';
 import localData from '../lib/localData.json';
+import type { FlattenedCast }  from '../types/indexer';
+
 
 const Gallery: React.FC<{user: string}> = ({user}) => {
     const isProd = false;
-    const [sort, setSort] = useState('Date')
-    const [filter, setFilter] = useState('Casts')
+    const [sort, setSort] = useState<string>('Date')
+    const [filter, setFilter] = useState<string>('Casts')
     const queryResult = isProd ? api.casts.getLatestCasts.useQuery(
       { limit:30 },
       { refetchOnWindowFocus: false } // for development
@@ -42,7 +44,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         setFilter(value)
     }
 
-    const sortCasts = (casts: any[]) => {
+    const sortCasts = (casts: FlattenedCast[]) => {
         if (sort === "Date") {
             return casts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
         } else if (sort === "Trending") {
@@ -65,8 +67,8 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         changeFilter={handleChangeFilter}
     />
     <div className="w-screen lg:w-full flex flex-wrap mt-[5vh] text-white">
-      {queryResult.data?.casts && sortCasts(queryResult.data.casts).map((cast, index) => (
-        <div 
+      {queryResult.data?.casts && sortCasts(queryResult.data.casts).map((cast: FlattenedCast, index: number) => (        
+      <div 
             key={cast.text.length / cast.author_fid} 
             className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
             <div 
@@ -89,7 +91,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
                   </p>
                 </div>
               </div>
-              <Link href={`/casts/${cast.hash as string}`}>
+              <Link href={`/casts/${cast.hash}`}>
                 <p className="p-3 break-words justify-center">{renderCastText(cast.text)}</p>
               </Link>
             </div>
