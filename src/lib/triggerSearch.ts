@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { AlchemyProvider, ethers } from "ethers";
+// import { AlchemyProvider, ethers } from "ethers";
 import type { NextRouter } from "next/router";
 import { z } from "zod";
 

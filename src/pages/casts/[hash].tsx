@@ -36,7 +36,7 @@ const CastByHash = () => {
                 image={true} 
                 imageUrl={queryResult.data?.cast?.author_pfp_url as string || ''} 
                 imageAlt={`@${queryResult.data?.cast?.author_username as string || ''}'s PFP`} 
-                result={`${queryResult.data?.cast?.author_display_name as string || ''} · @${queryResult.data?.cast?.author_username as string || ''}`} />
+                result={`@${queryResult.data?.cast?.author_username as string || ''}`} />
             <TableRow 
                 field="Casted At" 
                 image={false} 
