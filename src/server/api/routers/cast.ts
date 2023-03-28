@@ -18,11 +18,14 @@ export const castsRouter = createTRPCRouter({
         .select('*')
         .limit(input.limit || 100);
 
-      if (castError || !castData) throw new TRPCError({
-        message: "Failed to fetch latest casts.",
-        code: "NOT_FOUND",
-        cause: "An error occurred while fetching the latest casts."
-      });
+      if (castError || !castData) {
+        console.log("Error:\n", castError);
+        throw new TRPCError({
+          message: "Failed to fetch latest casts.",
+          code: "NOT_FOUND",
+          cause: "An error occurred while fetching the latest casts."
+        });
+      };
 
       const casts = castData as FlattenedCast[];
 
@@ -42,11 +45,14 @@ export const castsRouter = createTRPCRouter({
         .select('*')
         .eq('hash', input.hash);
 
-        if (castError || !castData) throw new TRPCError({
-          message: "Failed to fetch cast.",
-          code: "NOT_FOUND",
-          cause: "An error occurred while fetching the cast."
-        });
+        if (castError || !castData) {
+          console.log("Error:\n", castError);
+          throw new TRPCError({
+            message: "Failed to fetch cast.",
+            code: "NOT_FOUND",
+            cause: "An error occurred while fetching the cast."
+          });
+        };
         
         const cast = castData[0] as FlattenedCast;
         return {

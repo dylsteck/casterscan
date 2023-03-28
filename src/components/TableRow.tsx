@@ -26,9 +26,9 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
 
   return (
     <>
-      <div className="w-[100%] border-t border-white relative mt-[2.5vh]"></div>
-      <div className="flex justify-between items-center ml-5 mt-[2.5vh]">
-        <p className="text-lg">{field}</p>
+      <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative "></div>
+      <div className="flex justify-between items-center ml-5 my-2">
+        <p className="text-sm text-gray-300">{field}</p>
         <div className="flex items-center mr-5">
           {image && (
             <Image
@@ -48,7 +48,7 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
             transition={{ duration: 0.5 }}
           >
             <p
-              className="font-medium ml-2 overflow-x-auto whitespace-nowrap"
+              className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300"
             >
               {/* If result is a hash, it truncates the hash */}
               {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
@@ -58,7 +58,7 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
       </div>
       {copied && (
         <motion.div
-          className="bg-gray-500 text-white rounded-md px-2 py-1 absolute top-0 right-0 mr-5 mt-2"
+          className="bg-gray-500 rounded-md px-2 py-1 absolute top-0 right-0 mr-5 mt-2"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}

@@ -18,6 +18,7 @@
     "@trpc/next": "^10.9.0",
     "@trpc/react-query": "^10.9.0",
     "@trpc/server": "^10.9.0",
+    "ethers": "^6.2.2",
     "framer-motion": "^10.8.5",
     "heroicons": "^2.0.16",
     "next": "^13.2.1",

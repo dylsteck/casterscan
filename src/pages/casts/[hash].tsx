@@ -9,18 +9,19 @@ const CastByHash = () => {
 
   const router = useRouter();
   const { hash } = router.query;
-  const isProd = false;
-  const queryResult = isProd ? api.casts.getCastByHash.useQuery(
-    { hash: hash as string },
-    { enabled: true }
-  ) : { data: { cast: localData.cast } }; 
+  const queryResult = api.casts.getCastByHash.useQuery({
+    hash: hash as string 
+  }, {
+    enabled: true,
+    refetchOnWindowFocus: false 
+  });
 
   return (
     <>
-      { isProd && queryResult.isFetching ? "Loading" : (
-        isProd && !queryResult.isSuccess ? "Invalid Hash" : (
-        <div className="h-screen flex flex-col md:flex-row">
-          <div className="border-r border-white mt-[1.25vh] w-full md:w-1/3">
+      { queryResult.isFetching ? "Loading" : (
+        !queryResult.isSuccess ? "Invalid Hash" : (
+        <div className="h-screen flex flex-col md:flex-row text-white">
+          <div className="border-r-2 border-purple-800 mt-[1.25vh] w-full md:w-1/3">
             <div className="pt-[3.5vh] p-5">
                <div className="flex items-center">
                </div>
@@ -39,7 +40,7 @@ const CastByHash = () => {
             <TableRow 
                 field="Casted At" 
                 image={false} 
-                result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at as string).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
+                result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Likes" 
                 image={false} 
@@ -63,52 +64,6 @@ const CastByHash = () => {
           </div>
         </div>
       ))}
-      { !isProd && (
-        <div className="h-screen flex flex-col md:flex-row">
-          <div className="border-r border-white mt-[1.25vh] w-full md:w-1/3">
-            <div className="pt-[3.5vh] p-5">
-               <div className="flex items-center">
-               </div>
-               <p className="ml-auto text-sm float-right text-md">Cast</p>
-               <p className="text-2xl">{localData.cast?.text || ''}</p>
-            </div>
-            <TableRow 
-              field="Cast Hash"
-              image={false}
-              result={localData.cast?.hash as string} imageUrl={''} imageAlt={''} />
-            <TableRow 
-                field="Casted By" 
-                image={true} 
-                imageUrl={localData.cast?.author_pfp_url as string || ''} 
-                imageAlt={`@${localData.cast?.author_username as string || ''}'s PFP`} 
-                result={`${localData.cast?.author_display_name as string || ''} · @${localData.cast?.author_username as string || ''}`} />
-            <TableRow 
-                field="Casted At" 
-                image={false} 
-                result={localData.cast ? new Date(localData.cast.published_at as string).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
-            <TableRow 
-                field="Likes" 
-                image={false} 
-                result={String(localData.cast?.reactions_count || 0)} imageUrl={''} imageAlt={''} />
-            <TableRow 
-                field="Recasts" 
-                image={false} 
-                result={String(localData.cast?.recasts_count || 0)} imageUrl={''} imageAlt={''} />
-            <TableRow 
-                field="Replies" 
-                image={false} 
-                result={String(localData.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
-          </div>
-          <div className="w-2/3">
-            <div className="pt-[3.5vh] p-5">
-               <div className="flex items-center">
-               </div>
-               <p className="text-2xl">Recent Casts</p>
-            </div>
-            <Gallery />
-          </div>
-        </div>
-      )}
     </>
   )
 }

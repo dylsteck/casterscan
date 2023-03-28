@@ -15,7 +15,9 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-  // NEXT_PUBLIC_CLIENTVAR: z.string().min(1),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+  NEXT_PUBLIC_ALCHEMY_API_KEY: z.string(),
 });
 
 /**
@@ -28,6 +30,9 @@ const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_KEY: process.env.SUPABASE_KEY,
+  NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY, 
+  NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_KEY,
 };
 
 // Don't touch the part below
