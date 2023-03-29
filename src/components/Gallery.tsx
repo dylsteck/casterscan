@@ -15,7 +15,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
     const queryResult = isProd ? api.casts.getLatestCasts.useQuery(
       { limit:30 },
       { refetchOnWindowFocus: false } // for development
-    ) : { data: { casts: localData.casts } }; 
+    ) : { data: { casts: localData.casts } } as { data: { casts: FlattenedCast[] } } | undefined; 
 
     const renderCastText = (text: string) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
@@ -67,7 +67,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         changeFilter={handleChangeFilter}
     />
     <div className="w-screen lg:w-full flex flex-wrap mt-[5vh] text-white">
-      {queryResult.data?.casts && sortCasts(queryResult.data.casts).map((cast: FlattenedCast, index: number) => (        
+      {queryResult?.data?.casts && sortCasts(queryResult.data.casts).map((cast: FlattenedCast, index: number) => (        
       <div 
             key={cast.text.length / cast.author_fid} 
             className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
@@ -81,7 +81,9 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
                     alt={`@${cast.author_username as string}'s PFP`} 
                     width={20} height={20} 
                     className="rounded-full w-6 h-6" />
-                <p className="ml-3">@{cast.author_username}</p>
+                <Link href={`/fid/${cast.author_fid}`}>
+                    <p className="ml-3">@{cast.author_username}</p>
+                </Link>
                 <div className="relative ml-auto text-sm group min-w-[30ch] self-start text-gray-300">
                   <p className='absolute top-0 right-0 group-hover:text-transparent transition-colors duration-200'>
                       {getRelativeTime(new Date(cast.published_at))}

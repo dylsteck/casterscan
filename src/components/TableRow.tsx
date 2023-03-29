@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 interface TableRowProps {
   field: string;
   image: boolean;
-  imageUrl: string;
-  imageAlt: string;
+  imageUrl?: string;
+  imageAlt?: string;
   result: string;
 }
 
@@ -32,8 +32,8 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
         <div className="flex items-center mr-5">
           {image && (
             <Image
-              src={imageUrl}
-              alt={imageAlt}
+              src={imageUrl || ''}
+              alt={imageAlt || ''}
               width={35}
               height={35}
               className="rounded-sm w-10 h-10"

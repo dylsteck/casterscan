@@ -6,6 +6,7 @@ import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
 import localData from '../../lib/localData.json';
+import type { Profile }  from '../../types/indexer';
 
 
 const UserByFid = () => {
@@ -16,8 +17,11 @@ const UserByFid = () => {
   const queryResult = isProd ? api.user.getUserPageData.useQuery({
     fid: fid as string
   }, {
-    refetchOnWindowFocus: false
-  }): {data: {fid: localData.fid }};
+    refetchOnWindowFocus: false,
+    onError: (err) => {
+      console.log(err)
+    }
+  }): {data: {user: localData.fid as unknown as Profile}} ;
 
   console.log(queryResult)
   return (
@@ -39,43 +43,43 @@ const UserByFid = () => {
                </div>
               <div className="flex">
                 <div>
-                  <Image alt="User PFP" src={queryResult.data?.fid?.pfp.url as string} width={50} height={50} />
+                  {queryResult.data?.user?.pfp?.url && <Image alt="User PFP" src={queryResult.data?.user?.pfp.url} width={50} height={50} />}
                 </div>
                 <div>
-                  <p className="text-2xl text-white mt-2 ml-3">{queryResult.data?.fid?.displayName || ''}</p>
-                  <p className="text-lg text-white mt-2 ml-3">{queryResult.data?.fid?.profile.bio.text || ''}</p>                </div>
+                  <p className="text-2xl text-white mt-2 ml-3">{queryResult.data?.user?.displayName || ''}</p>
+                  <p className="text-lg text-white mt-2 ml-3">{queryResult.data?.user?.profile?.bio?.text || ''}</p>                </div>
               </div>
             </div>
             <TableRow 
               field="Followers"
               image={false}
-              result={queryResult.data?.fid?.followerCount as string} imageUrl={''} imageAlt={''} />
+              result={queryResult.data?.user?.followerCount?.toString() as string} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Following" 
                 image={false} 
-                result={queryResult.data?.fid?.followingCount as string} />
+                result={queryResult.data?.user?.followingCount?.toString() as string} />
             <TableRow 
                 field="Username" 
                 image={false} 
-                result={queryResult.data?.fid?.username as string} />
+                result={queryResult.data?.user?.username as string} />
             <TableRow 
                 field="FID" 
                 image={false} 
-                result={queryResult.data?.fid?.fid as string} />
-            {queryResult.data?.fid?.profile.location.description.length > 0 && 
+                result={queryResult.data?.user?.fid?.toString() as string} />
+            {typeof queryResult.data?.user?.profile?.location?.description !== 'undefined' && 
             <>
               <TableRow 
                 field="Location" 
                 image={false} 
-                result={queryResult.data?.fid?.profile.location.description as string} />
+                result={queryResult.data?.user?.profile?.location?.description} />
             </>
             }
-            {queryResult.data?.fid?.referrerUsername.length > 0 && 
+            {typeof queryResult.data?.user?.referrerUsername !== 'undefined' && 
             <>
               <TableRow 
                 field="Referrer" 
                 image={false} 
-                result={queryResult.data?.fid?.referrerUsername as string} />
+                result={queryResult.data?.user?.referrerUsername} />
             </>
             }
           </div>

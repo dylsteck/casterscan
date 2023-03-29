@@ -4,7 +4,8 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 
-import type { FlattenedProfile } from "~/types/indexer";
+import type { Profile } from "~/types/indexer";
+// switched from FlattenedProfile
 
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
@@ -31,7 +32,7 @@ export const userRouter = createTRPCRouter({
         })
       }
 
-      const user = userData as FlattenedProfile;
+      const user = userData as Profile;
 
       // TODO: Add list of user's most recent casts
       

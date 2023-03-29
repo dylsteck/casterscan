@@ -20,16 +20,22 @@ interface ProfileCore {
   displayName: string
   pfp?: PFP
 }
-
 export interface Profile {
   fid: number
   username?: string
   displayName?: string
-  pfp?: PFP
+  pfp?: {
+    url: string
+    verified: boolean
+  }
   profile?: {
     bio: {
       text: string
-      mentions: ProfileCore[]
+      mentions: Array<string>
+    }
+    location?: {
+      placeId: string
+      description: string
     }
   }
   followerCount?: number
@@ -127,3 +133,4 @@ export interface FlattenedVerification {
   address: string
   created_at: Date
 }
+
