@@ -43,5 +43,5 @@ export default async function triggerSearch(input: string, router: NextRouter, s
     return;
   }
 
-  await router.push(`/hash/${input}`);
+  await router.push(`/casts/${input}`);
 }
