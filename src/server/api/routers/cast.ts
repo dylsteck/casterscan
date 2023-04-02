@@ -3,7 +3,6 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
-import type { FlattenedCast } from "~/types/indexer";
 
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
@@ -13,12 +12,12 @@ export const castsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const { data: castData, error: castError } = await supabase
+      const { data: casts, error: castError } = await supabase
         .from('casts')
-        .select('*')
+        .select()
         .limit(input.limit || 100);
 
-      if (castError || !castData) {
+      if (castError || !casts) {
         console.log("Error:\n", castError);
         throw new TRPCError({
           message: "Failed to fetch latest casts.",
@@ -26,8 +25,6 @@ export const castsRouter = createTRPCRouter({
           cause: "An error occurred while fetching the latest casts."
         });
       }
-
-      const casts = castData as FlattenedCast[];
 
       return {
         casts
@@ -42,7 +39,7 @@ export const castsRouter = createTRPCRouter({
       .query(async ({ input }) => {
         const { data: castData, error: castError } = await supabase
         .from('casts')
-        .select('*')
+        .select()
         .eq('hash', input.hash);
 
         if (castError || !castData) {
@@ -54,7 +51,7 @@ export const castsRouter = createTRPCRouter({
           });
         }
         
-        const cast = castData[0] as FlattenedCast;
+        const cast = castData[0];
         return {
           cast
         };

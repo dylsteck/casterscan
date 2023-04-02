@@ -4,18 +4,16 @@ import Link from 'next/link';
 import Filters from './Filters';
 import { api } from '~/utils/api';
 import { getRelativeTime } from '../lib/time';
-import localData from '../lib/localData.json';
-import type { FlattenedCast }  from '../types/indexer';
+import { Database } from '~/types/database.t';
 
 
 const Gallery: React.FC<{user: string}> = ({user}) => {
-    const isProd = false;
     const [sort, setSort] = useState<string>('Date')
     const [filter, setFilter] = useState<string>('Casts')
-    const queryResult = isProd ? api.casts.getLatestCasts.useQuery(
+    const queryResult = api.casts.getLatestCasts.useQuery(
       { limit:30 },
       { refetchOnWindowFocus: false } // for development
-    ) : { data: { casts: localData.casts } } as { data: { casts: FlattenedCast[] } } | undefined; 
+    );
 
     const renderCastText = (text: string) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
@@ -44,13 +42,13 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         setFilter(value)
     }
 
-    const sortCasts = (casts: FlattenedCast[]) => {
+    const sortCasts = (casts: Database['public']['Tables']['casts']['Row'][]) => {
         if (sort === "Date") {
-            return casts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
+          return casts.sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime());
         } else if (sort === "Trending") {
             return casts.sort((a, b) => {
-                const aTrendFactor = a.reactions_count + a.recasts_count + a.replies_count;
-                const bTrendFactor = b.reactions_count + b.recasts_count + b.replies_count;
+                const aTrendFactor = (a.reactions_count || 0) + (a.recasts_count || 0) + (a.replies_count || 0);
+                const bTrendFactor = (b.reactions_count || 0) + (b.recasts_count || 0) + (b.replies_count || 0);
                 return bTrendFactor - aTrendFactor;
             });
         }
@@ -67,12 +65,12 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         changeFilter={handleChangeFilter}
     />
     <div className="w-screen lg:w-full flex flex-wrap mt-[5vh] text-white">
-      {queryResult?.data?.casts && sortCasts(queryResult.data.casts).map((cast: FlattenedCast, index: number) => (        
+      {queryResult?.data?.casts && sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
       <div 
             key={cast.text.length / cast.author_fid} 
             className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
             <div 
-                className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 md:border-l md:border-l-0 h-full`} 
+                className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full`} 
                 style={{borderLeft: '2px solid #6b21a8'}}>
               <div 
                   className="flex items-center p-2">

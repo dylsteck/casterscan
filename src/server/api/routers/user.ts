@@ -4,9 +4,6 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 
-import type { Profile } from "~/types/indexer";
-// switched from FlattenedProfile
-
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
     .input(
@@ -15,10 +12,10 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      console.log("initing query to supabase.");
+      console.log("initing query to supabase for FID:", input.fid);
       const { data: userData, error: userError } = await supabase
         .from('profile')
-        .select('*')
+        .select()
         .eq('id', input.fid)
         .limit(1)
         .single();
@@ -32,7 +29,7 @@ export const userRouter = createTRPCRouter({
         })
       }
 
-      const user = userData as Profile;
+      const user = userData;
 
       // TODO: Add list of user's most recent casts
       

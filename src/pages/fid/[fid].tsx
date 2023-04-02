@@ -1,92 +1,97 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
 import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
-import localData from '../../lib/localData.json';
-import type { Profile }  from '../../types/indexer';
-
+import { Database } from '~/types/database.t';
 
 const UserByFid = () => {
 
   const router = useRouter();
-  const { fid } = router.query;
-  const isProd = false
-  const queryResult = isProd ? api.user.getUserPageData.useQuery({
-    fid: fid as string
-  }, {
-    refetchOnWindowFocus: false,
-    onError: (err) => {
-      console.log(err)
-    }
-  }): {data: {user: localData.fid as unknown as Profile}} ;
+  const t = api.useContext();
+  const [user, setUser] = useState<Database['public']['Tables']['profile']['Row']>();
 
-  console.log(queryResult)
+  useEffect(() => {
+    if (!router.isReady) {
+      console.log("router not yet ready.");
+      return;
+    }
+    const { fid } = router.query
+    if (!fid) {
+      console.log("unable to get fid");
+      return;
+    }
+
+    async function getUser() {
+      console.log("getting user");
+      const { user: profile } = await t.user.getUserPageData.fetch({fid: fid as string});
+      setUser(profile);
+    }
+
+    getUser();
+
+  }, [])
+
   return (
     <main className="
       flex flex-col
       items-center justify-center
       min-h-fit
     ">
-      { isProd && !queryResult.data ?
-      <div className="mt-16 p-7 text-xl">
-        <p className='text-red-400 font-bold'>Invalid FID</p>
-        <Link href="/" className='text-purple-800 font-semibold '>{"←"} Go home</Link>
-      </div>
-         :
-      <div className="flex flex-col md:flex-row">
-          <div className="border-r border-white mt-[1.25vh] w-full md:w-1/2">
-            <div className="pt-[3.5vh] p-5">
-               <div className="flex items-center">
-               </div>
-              <div className="flex">
-                <div>
-                  {queryResult.data?.user?.pfp?.url && <Image alt="User PFP" src={queryResult.data?.user?.pfp.url} width={50} height={50} />}
+      { !user &&
+        <div className="mt-16 p-7 text-xl">
+          <p className='text-red-400 font-bold'>Loading...</p>
+          <svg className="w-6 h-6 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+          </svg>
+        </div>
+      }
+
+      { user && <div className="flex flex-col md:flex-row">
+            <div className="border-r border-white mt-[1.25vh] w-full md:w-1/2">
+              <div className="pt-[3.5vh] p-5">
+                 <div className="flex items-center">
+                 </div>
+                <div className="flex">
+                  <div>
+                    <Image alt="User PFP" src={user.avatar_url || "https://explorer.farcaster.xyz/avatar.png"} width={50} height={50} />
+                  </div>
+                  <div>
+                    <p className="text-2xl text-white mt-2 ml-3">{user.display_name || ''}</p>
+                    <p className="text-lg text-white mt-2 ml-3">{user.bio || ''}</p>                </div>
                 </div>
-                <div>
-                  <p className="text-2xl text-white mt-2 ml-3">{queryResult.data?.user?.displayName || ''}</p>
-                  <p className="text-lg text-white mt-2 ml-3">{queryResult.data?.user?.profile?.bio?.text || ''}</p>                </div>
               </div>
-            </div>
-            <TableRow 
-              field="Followers"
-              image={false}
-              result={queryResult.data?.user?.followerCount?.toString() as string} imageUrl={''} imageAlt={''} />
-            <TableRow 
+              <TableRow 
+                field="Followers"
+                image={false}
+                result={user.following?.toString() || ""} imageUrl={''} imageAlt={''} />
+              <TableRow 
                 field="Following" 
                 image={false} 
-                result={queryResult.data?.user?.followingCount?.toString() as string} />
-            <TableRow 
-                field="Username" 
-                image={false} 
-                result={queryResult.data?.user?.username as string} />
-            <TableRow 
-                field="FID" 
-                image={false} 
-                result={queryResult.data?.user?.fid?.toString() as string} />
-            {typeof queryResult.data?.user?.profile?.location?.description !== 'undefined' && 
-            <>
+                result={user.followers?.toString() || ""} imageUrl={''} imageAlt={''} />
               <TableRow 
-                field="Location" 
-                image={false} 
-                result={queryResult.data?.user?.profile?.location?.description} />
-            </>
-            }
-            {typeof queryResult.data?.user?.referrerUsername !== 'undefined' && 
-            <>
+                  field="Username" 
+                  image={false} 
+                  result={user.username || ""} />
               <TableRow 
-                field="Referrer" 
-                image={false} 
-                result={queryResult.data?.user?.referrerUsername} />
-            </>
-            }
+                  field="FID" 
+                  image={false} 
+                  result={user.id.toString()} />
+              {user.referrer && 
+              <>
+                <TableRow 
+                  field="Referrer" 
+                  image={false} 
+                  result={user.referrer} />
+              </>
+              }
+            </div>
+            <div className="w-2/3">
+              <Gallery user={user.username || ""} />
+            </div>
           </div>
-          <div className="w-2/3">
-            <Gallery user={''} />
-          </div>
-        </div>
       }
     </main>
   )
