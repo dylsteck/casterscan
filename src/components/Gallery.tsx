@@ -7,7 +7,7 @@ import { getRelativeTime } from '../lib/time';
 import { Database } from '~/types/database.t';
 
 
-const Gallery: React.FC<{user: string}> = ({user}) => {
+const Gallery: React.FC<{user: string, query?: string}> = ({user, query}) => {
     const [sort, setSort] = useState<string>('Date')
     const [filter, setFilter] = useState<string>('Casts')
     const queryResult = api.casts.getLatestCasts.useQuery(
@@ -79,7 +79,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
                     alt={`@${cast.author_username as string}'s PFP`} 
                     width={20} height={20} 
                     className="rounded-full w-6 h-6" />
-                <Link href={`/fid/${cast.author_fid}`}>
+                <Link href={`/users/${cast.author_username}`}>
                     <p className="ml-3">@{cast.author_username}</p>
                 </Link>
                 <div className="relative ml-auto text-sm group min-w-[30ch] self-start text-gray-300">

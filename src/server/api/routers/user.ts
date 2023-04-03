@@ -8,15 +8,15 @@ export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
     .input(
       z.object({
-        fid: z.string().transform(f => z.coerce.number().parse(f))
+        username: z.string()
       })
     )
     .query(async ({ input }) => {
-      console.log("initing query to supabase for FID:", input.fid);
+      console.log("initing query to supabase for username:", input.username);
       const { data: userData, error: userError } = await supabase
         .from('profile')
         .select()
-        .eq('id', input.fid)
+        .eq('username', input.username)
         .limit(1)
         .single();
   
@@ -25,7 +25,7 @@ export const userRouter = createTRPCRouter({
         throw new TRPCError({
           message: "Invalid user.",
           code: "NOT_FOUND",
-          cause: "User FID may not be registered."
+          cause: "User username may not be registered."
         })
       }
 

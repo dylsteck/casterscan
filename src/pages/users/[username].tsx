@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Database } from '~/types/database.t';
 
-const UserByFid = () => {
+const UserByUsername = () => {
 
   const router = useRouter();
   const t = api.useContext();
@@ -18,15 +18,15 @@ const UserByFid = () => {
       console.log("router not yet ready.");
       return;
     }
-    const { fid } = router.query
-    if (!fid) {
-      console.log("unable to get fid");
+    const { username } = router.query
+    if (!username) {
+      console.log("unable to get username");
       return;
     }
 
     async function getUser() {
       console.log("getting user");
-      const { user: profile } = await t.user.getUserPageData.fetch({fid: fid as string});
+      const { user: profile } = await t.user.getUserPageData.fetch({username: username as string});
       setUser(profile);
     }
 
@@ -97,4 +97,4 @@ const UserByFid = () => {
   )
 }
 
-export default UserByFid;
+export default UserByUsername;

@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
-import triggerSearch from '../lib/triggerSearch'
+import { api } from '~/utils/api';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from '../../public/casterScanIcon.png'
-import { createClient } from '@supabase/supabase-js';
 
 const Header: React.FC = () => {
 
-  const supabaseAnonClient = createClient(
-    "https://jzdvwdhdnueugpdzrsxb.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6ZHZ3ZGhkbnVldWdwZHpyc3hiIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY3ODA2MDA5OSwiZXhwIjoxOTkzNjM2MDk5fQ.tzpkcmX_9ztH25_PyZV2PVxeRbFafH9fmuGpaqeZvcs"
-  ); // remove from Git
-
   const [input, setInput] = useState('')
   const router = useRouter();
-  //mb-[5vh]
+  const [user, cast] = api.useQueries((t) => [
+    t.user.getUserPageData({username: input as string}, {enabled: false}),
+    t.casts.getCastByHash({hash: input as string}, {refetchOnWindowFocus: false, enabled: false})
+  ]);
+
+  const search = async () => {
+    const [refetchedUser, refetchedCast] = await Promise.all([
+      user.refetch(),
+      cast.refetch(),
+    ]);
+
+    const finalUser = refetchedUser.data
+    const finalCast = refetchedCast.data
+    if(typeof finalUser !== 'undefined'){
+      await router.push(`/users/${finalUser?.user?.username}`)
+    }
+    else if(typeof finalCast !== 'undefined'){
+      await router.push(`/casts/${finalCast?.cast?.hash}`)
+    }
+    else{
+      await router.push(`/search?q=${input}`)
+    }
+  };
+  
+  
   return (
     <nav className="bg-transparent border-purple-800 sticky top-3">
       <div className="container flex flex-wrap items-center justify-between mx-auto px-4 sm:px-0">
@@ -29,11 +47,11 @@ const Header: React.FC = () => {
           <form className="relative text-gray-400 block"
             onSubmit={e => {
               e.preventDefault();
-              void triggerSearch(input, router, supabaseAnonClient);
+              search();
           }}>
             <input 
               type="text" 
-              placeholder="Search by hash or FID" 
+              placeholder="Search by hash or username" 
               value={input}
               className="min-w-[30vw] form-input rounded-lg py-3 px-4 bg-white placeholder-gray-400 text-gray-500 appearance-none w-full block pl-5 focus:outline-none sm:min-w-[50vw]"
               onChange={(e) => setInput(e.target.value)}
