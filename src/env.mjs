@@ -7,7 +7,7 @@ import { z } from "zod";
 const server = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
   SUPABASE_URL: z.string().url(),
-  SUPABASE_KEY: z.string(),
+  SUPABASE_ANON_KEY: z.string(),
 });
 
 /**
@@ -17,7 +17,6 @@ const server = z.object({
 const client = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string(),
-  NEXT_PUBLIC_ALCHEMY_API_KEY: z.string(),
 });
 
 /**
@@ -29,10 +28,9 @@ const client = z.object({
 const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
   SUPABASE_URL: process.env.SUPABASE_URL,
-  SUPABASE_KEY: process.env.SUPABASE_KEY,
-  NEXT_PUBLIC_ALCHEMY_API_KEY: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY, // Fix this line
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
 };
 
 // Don't touch the part below

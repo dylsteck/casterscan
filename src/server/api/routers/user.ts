@@ -8,7 +8,7 @@ export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
     .input(
       z.object({
-        username: z.string()
+        username: z.string().min(1)
       })
     )
     .query(async ({ input }) => {

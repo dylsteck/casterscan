@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '~/utils/api';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/solid'
+import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -8,30 +8,30 @@ import logo from '../../public/casterScanIcon.png'
 
 const Header: React.FC = () => {
 
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState('');
+  const [searching, setSearching] = useState(false);
   const router = useRouter();
-  const [user, cast] = api.useQueries((t) => [
-    t.user.getUserPageData({username: input as string}, {enabled: false}),
-    t.casts.getCastByHash({hash: input as string}, {refetchOnWindowFocus: false, enabled: false})
-  ]);
+  const t = api.useContext();
 
   const search = async () => {
-    const [refetchedUser, refetchedCast] = await Promise.all([
-      user.refetch(),
-      cast.refetch(),
-    ]);
+    const usernameRegex = /^[a-z0-9][a-z0-9-]{0,15}$/;
+    const isSearchTermUsername = usernameRegex.test(input);
 
-    const finalUser = refetchedUser.data
-    const finalCast = refetchedCast.data
-    if(typeof finalUser !== 'undefined'){
-      await router.push(`/users/${finalUser?.user?.username}`)
+    if (isSearchTermUsername) {
+      const searchUser = await t.user.getUserPageData.fetch({ username: input });
+      if (searchUser) {
+        await router.push(`/users/${searchUser.user.username}/`);
+        return;
+      };
+    } else {
+      const searchCast = await t.casts.getCastByHash.fetch({ hash: input });
+      if (searchCast) {
+        await router.push(`/casts/${searchCast.cast?.hash}`);
+        return;
+      }
     }
-    else if(typeof finalCast !== 'undefined'){
-      await router.push(`/casts/${finalCast?.cast?.hash}`)
-    }
-    else{
-      await router.push(`/search?q=${input}`)
-    }
+
+    await router.push(`/search?q=${input}`);
   };
   
   
@@ -45,9 +45,11 @@ const Header: React.FC = () => {
         <div className="flex">
 
           <form className="relative text-gray-400 block"
-            onSubmit={e => {
+            onSubmit={async e => {
               e.preventDefault();
-              search();
+              setSearching(true);
+              await search();
+              setSearching(false);
           }}>
             <input 
               type="text" 
@@ -57,14 +59,17 @@ const Header: React.FC = () => {
               onChange={(e) => setInput(e.target.value)}
             />
 
-            <button className="
+            <button type="submit" className="
               bg-[#6F5B9C]
               rounded-md
               p-1.5 w-8 h-8
               absolute top-1/2 right-3
               transform -translate-y-1/2 
             ">
-              <MagnifyingGlassIcon className="w-full h-full text-white" />
+              { searching ?
+                <ArrowPathIcon className="animate-spin w-full h-full text-white" />
+                : <MagnifyingGlassIcon className=" w-full h-full text-white" />
+              }
             </button>
           </form>
 

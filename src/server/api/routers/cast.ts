@@ -59,7 +59,7 @@ export const castsRouter = createTRPCRouter({
     getCastByHash: publicProcedure
       .input(
         z.object({
-          hash: z.string()
+          hash: z.string().min(5)
         })
       )
       .query(async ({ input }) => {
