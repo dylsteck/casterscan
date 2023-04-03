@@ -15,7 +15,7 @@ const Filters: React.FC<FiltersProps> = ({ user, sort, changeSort, filter, chang
         <span>Sort by</span>
         <hr className="bg-white w-full mt-1" />
         <span className={`pt-1 ${sort === 'Date' ? 'font-bold' : ''}`} onClick={() => changeSort('Date')}>Date</span>
-        <span className={`pt-2 ${sort === 'Trending' ? 'font-bold' : ''}`} onClick={() => changeSort('Trending')}>Trending</span>
+        {filter !== 'Profiles' && <span className={`pt-2 ${sort === 'Trending' ? 'font-bold' : ''}`} onClick={() => changeSort('Trending')}>Trending</span>}
       </div>
       <div className="flex flex-col">
         <span>Filter</span>
@@ -24,7 +24,7 @@ const Filters: React.FC<FiltersProps> = ({ user, sort, changeSort, filter, chang
           <>
             <span className={`pt-1 ${filter === 'Casts' ? 'font-bold' : ''}`} onClick={() => changeFilter('Casts')}>Casts</span>
             <span className={`pt-2 ${filter === 'Casts + Replies' ? 'font-bold' : ''}`} onClick={() => changeFilter('Casts + Replies')}>Casts + Replies</span>
-            <span className={`pt-2 ${filter === 'Likes' ? 'font-bold' : ''}`} onClick={() => changeFilter('Likes')}>Likes</span>
+            {/* On hold until we index likes(could use Warpcast API though) <span className={`pt-2 ${filter === 'Likes' ? 'font-bold' : ''}`} onClick={() => changeFilter('Likes')}>Likes</span> */}
           </>
         ) : (
           <>

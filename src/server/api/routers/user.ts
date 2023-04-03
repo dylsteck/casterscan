@@ -38,4 +38,29 @@ export const userRouter = createTRPCRouter({
         user
       };
     }),
+    getLatestProfiles: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().optional()
+      })
+    )
+    .query(async ({ input }) => {
+      const { data: profiles, error: profileError } = await supabase
+        .from('profile')
+        .select()
+        .limit(input.limit || 100);
+
+      if (profileError || !profiles) {
+        console.log("Error:\n", profileError);
+        throw new TRPCError({
+          message: "Failed to fetch latest profiles.",
+          code: "NOT_FOUND",
+          cause: "An error occurred while fetching the latest profiles."
+        });
+      }
+
+      return {
+        profiles
+      };
+    }),
 });

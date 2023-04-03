@@ -14,7 +14,7 @@ const Search: NextPage = () => {
         <meta name="description" content="A block explorer for the Farcaster network" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Gallery user={''} query={q} />
+      <Gallery user={''} />
     </>
   );
 };

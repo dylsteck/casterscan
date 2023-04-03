@@ -30,6 +30,32 @@ export const castsRouter = createTRPCRouter({
         casts
       };
     }),
+    getCastsByUsername: publicProcedure
+    .input(
+      z.object({
+        username: z.string()
+      })
+    )
+    .query(async ({ input }) => {
+      const { data: casts, error: castError } = await supabase
+        .from('casts')
+        .select()
+        .eq('author_username', input.username)
+        .limit(30);
+
+      if (castError || !casts) {
+        console.log("Error:\n", castError);
+        throw new TRPCError({
+          message: "Failed to fetch user casts.",
+          code: "NOT_FOUND",
+          cause: "An error occurred while fetching the user's casts."
+        });
+      }
+
+      return {
+        casts
+      };
+    }),
     getCastByHash: publicProcedure
       .input(
         z.object({
