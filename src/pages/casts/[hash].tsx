@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
@@ -15,6 +15,29 @@ const CastByHash = () => {
     { refetchOnWindowFocus: false}
   );
 
+  const ExpandableImage = ({ imageUrl }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+  
+    return (
+      <div className="relative">
+        <div
+          className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} />
+        </div>
+        {isExpanded && (
+          <div
+            className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            onClick={() => setIsExpanded(false)}
+          >
+            <img src={`${imageUrl}.png`} alt="imgur image" className="max-w-full max-h-full" />
+          </div>
+        )}
+      </div>
+    );
+  };  
+
   const renderCastText = (text: string) => {
     const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
     const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
@@ -25,9 +48,9 @@ const CastByHash = () => {
       return (
         <>
           <p>{textWithoutImgur}</p>
-          {imgurMatches.map((match) => (
-            <div key={match.length + 1} className="mt-4 mb-4 flex justify-center">
-              <img src={`${match}.png`} alt="imgur image" width={400} height={400} className="max-w-[20ch] max-h-[20ch] object-contain" />
+          {imgurMatches.map((match, index) => (
+            <div key={index} className="mt-4 mb-4 flex justify-center">
+              <ExpandableImage imageUrl={match} />
             </div>
           ))}
         </>
@@ -105,9 +128,7 @@ const CastByHash = () => {
                 image={false} 
                 result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
           </div>
-          <div className="w-2/3">
-            <Gallery user={queryResult.data?.cast?.author_username as string} />
-          </div>
+          <Gallery user={queryResult.data?.cast?.author_username as string} />
         </div>
       )}
     </main>

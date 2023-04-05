@@ -15,6 +15,7 @@ export const castsRouter = createTRPCRouter({
       const { data: casts, error: castError } = await supabase
         .from('casts')
         .select()
+        .order('published_at', {ascending: false})
         .limit(input.limit || 100);
 
       if (castError || !casts) {
@@ -41,6 +42,7 @@ export const castsRouter = createTRPCRouter({
         .from('casts')
         .select()
         .eq('author_username', input.username)
+        .order('published_at', {ascending: false})
         .limit(30);
 
       if (castError || !casts) {

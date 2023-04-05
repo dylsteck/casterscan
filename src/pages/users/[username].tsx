@@ -123,9 +123,7 @@ const UserByUsername = () => {
               </>
               }
             </div>
-            <div className="w-2/3">
               <Gallery user={user.username || ""} />
-            </div>
           </div>
       }
     </main>
