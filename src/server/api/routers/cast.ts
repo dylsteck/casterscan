@@ -82,4 +82,29 @@ export const castsRouter = createTRPCRouter({
           cast
         };
       }),
+      getCastsByKeyword: publicProcedure
+      .input(
+        z.object({
+          keyword: z.string()
+        })
+      )
+      .query(async ({ input }) => {
+        const { data: castsData, error: castsError } = await supabase
+        .from('casts')
+        .select()
+        .textSearch('text', `'${input.keyword}'` as string, { type: 'plain', config: 'english' });
+
+        if (castsError || !castsData) {
+          console.log("Error:\n", castsError);
+          throw new TRPCError({
+            message: "Failed to fetch casts.",
+            code: "NOT_FOUND",
+            cause: "An error occurred while fetching casts."
+          });
+        }
+        const casts = castsData
+        return {
+          casts
+        };
+      }),
 });

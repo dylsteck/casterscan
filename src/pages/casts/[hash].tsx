@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import { useRouter } from 'next/router';
@@ -13,6 +14,43 @@ const CastByHash = () => {
     { hash: hash as string },
     { refetchOnWindowFocus: false}
   );
+
+  const renderCastText = (text: string) => {
+    const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
+    const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
+  
+    const imgurMatches = text.match(imgurRegex);
+    if (imgurMatches) {
+      const textWithoutImgur = text.replace(imgurRegex, '').trim();
+      return (
+        <>
+          <p>{textWithoutImgur}</p>
+          {imgurMatches.map((match) => (
+            <div key={match.length + 1} className="mt-4 mb-4 flex justify-center">
+              <img src={`${match}.png`} alt="imgur image" width={400} height={400} className="max-w-[20ch] max-h-[20ch] object-contain" />
+            </div>
+          ))}
+        </>
+      );
+    }
+  
+    const tokens = text.split(urlRegex);
+    return (
+      <p>
+        {tokens.map((token, index) => {
+          if (urlRegex.test(token)) {
+            const url = token.startsWith('http') ? token : `http://${token}`;
+            return (
+              <Link key={index} href={url}>
+                {token}
+              </Link>
+            );
+          }
+          return token;
+        })}
+      </p>
+    );
+  };
 
   return (
     <main className="
@@ -38,7 +76,7 @@ const CastByHash = () => {
             <div className="pt-[3.5vh] p-5">
                <div className="flex items-center">
                </div>
-               <p className="text-2xl text-white">{queryResult.data?.cast?.text || ''}</p>
+               <p className="text-2xl text-white">{renderCastText(queryResult.data?.cast?.text as string) || ''}</p>
             </div>
             <TableRow 
               field="Cast Hash"

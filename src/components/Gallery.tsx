@@ -4,20 +4,28 @@ import Filters from './Filters';
 import { api } from '~/utils/api';
 import { getRelativeTime } from '../lib/time';
 import { Database } from '~/types/database.t';
-
+import { useRouter } from 'next/router';
 
 const Gallery: React.FC<{user: string}> = ({user}) => {
     const [sort, setSort] = useState<string>('Date')
     const [filter, setFilter] = useState<string>('Casts')
-    const queryResult = user.length > 0 
-    ? api.casts.getCastsByUsername.useQuery(
-      { username: user },
-      { refetchOnWindowFocus: false } // for development
-    )
-    : api.casts.getLatestCasts.useQuery(
-      { limit: 30 },
-      { refetchOnWindowFocus: false } // for development
-    );
+    const router = useRouter()
+    const searchParam = router.query.q;
+
+    const queryResult = searchParam 
+    ? api.casts.getCastsByKeyword.useQuery(
+        { keyword: searchParam as string },
+        { refetchOnWindowFocus: false } // for development
+      )
+    : user.length > 0 
+      ? api.casts.getCastsByUsername.useQuery(
+        { username: user },
+        { refetchOnWindowFocus: false } // for development
+      )
+      : api.casts.getLatestCasts.useQuery(
+        { limit: 30 },
+        { refetchOnWindowFocus: false } // for development
+      );
 
     const profilesQueryResult = api.user.getLatestProfiles.useQuery(
       { limit:30 },
@@ -126,7 +134,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       <div className="w-screen lg:w-full flex flex-wrap mt-[5vh] text-white">
         {queryResult?.data?.casts && filter === 'Casts' ? sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
         <div 
-              key={cast.text.length / cast.author_fid} 
+              key={`cast-${cast.hash}-${index}`} 
               className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
               <div 
                   className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full`} 
@@ -157,7 +165,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
           </div>
         )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
           <div 
-              key={profile.bio?.toString().length} 
+              key={`profile-${profile.username}-${index}`} 
               className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
               <div 
                   className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full`} 

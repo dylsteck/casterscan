@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { api } from '~/utils/api';
 import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
 import Image from 'next/image';
@@ -12,6 +12,13 @@ const Header: React.FC = () => {
   const [searching, setSearching] = useState(false);
   const router = useRouter();
   const t = api.useContext();
+  const { q } = router.query;
+
+  useEffect(() => {
+    if (typeof q === 'undefined') {
+      setInput('');
+    }
+  }, [q]);
 
   const search = async () => {
     const usernameRegex = /^[a-z0-9][a-z0-9-]{0,15}$/;
@@ -19,7 +26,9 @@ const Header: React.FC = () => {
 
     if (isSearchTermUsername) {
       const searchUser = await t.user.getUserPageData.fetch({ username: input });
-      if (searchUser) {
+      // Note: added logic to replace user with TRPCError if error exists
+      // In future can change so there's a separate property called error
+      if (searchUser.user.name !== "TRPCError") {
         await router.push(`/users/${searchUser.user.username}/`);
         return;
       };
@@ -30,8 +39,8 @@ const Header: React.FC = () => {
         return;
       }
     }
-
-    await router.push(`/search?q=${input}`);
+    // If input not cast or user, push as search query
+    await router.push(`/?q=${input}`);
   };
   
   

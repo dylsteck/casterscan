@@ -1,8 +1,16 @@
 import { type NextPage } from "next";
+import { useRouter } from 'next/router'
 import Head from "next/head";
 import Gallery from '../components/Gallery';
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
+  const router = useRouter()
+  const { q } = router.query
+
+  useEffect(() => {
+    console.log("New q: ", q);
+  }, [q])
 
   return (
     <>
