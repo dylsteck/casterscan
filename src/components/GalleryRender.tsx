@@ -45,7 +45,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         );
       };      
     
-    const renderCastText = (text: string, hash: string) => {
+      const renderCastText = (text: string, hash: string) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
       
@@ -54,16 +54,11 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           const textWithoutImgur = text.replace(imgurRegex, '').trim();
           return (
             <>
-             {/* Still need to fix */}
-              {hash.length > 0 ? (
-                <div>
-                  <Link href={`/casts/${hash}`}>
-                    <p>{textWithoutImgur}</p>
-                  </Link>
-                </div>
-              ) : (
-                <><p>{textWithoutImgur}</p></>
-              )}
+              <div>
+                <Link href={`/casts/${hash}`}>
+                  <p>{textWithoutImgur}</p>
+                </Link>
+              </div>
               {imgurMatches.map((match, index) => (
                 <div key={index} className="mt-4 mb-4 flex justify-center">
                   <ExpandableImage imageUrl={match} />
@@ -71,7 +66,18 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
               ))}
             </>
           );
-    };
+        }
+        else{
+          return (
+            <>
+              <div>
+                <Link href={`/casts/${hash}`}>
+                  <p>{text}</p>
+                </Link>
+              </div>
+            </>
+          );
+        }
       
         const tokens = text.split(urlRegex);
         return (
@@ -118,7 +124,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
                 </p>
                 </div> */ }
             </div>
-                <p className="p-3 break-words justify-center">{renderCastText(cast?.text || profile?.bio || '', cast?.hash || '')}</p>
+                <p className="p-3 break-words justify-center">{renderCastText(cast?.text || profile?.bio || '', cast?.hash as string)}</p>
             </div>
         </div>
     )
