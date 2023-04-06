@@ -15,7 +15,11 @@ const CastByHash = () => {
     { refetchOnWindowFocus: false}
   );
 
-  const ExpandableImage = ({ imageUrl }) => {
+  interface ExpandableImageProps {
+    imageUrl: string;
+  }    
+
+  const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
   
     return (
@@ -24,7 +28,7 @@ const CastByHash = () => {
           className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} />
+          <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[40vh] pt-2.5 pb-5" />
         </div>
         {isExpanded && (
           <div

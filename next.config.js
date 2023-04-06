@@ -1,7 +1,15 @@
 // next.config.js
 module.exports = {
   images: {
-    domains: ['i.seadn.io', 'i.imgur.com', 'res.cloudinary.com', 'pbs.twimg.com', 'lh3.googleusercontent.com', 'd2qbf73089ujv4.cloudfront.net', 'explorer.farcaster.xyz'],
+    domains: [
+      'i.seadn.io',
+      'i.imgur.com',
+      'res.cloudinary.com',
+      'pbs.twimg.com',
+      'lh3.googleusercontent.com',
+      'd2qbf73089ujv4.cloudfront.net',
+      'explorer.farcaster.xyz',
+    ],
     remotePatterns: [
       {
         protocol: 'https',

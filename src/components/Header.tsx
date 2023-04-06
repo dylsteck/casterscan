@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from '../../public/casterScanIcon.png'
+import { TRPCError } from '@trpc/server';
 
 const Header: React.FC = () => {
 
@@ -23,12 +24,12 @@ const Header: React.FC = () => {
   const search = async () => {
     const usernameRegex = /^[a-z0-9][a-z0-9-]{0,15}$/;
     const isSearchTermUsername = usernameRegex.test(input);
-
+  
     if (isSearchTermUsername) {
       const searchUser = await t.user.getUserPageData.fetch({ username: input });
       // Note: added logic to replace user with TRPCError if error exists
       // In future can change so there's a separate property called error
-      if (searchUser.user.name !== "TRPCError") {
+      if (!(searchUser.user instanceof TRPCError)) {
         await router.push(`/users/${searchUser.user.username}/`);
         return;
       };
@@ -41,7 +42,7 @@ const Header: React.FC = () => {
     }
     // If input not cast or user, push as search query
     await router.push(`/?q=${input}`);
-  };
+  };  
   
   
   return (

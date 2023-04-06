@@ -32,13 +32,17 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       { refetchOnWindowFocus: false } // for development
     );
 
-    const ExpandableImage = ({ imageUrl }) => {
+    interface ExpandableImageProps {
+      imageUrl: string;
+    }    
+
+    const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
       const [isExpanded, setIsExpanded] = useState(false);
     
       return (
         <div className="relative">
           <div
-            className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
+            className="max-h-[1ch] object-contain cursor-pointer"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} />
@@ -65,7 +69,6 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         const textWithoutImgur = text.replace(imgurRegex, '').trim();
         return (
           <>
-           {/* Still need to fix */}
             {hash.length > 0 ? (
               <div>
                 <Link href={`/casts/${hash}`}>
@@ -90,9 +93,10 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
           {tokens.map((token, index) => {
             if (urlRegex.test(token)) {
               const url = token.startsWith('http') ? token : `http://${token}`;
+              const urlText = url.replace(/^https?:\/\/(www\.)?/, '');
               return (
                 <Link key={index} href={url}>
-                  {token}
+                  {urlText}
                 </Link>
               );
             }
@@ -100,7 +104,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
           })}
         </p>
       );
-    };
+    };    
     
 
     const handleChangeSort = (value: string) => {
@@ -143,11 +147,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
   }
 
   return (
-    <main className="
-      flex flex-col
-      items-center justify-center
-      min-h-fit
-    ">
+    <>
       <div className='self-start'>
         <Filters
             user={user}
@@ -169,7 +169,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         <GalleryRender profile={profile} index={index} />
       )) : null}
       </div>
-    </main>
+    </>
   );
 };
 export default Gallery;

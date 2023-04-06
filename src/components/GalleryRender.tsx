@@ -11,16 +11,27 @@ type GalleryRenderProps = {
   };
   
 export default function GalleryRender({ cast, profile, index }: GalleryRenderProps) {
-    const ExpandableImage = ({ imageUrl }) => {
+    
+    interface ExpandableImageProps {
+        imageUrl: string;
+      }    
+  
+      const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
         const [isExpanded, setIsExpanded] = useState(false);
       
         return (
-          <div className="relative">
+          <div className="relative mb-[5vh]">
             <div
-              className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
+              className="h-full object-contain cursor-pointer"
               onClick={() => setIsExpanded(!isExpanded)}
             >
-              <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} />
+              <img
+                src={`${imageUrl}.png`}
+                alt="imgur image"
+                width={400}
+                height={400}
+                className="w-auto h-auto max-h-[50vh] pt-2.5"
+              />
             </div>
             {isExpanded && (
               <div
@@ -32,10 +43,9 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
             )}
           </div>
         );
-      };
+      };      
     
     const renderCastText = (text: string, hash: string) => {
-        console.log("HASH", hash, hash.length);
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
       
