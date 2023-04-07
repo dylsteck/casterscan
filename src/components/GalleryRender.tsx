@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Database } from '~/types/database.t';
+import { getRelativeTime } from '~/lib/time';
 
 type GalleryRenderProps = {
     cast?: Database['public']['Tables']['casts']['Row'];
@@ -99,7 +100,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
 
       function stringify(value: unknown): string {
         return value === null || value === undefined ? '' : String(value);
-      }    
+      }
     
       return (
         <div
@@ -109,7 +110,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
                 className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full`}
                 style={{ borderLeft: '2px solid #6b21a8' }}>
                 <div
-                    className="flex items-center p-2">
+                    className="flex flex-row p-2 w-full ml-auto">
                     <Image
                         src={cast?.author_pfp_url ?? profile?.avatar_url ?? ''}
                         alt={`@${cast?.author_username ?? profile?.username ?? 'unknown'}'s PFP`}
@@ -118,8 +119,19 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
                     <Link href={`/users/${cast?.author_username || profile?.username || ''}`}>
                         <p className="ml-3">@{cast?.author_username ?? profile?.username}</p>
                     </Link>
+
+                    <div className="relative ml-auto group text-sm text-gray-300">
+                      <p className='block group-hover:hidden'>{getRelativeTime(new Date(cast?.published_at || new Date()))}</p>
+                      <p className="hidden group-hover:block">
+                        {
+                          (new Date(cast?.published_at || new Date()))
+                            .toUTCString()
+                            .slice(4, 16)
+                        }
+                      </p>
+                    </div>
                 </div>
-                <p className="p-3 break-words justify-center">{renderCastText(cast?.text ?? '', cast?.hash ?? '')}</p>
+                <div className="p-3 break-words justify-center">{renderCastText(cast?.text ?? '', cast?.hash ?? '')}</div>
             </div>
         </div>
     )  

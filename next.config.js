@@ -11,6 +11,9 @@ module.exports = {
       'explorer.farcaster.xyz',
       'openseauserdata.com',
       'media.discordapp.net',
+      'user-images.githubusercontent.com',
+      'img.seadn.io',
+      '*',
     ],
     remotePatterns: [
       {
@@ -67,7 +70,24 @@ module.exports = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'user-images.githubusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'img.seadn.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
-

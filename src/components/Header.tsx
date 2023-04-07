@@ -13,6 +13,8 @@ const Header: React.FC = () => {
   const [searching, setSearching] = useState(false);
   const router = useRouter();
   const t = api.useContext();
+  const fetchUser = api.user.getUserPageData.useQuery({ username: input}, { retry: false });
+  const fetchCast = api.casts.getCastByHash.useQuery({ hash: input }, { retry: false });
   const { q } = router.query;
 
   useEffect(() => {
@@ -24,24 +26,31 @@ const Header: React.FC = () => {
   const search = async () => {
     const usernameRegex = /^[a-z0-9][a-z0-9-]{0,15}$/;
     const isSearchTermUsername = usernameRegex.test(input);
-  
+
     if (isSearchTermUsername) {
-      const searchUser = await t.user.getUserPageData.fetch({ username: input });
-      // Note: added logic to replace user with TRPCError if error exists
-      // In future can change so there's a separate property called error
-    if (!(searchUser.user instanceof TRPCError)) {
-      await router.push(`/users/${searchUser.user?.username ?? ''}/`);
-      return;
-    }
-   } else {
-      const searchCast = await t.casts.getCastByHash.fetch({ hash: input });
-      if (searchCast) {
-        await router.push(`/casts/${searchCast.cast?.hash ?? ''}`);
+      const usernameFetch = await fetchUser.refetch();
+
+      if (usernameFetch.error?.message == "PGRST116") {
+        console.log("PGRST116 yes");
+        // early return as query matches username regex, but username not found => query is a text-query
+        await router.push(`/?q=${input}`);
         return;
       }
+
+      // query matches username regex and does not throw => userame exists;
+      await router.push(`/users/${usernameFetch.data?.user.username}`);
+      return;
+    }
+
+    // if the search term was a username, function wouldve already exited. 
+    const castFetch = await fetchCast.refetch();
+    if (castFetch.data) {
+      await router.push(`/casts/${castFetch.data.cast?.hash}`);
+      return;
     }
     // If input not cast or user, push as search query
     await router.push(`/?q=${input ?? ''}`);
+    return;
   };  
 
   const searchAsync = async (): Promise<void> => {
@@ -73,8 +82,6 @@ const Header: React.FC = () => {
         <div className="flex">
 
         <form className="relative text-gray-400 block" onSubmit={(e) => handleFormSubmit(e)}>
-
-
 
             <input 
               type="text" 

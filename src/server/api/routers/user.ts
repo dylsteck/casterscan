@@ -5,7 +5,7 @@ import { TRPCError } from "@trpc/server";
 import type { Database } from "~/types/database.t";
 
 type UserPageData = {
-  user: Database["public"]["Tables"]["profile"]["Row"] | TRPCError;
+  user: Database["public"]["Tables"]["profile"]["Row"];
 };
 
 type LatestProfilesData = {
@@ -28,21 +28,25 @@ export const userRouter = createTRPCRouter({
         .limit(1)
         .single();
 
-      let final: TRPCError | undefined;
       if (userError || !userData) {
         console.log(userError);
-        final = new TRPCError({
-          message: "Invalid user.",
-          code: "NOT_FOUND",
-          cause: "User username may not be registered.",
-        });
+
+        if (userError.code == "PGRST116") {
+          throw new TRPCError({
+            message: "PGRST116",
+            code: "NOT_FOUND",
+            cause: "Query matches username regex, but username not found; likely to be a text-query."
+          })
+        } else {
+          throw new TRPCError({
+            message: "Invalid user.",
+            code: "NOT_FOUND",
+            cause: "User username may not be registered.",
+          });
+        }
       }
 
-      // Define the userData variable with the proper type
-      const user: Database["public"]["Tables"]["profile"]["Row"] | TRPCError | undefined = userData || final;
-      
-      // TODO: Add list of user's most recent casts
-
+      const user = userData
       console.log(user);
       return {
         user,
