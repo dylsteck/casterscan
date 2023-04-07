@@ -29,21 +29,39 @@ const Header: React.FC = () => {
       const searchUser = await t.user.getUserPageData.fetch({ username: input });
       // Note: added logic to replace user with TRPCError if error exists
       // In future can change so there's a separate property called error
-      if (!(searchUser.user instanceof TRPCError)) {
-        await router.push(`/users/${searchUser.user.username}/`);
-        return;
-      };
-    } else {
+    if (!(searchUser.user instanceof TRPCError)) {
+      await router.push(`/users/${searchUser.user?.username ?? ''}/`);
+      return;
+    }
+   } else {
       const searchCast = await t.casts.getCastByHash.fetch({ hash: input });
       if (searchCast) {
-        await router.push(`/casts/${searchCast.cast?.hash}`);
+        await router.push(`/casts/${searchCast.cast?.hash ?? ''}`);
         return;
       }
     }
     // If input not cast or user, push as search query
-    await router.push(`/?q=${input}`);
+    await router.push(`/?q=${input ?? ''}`);
   };  
+
+  const searchAsync = async (): Promise<void> => {
+    try {
+      await search();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSearching(false);
+    }
+  };
   
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault();
+    setSearching(true);
+    searchAsync()
+      .catch((error) => console.error(error))
+      .finally(() => setSearching(false));
+  };
   
   return (
     <nav className="bg-transparent border-purple-800 sticky top-3">
@@ -54,13 +72,10 @@ const Header: React.FC = () => {
         </Link>
         <div className="flex">
 
-          <form className="relative text-gray-400 block"
-            onSubmit={async e => {
-              e.preventDefault();
-              setSearching(true);
-              await search();
-              setSearching(false);
-          }}>
+        <form className="relative text-gray-400 block" onSubmit={(e) => handleFormSubmit(e)}>
+
+
+
             <input 
               type="text" 
               placeholder="Search by hash or username" 

@@ -5,8 +5,7 @@ import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Database } from '~/types/database.t';
-import type { TRPCError } from '@trpc/server';
+import type { Database } from '~/types/database.t';
 
 const UserByUsername = () => {
 
@@ -29,15 +28,17 @@ const UserByUsername = () => {
       console.log("getting user");
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({username: username as string});
-        setUser(profile);
+        setUser(profile as Database['public']['Tables']['profile']['Row']);
       } catch (error) {
         console.log("Error fetching user data:", error);
         // handle the error response, e.g. display an error message to the user
       }
     }
-    getUser();
+    void getUser();
 
-  }, [])
+  }, [router, t])
+
+
 
   interface ExpandableImageProps {
     imageUrl: string;
@@ -52,14 +53,14 @@ const UserByUsername = () => {
           className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[12.5vh] pt-2.5 pb-5" />
+          <Image src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[12.5vh] pt-2.5 pb-5" />
         </div>
         {isExpanded && (
           <div
             className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
             onClick={() => setIsExpanded(false)}
           >
-            <img src={`${imageUrl}.png`} alt="imgur image" className="max-w-full max-h-full" />
+            <Image src={`${imageUrl}.png`} alt="imgur image" width={700} height={700} className="max-w-full max-h-full" />
           </div>
         )}
       </div>
@@ -133,7 +134,7 @@ const UserByUsername = () => {
                   <ExpandableImage imageUrl={user.avatar_url || "https://explorer.farcaster.xyz/avatar.png"} />
                   <div>
                     <p className="text-2xl text-white mt-2 ml-3">{user.display_name || ''}</p>
-                    <p className="text-lg text-white mt-2 ml-3">{renderCastText(user.bio as string) || ''}</p>
+                    <p className="text-lg text-white mt-2 ml-3">{renderCastText(user.bio as string || '') || ''}</p>
                   </div>
                 </div>
               </div>

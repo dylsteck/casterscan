@@ -21,13 +21,12 @@ export const userRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       console.log("initing query to supabase for username:", input.username);
-      const { data: userData, error: userError } =
-        await supabase
-          .from<Database["public"]["Tables"]["profile"]["Row"]>("profile")
-          .select()
-          .eq("username", input.username)
-          .limit(1)
-          .single();
+      const { data: userData, error: userError } = await supabase
+        .from("profile")
+        .select()
+        .eq("username", input.username)
+        .limit(1)
+        .single();
 
       let final: TRPCError | undefined;
       if (userError || !userData) {
@@ -39,7 +38,9 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const user = userData || final;
+      // Define the userData variable with the proper type
+      const user: Database["public"]["Tables"]["profile"]["Row"] | TRPCError | undefined = userData || final;
+      
       // TODO: Add list of user's most recent casts
 
       console.log(user);
@@ -54,11 +55,10 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const { data: profiles, error: profileError } =
-        await supabase
-          .from<Database["public"]["Tables"]["profile"]["Row"]>("profile")
-          .select()
-          .limit(input.limit || 100);
+      const { data: profiles, error: profileError } = await supabase
+        .from("profile")
+        .select()
+        .limit(input.limit || 100);
 
       if (profileError || !profiles) {
         console.log("Error:\n", profileError);

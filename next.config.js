@@ -9,6 +9,8 @@ module.exports = {
       'lh3.googleusercontent.com',
       'd2qbf73089ujv4.cloudfront.net',
       'explorer.farcaster.xyz',
+      'openseauserdata.com',
+      'media.discordapp.net',
     ],
     remotePatterns: [
       {
@@ -53,6 +55,19 @@ module.exports = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'openseauserdata.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.discordapp.net',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };
+

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import { Database } from '~/types/database.t';
+import type { Database } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -31,81 +30,6 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       { limit:30 },
       { refetchOnWindowFocus: false } // for development
     );
-
-    interface ExpandableImageProps {
-      imageUrl: string;
-    }    
-
-    const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
-      const [isExpanded, setIsExpanded] = useState(false);
-    
-      return (
-        <div className="relative">
-          <div
-            className="max-h-[1ch] object-contain cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} />
-          </div>
-          {isExpanded && (
-            <div
-              className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
-              onClick={() => setIsExpanded(false)}
-            >
-              <img src={`${imageUrl}.png`} alt="imgur image" className="max-w-full max-h-full" />
-            </div>
-          )}
-        </div>
-      );
-    };  
-
-    const renderCastText = (text: string, hash: string) => {
-      console.log("HASH", hash, hash.length);
-      const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
-      const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
-    
-      const imgurMatches = text.match(imgurRegex);
-      if (imgurMatches) {
-        const textWithoutImgur = text.replace(imgurRegex, '').trim();
-        return (
-          <>
-            {hash.length > 0 ? (
-              <div>
-                <Link href={`/casts/${hash}`}>
-                  <p>{textWithoutImgur}</p>
-                </Link>
-              </div>
-            ) : (
-              <><p>{textWithoutImgur}</p></>
-            )}
-            {imgurMatches.map((match, index) => (
-              <div key={index} className="mt-4 mb-4 flex justify-center">
-                <ExpandableImage imageUrl={match} />
-              </div>
-            ))}
-          </>
-        );
-      }
-    
-      const tokens = text.split(urlRegex);
-      return (
-        <p>
-          {tokens.map((token, index) => {
-            if (urlRegex.test(token)) {
-              const url = token.startsWith('http') ? token : `http://${token}`;
-              const urlText = url.replace(/^https?:\/\/(www\.)?/, '');
-              return (
-                <Link key={index} href={url}>
-                  {urlText}
-                </Link>
-              );
-            }
-            return token;
-          })}
-        </p>
-      );
-    };    
-    
 
     const handleChangeSort = (value: string) => {
         setSort(value)
@@ -164,11 +88,13 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       }
       <div className="w-full lg:w-full flex flex-wrap mt-[5vh] text-white">
       {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
-        <GalleryRender cast={cast} index={index} />
+        <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
-        <GalleryRender profile={profile} index={index} />
+        <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
       )) : null}
       </div>
+
+
     </>
   );
 };

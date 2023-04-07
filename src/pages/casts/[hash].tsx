@@ -4,7 +4,7 @@ import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
-import localData from '../../lib/localData.json';
+import Image from 'next/image';
 
 const CastByHash = () => {
 
@@ -28,14 +28,14 @@ const CastByHash = () => {
           className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <img src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[40vh] pt-2.5 pb-5" />
+          <Image src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[40vh] pt-2.5 pb-5" />
         </div>
         {isExpanded && (
           <div
             className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
             onClick={() => setIsExpanded(false)}
           >
-            <img src={`${imageUrl}.png`} alt="imgur image" className="max-w-full max-h-full" />
+            <Image src={`${imageUrl}.png`} alt="imgur image" width={700} height={700} className="max-w-full max-h-full" />
           </div>
         )}
       </div>
@@ -80,11 +80,7 @@ const CastByHash = () => {
   };
 
   return (
-    <main className="
-      flex flex-col
-      items-center justify-center
-      min-h-fit
-    ">
+    <div>
       { (queryResult.isFetching || queryResult.isLoading) && (
         <svg className="mt-7 w-12 h-12 animate-spin text-purple-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -132,10 +128,12 @@ const CastByHash = () => {
                 image={false} 
                 result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
           </div>
-          <Gallery user={queryResult.data?.cast?.author_username as string} />
+          <div className="lg:w-1/2 md:w-full">
+            <Gallery user={queryResult.data?.cast?.author_username as string} />
+          </div>
         </div>
       )}
-    </main>
+    </div>
 );
 }
 export default CastByHash;

@@ -94,7 +94,7 @@ export const castsRouter = createTRPCRouter({
         const { data: castsData, error: castsError } = await supabase
         .from('casts')
         .select()
-        .textSearch('text', `'${input.keyword}'` as string, { type: 'plain', config: 'english' });
+        .textSearch('text', `'${input.keyword}'`, { type: 'plain', config: 'english' });
 
         if (castsError || !castsData) {
           console.log("Error:\n", castsError);
