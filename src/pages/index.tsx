@@ -19,7 +19,39 @@ const Home: NextPage = () => {
         <meta name="description" content="A block explorer for the Farcaster network" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <Gallery user={''} />
+
+      <footer className="
+        flex flex-row
+        justify-center
+        gap-1 pt-4 mb-4
+        border-t-2 border-purple-800
+      ">
+        <div>
+          Made by{' '}
+
+          <a href="/users/yashkarthik" className="
+            text-purple-900
+            underline decoration-1
+            decoration-transparent
+            hover:decoration-purple-900
+            decoration-wavy
+            transition-colors ease-in-out duration-200
+          ">Yash Karthik</a>
+
+          {' '} and{' '}
+
+          <a href="/users/dylsteck" className="
+            text-purple-900
+            underline decoration-1
+            decoration-transparent
+            hover:decoration-purple-900
+            decoration-wavy
+            transition-colors ease-in-out duration-200
+          ">Dylan Steck</a>
+        </div>
+      </footer>
     </>
   );
 };

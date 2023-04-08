@@ -8,15 +8,19 @@ export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
     .input(
       z.object({
-        limit: z.number().optional()
+        startRow: z.number(),
       })
     )
     .query(async ({ input }) => {
+      input.startRow;
       const { data: casts, error: castError } = await supabase
         .from('casts')
         .select()
-        .order('published_at', {ascending: false})
-        .limit(input.limit || 100);
+        .order('published_at', { ascending: false })
+        .range(
+          input.startRow,
+          input.startRow + 30
+        );
 
       if (castError || !casts) {
         console.log("Error:\n", castError);
@@ -28,13 +32,14 @@ export const castsRouter = createTRPCRouter({
       }
 
       return {
-        casts
+        casts,
       };
     }),
     getCastsByUsername: publicProcedure
     .input(
       z.object({
-        username: z.string()
+        username: z.string(),
+        startRow: z.number(),
       })
     )
     .query(async ({ input }) => {
@@ -43,7 +48,7 @@ export const castsRouter = createTRPCRouter({
         .select()
         .eq('author_username', input.username)
         .order('published_at', {ascending: false})
-        .limit(30);
+        .range(input.startRow, input.startRow + 30);
 
       if (castError || !casts) {
         console.log("Error:\n", castError);
@@ -55,13 +60,13 @@ export const castsRouter = createTRPCRouter({
       }
 
       return {
-        casts
+        casts,
       };
     }),
     getCastByHash: publicProcedure
       .input(
         z.object({
-          hash: z.string().min(5)
+          hash: z.string().min(5),
         })
       )
       .query(async ({ input }) => {
@@ -87,7 +92,7 @@ export const castsRouter = createTRPCRouter({
       getCastsByKeyword: publicProcedure
       .input(
         z.object({
-          keyword: z.string()
+          keyword: z.string(),
         })
       )
       .query(async ({ input }) => {
