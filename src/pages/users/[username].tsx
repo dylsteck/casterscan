@@ -134,7 +134,7 @@ const UserByUsername = () => {
                   <ExpandableImage imageUrl={user.avatar_url || "https://explorer.farcaster.xyz/avatar.png"} />
                   <div>
                     <p className="text-2xl text-white mt-2 ml-3">{user.display_name || ''}</p>
-                    <p className="text-lg text-white mt-2 ml-3">{renderCastText(user.bio as string || '') || ''}</p>
+                    <p className="text-lg text-white mt-2 ml-3 break-words">{renderCastText(user.bio as string || '') || ''}</p>
                   </div>
                 </div>
               </div>

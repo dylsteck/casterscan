@@ -19,7 +19,7 @@ export const castsRouter = createTRPCRouter({
         .order('published_at', { ascending: false })
         .range(
           input.startRow,
-          input.startRow + 30
+          input.startRow + 32
         );
 
       if (castError || !casts) {
@@ -48,7 +48,7 @@ export const castsRouter = createTRPCRouter({
         .select()
         .eq('author_username', input.username)
         .order('published_at', {ascending: false})
-        .range(input.startRow, input.startRow + 30);
+        .range(input.startRow, input.startRow + 32);
 
       if (castError || !casts) {
         console.log("Error:\n", castError);

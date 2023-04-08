@@ -9,7 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@heroicons/react": "^2.0.16",
+    "@heroicons/react": "^2.0.17",
     "@reduxjs/toolkit": "^1.9.3",
     "@standard-crypto/farcaster-js": "^5.5.3",
     "@supabase/supabase-js": "^2.10.0",

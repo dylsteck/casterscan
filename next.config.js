@@ -13,6 +13,7 @@ module.exports = {
       'media.discordapp.net',
       'user-images.githubusercontent.com',
       'img.seadn.io',
+      'github.com',
       '*',
     ],
     remotePatterns: [
@@ -79,6 +80,12 @@ module.exports = {
       {
         protocol: 'https',
         hostname: 'img.seadn.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'github.com',
         port: '',
         pathname: '/**',
       },

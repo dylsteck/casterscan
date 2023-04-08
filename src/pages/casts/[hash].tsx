@@ -99,7 +99,7 @@ const CastByHash = () => {
             <div className="pt-[3.5vh] p-5">
                <div className="flex items-center">
                </div>
-               <p className="text-2xl text-white">{renderCastText(queryResult.data?.cast?.text as string) || ''}</p>
+               <p className="text-2xl text-white break-words">{renderCastText(queryResult.data?.cast?.text as string) || ''}</p>
             </div>
             <TableRow 
               field="Cast Hash"

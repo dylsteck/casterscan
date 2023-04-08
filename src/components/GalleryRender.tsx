@@ -4,6 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Database } from '~/types/database.t';
 import { getRelativeTime } from '~/lib/time';
+import { useRouter } from 'next/router'
+import warpcastIcon from '../../public/warpcastIcon.png';
+import { ArrowPathRoundedSquareIcon, HandThumbUpIcon } from '@heroicons/react/24/solid';
 
 type GalleryRenderProps = {
     cast?: Database['public']['Tables']['casts']['Row'];
@@ -12,6 +15,8 @@ type GalleryRenderProps = {
   };
   
 export default function GalleryRender({ cast, profile, index }: GalleryRenderProps) {
+
+    const router = useRouter();
     
     interface ExpandableImageProps {
         imageUrl: string;
@@ -19,13 +24,16 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
   
       const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
         const [isExpanded, setIsExpanded] = useState(false);
-      
+    
+        const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
+          event.stopPropagation();
+          event.preventDefault();
+          setIsExpanded(!isExpanded);
+        };
+    
         return (
           <div className="relative mb-[5vh]">
-            <div
-              className="h-full object-contain cursor-pointer"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
+            <div className="h-full object-contain cursor-pointer" onClick={handleImageClick}>
               <Image
                 src={`${imageUrl}.png`}
                 alt="imgur image"
@@ -46,7 +54,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         );
       };      
     
-      const renderCastText = (text: string, hash: string) => {
+      const renderCastText = (text: string) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         const urlRegex = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
       
@@ -55,11 +63,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           const textWithoutImgur = text.replace(imgurRegex, '').trim();
           return (
             <>
-              <div>
-                <Link href={`/casts/${hash}`}>
-                  <p>{textWithoutImgur}</p>
-                </Link>
-              </div>
+              <p>{textWithoutImgur}</p>
               {imgurMatches.map((match, index) => (
                 <div key={index} className="mt-4 mb-4 flex justify-center">
                   <ExpandableImage imageUrl={match} />
@@ -68,35 +72,34 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
             </>
           );
         }
-        else{
-          return (
-            <>
-              <div>
-                <Link href={`/casts/${hash}`}>
-                  <p>{text}</p>
-                </Link>
-              </div>
-            </>
-          );
-        }
       
-        const tokens = text.split(urlRegex);
+        const tokens = [];
+        let match;
+        let lastIndex = 0;
+        while ((match = urlRegex.exec(text)) !== null) {
+          tokens.push(text.slice(lastIndex, match.index));
+          tokens.push(match[0]);
+          lastIndex = urlRegex.lastIndex;
+        }
+        tokens.push(text.slice(lastIndex));
+      
         return (
           <p>
             {tokens.map((token, index) => {
               if (urlRegex.test(token)) {
-                const url = token.startsWith('http') ? token : `http://${token}`;
+                const url = token.startsWith('http') ? token : `https://${token}`;
                 return (
-                  <Link key={index} href={url}>
-                    {token}
+                  <Link key={`${index}_1`} href={url}>
+                    {url}
                   </Link>
                 );
+              } else {
+                return token;
               }
-              return token;
             })}
           </p>
         );
-      };
+      };          
 
       function stringify(value: unknown): string {
         return value === null || value === undefined ? '' : String(value);
@@ -105,17 +108,19 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
       return (
         <div
             key={`${typeof profile === 'undefined' ? `cast-${stringify(cast?.hash)}-${stringify(index)}` : `profile-${stringify(profile?.username)}-${stringify(index)}`}`}
-            className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}>
+            className={`w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500`}
+            onClick={() => router.push(`/casts/${cast?.hash}`)}>
             <div
-                className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full`}
-                style={{ borderLeft: '2px solid #6b21a8' }}>
+                className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full last:border-b-1`}
+                style={{ borderLeft: '2px solid #6b21a8' }}
+                onClick={() => router.push(`/casts/${cast?.hash}`)}>
                 <div
                     className="flex flex-row p-2 w-full ml-auto">
                     <Image
                         src={cast?.author_pfp_url ?? profile?.avatar_url ?? ''}
                         alt={`@${cast?.author_username ?? profile?.username ?? 'unknown'}'s PFP`}
                         width={20} height={20}
-                        className="rounded-full w-6 h-6" />
+                        className="rounded-full w-6 h-6 pointer-events-none" />
                     <Link href={`/users/${cast?.author_username || profile?.username || ''}`}>
                         <p className="ml-3">@{cast?.author_username ?? profile?.username}</p>
                     </Link>
@@ -131,8 +136,21 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
                       </p>
                     </div>
                 </div>
-                <div className="p-3 break-words justify-center">{renderCastText(cast?.text ?? '', cast?.hash ?? '')}</div>
-            </div>
-        </div>
+                <div className="p-3 break-words justify-center cursor-default" onClick={(e) => e.stopPropagation()}>{renderCastText(cast?.text ?? '')}</div>
+               <div className="mb-2">
+                <div className="float-left">
+                    <Link href={`https://warpcast.com/${cast?.author_username}/${cast?.hash?.slice(0, 8)}`}>
+                      <Image src={warpcastIcon} width={24} height={24} alt="Warpcast icon" />
+                    </Link>
+                  </div>
+                <div className="float-right text-white/90">
+                  <HandThumbUpIcon className="w-3 inline-block mr-1" />
+                  <p className="inline-block text-xs mr-2">{cast?.reactions_count}</p>
+                  <ArrowPathRoundedSquareIcon className="w-3 inline-block mr-1" />
+                  <p className="inline-block text-xs">{cast?.recasts_count}</p>
+                </div>
+              </div>
+              </div>
+          </div>
     )  
 }
