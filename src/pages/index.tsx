@@ -25,12 +25,9 @@ const Home: NextPage = () => {
       <footer className="
         flex flex-row
         justify-center
-        gap-1 pt-4 mb-4
-        border-t-2 border-purple-800
+        gap-1 my-4
       ">
-        <div>
-          Made by{' '}
-
+          Made by
           <a href="/users/yashkarthik" className="
             text-purple-900
             underline decoration-1
@@ -39,9 +36,7 @@ const Home: NextPage = () => {
             decoration-wavy
             transition-colors ease-in-out duration-200
           ">Yash Karthik</a>
-
-          {' '} and{' '}
-
+          and
           <a href="/users/dylsteck" className="
             text-purple-900
             underline decoration-1
@@ -50,7 +45,7 @@ const Home: NextPage = () => {
             decoration-wavy
             transition-colors ease-in-out duration-200
           ">Dylan Steck</a>
-        </div>
+
       </footer>
     </>
   );
