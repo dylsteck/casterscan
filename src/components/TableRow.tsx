@@ -49,7 +49,7 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
             transition={{ duration: 0.5 }}
           >
             {field === 'Casted By' || field === 'Cast Hash' || field === 'Referrer' ?
-             <Link href={field === 'Casted By' || field === 'Referrer' ? `/users/${result.substring(1)}` : `/casts/${result}`}>
+             <Link href={field === 'Casted By' ? `/users/${result.substring(1)}` : field === 'Referrer' ? `/users/${result}` : `/casts/${result}`}>
                 <p
                   className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300"
                 >

@@ -141,11 +141,11 @@ const UserByUsername = () => {
               <TableRow 
                 field="Followers"
                 image={false}
-                result={user.following?.toString() || ""} imageUrl={''} imageAlt={''} />
+                result={user.followers?.toString() || ""} imageUrl={''} imageAlt={''} />
               <TableRow 
                 field="Following" 
                 image={false} 
-                result={user.followers?.toString() || ""} imageUrl={''} imageAlt={''} />
+                result={user.following?.toString() || ""} imageUrl={''} imageAlt={''} />
               <TableRow 
                   field="Username" 
                   image={false} 
@@ -155,12 +155,10 @@ const UserByUsername = () => {
                   image={false} 
                   result={user.id.toString()} />
               {user.referrer && 
-              <>
                 <TableRow 
                   field="Referrer" 
                   image={false} 
                   result={user.referrer} />
-              </>
               }
             </div>
             {/* fix line <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative block"></div> */}
