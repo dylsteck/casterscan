@@ -140,7 +140,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
             return;
           }
 
-          const nextPagePath = `${segments[0]}?page=${parseInt(segments[1] ?? '0') + 1}`;
+          const nextPagePath = `${segments[0] || ''}?page=${parseInt(segments[1] || '0', 10) + 1}`;
           try {
             await router.push(nextPagePath);
           } catch (error) {
