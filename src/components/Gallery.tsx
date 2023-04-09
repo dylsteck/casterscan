@@ -11,8 +11,8 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
     const router = useRouter();
 
     const searchParam = router.query.q;
-    const page = router.query.page;
-
+    const page = router.query.page as string | undefined;
+    
     const queryResult = searchParam 
     ? (
         api.casts.getCastsByKeyword.useQuery(
@@ -118,26 +118,36 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         </svg>
        </button>
 
-       <button type="button" className="
-        text-purple-900 font-bold
-        rounded-md p-1
-        hover:bg-purple-600
-        border-2
-        border-transparent hover:border-purple-800
-        transition-colors ease-in-out duration-500
-       " 
-       onClick={() => {
-         const segments = router.asPath.split("?page=");
-         if (segments.length < 2) {
-           const nextPagePath = router.asPath + "?page=2";
-           router.push(nextPagePath);
-           return;
-         };
+       <button
+        type="button"
+        className="
+              text-purple-900 font-bold
+              rounded-md p-1
+              hover:bg-purple-600
+              border-2
+              border-transparent hover:border-purple-800
+              transition-colors ease-in-out duration-500
+            "
+        onClick={async (): Promise<void> => {
+          const segments = router.asPath.split('?page=');
+          if (segments.length < 2) {
+            const nextPagePath = router.asPath + '?page=2';
+            try {
+              await router.push(nextPagePath);
+            } catch (error) {
+              console.error(error);
+            }
+            return;
+          }
 
-         // @ts-expect-error
-         const nextPagePath = segments[0] + "?page=" + (parseInt(segments[1]) + 1);
-         router.push(nextPagePath);
-       }}>
+          const nextPagePath = `${segments[0]}?page=${parseInt(segments[1] ?? '0') + 1}`;
+          try {
+            await router.push(nextPagePath);
+          } catch (error) {
+            console.error(error);
+          }
+        }}
+      >
         <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
         </svg>

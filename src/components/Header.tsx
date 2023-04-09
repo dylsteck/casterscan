@@ -5,14 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from '../../public/casterScanIcon.png'
-import { TRPCError } from '@trpc/server';
 
 const Header: React.FC = () => {
 
   const [input, setInput] = useState('');
   const [searching, setSearching] = useState(false);
   const router = useRouter();
-  const t = api.useContext();
   const fetchUser = api.user.getUserPageData.useQuery({ username: input}, { retry: false });
   const fetchCast = api.casts.getCastByHash.useQuery({ hash: input }, { retry: false });
   const { q } = router.query;
@@ -38,16 +36,18 @@ const Header: React.FC = () => {
       }
 
       // query matches username regex and does not throw => userame exists;
-      await router.push(`/users/${usernameFetch.data?.user.username}`);
+      await router.push(`/users/${usernameFetch.data?.user?.username ?? ''}`);
       return;
     }
 
     // if the search term was a username, function wouldve already exited. 
     const castFetch = await fetchCast.refetch();
     if (castFetch.data) {
-      await router.push(`/casts/${castFetch.data.cast?.hash}`);
+      await router.push(`/casts/${castFetch.data.cast?.hash ?? ''}`);
       return;
     }
+
+
     // If input not cast or user, push as search query
     await router.push(`/?q=${input ?? ''}`);
     return;

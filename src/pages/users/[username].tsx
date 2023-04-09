@@ -28,7 +28,7 @@ const UserByUsername = () => {
       console.log("getting user");
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({username: username as string});
-        setUser(profile as Database['public']['Tables']['profile']['Row']);
+        setUser(profile);
       } catch (error) {
         console.log("Error fetching user data:", error);
         // handle the error response, e.g. display an error message to the user
