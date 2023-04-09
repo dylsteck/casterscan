@@ -74,7 +74,19 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
     const sortProfiles = (profiles: Database['public']['Tables']['profile']['Row'][]) => {
       console.log(profiles.filter((profile) => profile.username !== null))
       return profiles.filter((profile) => profile.username !== null);
-  }
+    }
+
+    const handleNextPage = async () => {
+      const segments = router.asPath.split('?page=');
+      if (segments.length < 2) {
+        const nextPagePath = router.asPath + '?page=2';
+        await router.push(nextPagePath);
+        return;
+      }
+
+      const nextPagePath = `${segments[0] || ''}?page=${parseInt(segments[1] || '0', 10) + 1}`;
+      await router.push(nextPagePath);
+    };
 
   return (
     <div className='flex flex-col'>
@@ -128,23 +140,11 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
               border-transparent hover:border-purple-800
               transition-colors ease-in-out duration-500
             "
-        onClick={async (): Promise<void> => {
-          const segments = router.asPath.split('?page=');
-          if (segments.length < 2) {
-            const nextPagePath = router.asPath + '?page=2';
-            try {
-              await router.push(nextPagePath);
-            } catch (error) {
-              console.error(error);
-            }
-            return;
-          }
-
-          const nextPagePath = `${segments[0] || ''}?page=${parseInt(segments[1] || '0', 10) + 1}`;
+        onClick={() => {
           try {
-            await router.push(nextPagePath);
-          } catch (error) {
-            console.error(error);
+            void handleNextPage()
+          } catch (e) {
+            console.log("Error while paginating:", e);
           }
         }}
       >

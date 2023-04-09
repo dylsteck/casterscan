@@ -114,28 +114,25 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
       };
 
 
-      const stopPropagating = async (e: React.MouseEvent<HTMLDivElement>): Promise<void> => {
-        e.stopPropagation();
-        try {
-          await router.push(`/casts/${cast?.hash ?? ''}`);
-        } catch (error: unknown) {
-          console.error(error);
-        }
-      };      
-                
-
-
       return (
         <div
           key={`${typeof profile === 'undefined'
             ? `cast-${stringify(cast?.hash ?? '')}-${stringify(index)}`
             : `profile-${stringify(profile?.username ?? '')}-${stringify(index)}`}`}
           className="w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500"
-          onClick={handleClick}>
+          onClick={void handleClick}>
           <div
             className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full last:border-b-1`}
             style={{ borderLeft: '2px solid #6b21a8' }}
-            onClick={(e) => stopPropagating(e)}>
+            onClick={(e) => {
+              e.stopPropagation();
+              try {
+                void router.push(`/casts/${cast?.hash ?? ''}`);
+              } catch (error) {
+                console.error(error);
+              }
+            }}
+          >
             <div className="flex flex-row p-2 w-full ml-auto">
               <Image
                 src={cast?.author_pfp_url ?? profile?.avatar_url ?? ''}
