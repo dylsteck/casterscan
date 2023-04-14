@@ -12,6 +12,7 @@ const UserByUsername = () => {
   const router = useRouter();
   const t = api.useContext();
   const [user, setUser] = useState<Database['public']['Tables']['profile']['Row']>();
+  const [nftdInfo, setNftdInfo] = useState(); // note: create types for NF.TD data
 
   useEffect(() => {
     if (!router.isReady) {
@@ -28,7 +29,10 @@ const UserByUsername = () => {
       console.log("getting user");
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({username: username as string});
+        const { nftd: nftd } = await t.user.getUserNFTDData.fetch({fid: profile.id});
         setUser(profile);
+        console.log("NFTD INFO", nftd);
+        setNftdInfo(nftd);
       } catch (error) {
         console.log("Error fetching user data:", error);
         // handle the error response, e.g. display an error message to the user
@@ -160,6 +164,18 @@ const UserByUsername = () => {
                   image={false} 
                   result={user.referrer} />
               }
+              {nftdInfo && 
+              <>
+                {nftdInfo.all_links.filter((link => link.type !== 'Header')).map((link => {
+                    return (
+                      <TableRow
+                      field={link.label}
+                      image={false}
+                      result={link.url}
+                      />
+                    )
+                }))}
+              </>}
             </div>
             {/* fix line <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative block"></div> */}
             <div className="lg:w-1/2 md:w-full">

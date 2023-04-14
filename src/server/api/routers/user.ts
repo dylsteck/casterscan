@@ -52,6 +52,34 @@ export const userRouter = createTRPCRouter({
         user,
       } as UserPageData;
     }),
+    getUserNFTDData: publicProcedure
+    .input(
+      z.object({
+        fid: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { data: verificationData, error: verificationError } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
+      const wallet = verificationData?.address;
+      if(typeof wallet !== 'undefined'){
+        try {
+          const response = await fetch(process.env.NFTD_USER_ENDPOINT + wallet);
+          if (!response.ok) {
+            // handle non-2xx responses
+            throw new Error(`Failed to fetch NFT data. Response status: ${response.status}`);
+          }
+          const data = await response.json();
+          return data;
+        } catch (error) {
+          console.error(error);
+          // throw new TRPCError({
+          //   message: 'Failed to fetch NFT data.',
+          //   code: 'INTERNAL_SERVER_ERROR',
+          //   cause: error.message,
+          // });
+        }
+      }
+    }),
   getLatestProfiles: publicProcedure
     .input(
       z.object({
