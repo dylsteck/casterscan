@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from "../../../lib/supabase";
 import { TRPCError } from "@trpc/server";
 import type { Database } from "~/types/database.t";
+import type { NFTDData } from "~/types/nftd.t";
 
 type UserPageData = {
   user: Database["public"]["Tables"]["profile"]["Row"];
@@ -51,6 +52,34 @@ export const userRouter = createTRPCRouter({
       return {
         user,
       } as UserPageData;
+    }),
+    getUserNFTDData: publicProcedure
+    .input(
+      z.object({
+        fid: z.number(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { data: verificationData } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
+      const wallet = verificationData?.address;
+      if(typeof wallet !== 'undefined'){
+        try {
+          const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${wallet ?? ''}`);
+          if (!response.ok) {
+            // handle non-2xx responses
+            throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
+          }
+          const data = await response.json() as NFTDData;
+          return data;
+        } catch (error) {
+          console.error(error);
+          // throw new TRPCError({
+          //   message: 'Failed to fetch NF.TD data.',
+          //   code: 'INTERNAL_SERVER_ERROR',
+          //   cause: error.message,
+          // });
+        }
+      }
     }),
   getLatestProfiles: publicProcedure
     .input(

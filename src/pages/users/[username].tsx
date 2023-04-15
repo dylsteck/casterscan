@@ -6,12 +6,15 @@ import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Database } from '~/types/database.t';
+import type { NFTDData } from '~/types/nftd.t';
+import nftdIcon from '../../../public/nftdIcon.png';
 
 const UserByUsername = () => {
 
   const router = useRouter();
   const t = api.useContext();
   const [user, setUser] = useState<Database['public']['Tables']['profile']['Row']>();
+  const [nftdInfo, setNftdInfo] = useState<NFTDData>();
 
   useEffect(() => {
     if (!router.isReady) {
@@ -27,13 +30,22 @@ const UserByUsername = () => {
     async function getUser() {
       console.log("getting user");
       try {
-        const { user: profile } = await t.user.getUserPageData.fetch({username: username as string});
+        const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
         setUser(profile);
+    
+        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: profile.id });
+    
+        if (nftdDataResponse) {
+          setNftdInfo(nftdDataResponse);
+        } else {
+          console.log("NFTD data is missing or malformed:", nftdDataResponse);
+          // Handle the case when NFTD data is not available or not in the expected format
+        }
       } catch (error) {
         console.log("Error fetching user data:", error);
         // handle the error response, e.g. display an error message to the user
       }
-    }
+    }    
     void getUser();
 
   }, [router, t])
@@ -160,6 +172,28 @@ const UserByUsername = () => {
                   image={false} 
                   result={user.referrer} />
               }
+              {nftdInfo && 
+              <>
+                <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
+                {nftdInfo.ensData && 
+                <>
+                <TableRow
+                  field={'ENS'}
+                  image={false}
+                  result={nftdInfo?.ensData[0]?.name || ''}
+                />
+                </>}
+                {nftdInfo.all_links.filter((link => link.type !== 'header')).map((link, index) => {
+                    return (
+                      <TableRow
+                      field={link.label ?? ''}
+                      image={false}
+                      result={link.url ?? ''}
+                      key={`${link.url ?? ''}-${index}`}
+                      />
+                    )
+                })}
+              </>}
             </div>
             {/* fix line <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative block"></div> */}
             <div className="lg:w-1/2 md:w-full">
