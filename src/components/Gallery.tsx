@@ -92,11 +92,11 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
     <div className='flex flex-col'>
       <div className='self-start'>
         <Filters
-            user={user}
-            sort={sort}
-            changeSort={handleChangeSort}
-            filter={filter}
-            changeFilter={handleChangeFilter}
+          user={user}
+          sort={sort}
+          changeSort={handleChangeSort}
+          filter={filter}
+          changeFilter={handleChangeFilter}
         />
       </div>
 
@@ -105,7 +105,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
         </svg>
       }
-      <div className="w-full lg:w-full flex flex-wrap mt-[5vh] text-white">
+      <div className="columns-3 gap-0 mt-[5vh] text-white">
       {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (

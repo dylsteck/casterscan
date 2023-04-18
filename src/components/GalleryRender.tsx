@@ -119,7 +119,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           key={`${typeof profile === 'undefined'
             ? `cast-${stringify(cast?.hash ?? '')}-${stringify(index)}`
             : `profile-${stringify(profile?.username ?? '')}-${stringify(index)}`}`}
-          className="w-full md:w-1/2 lg:w-1/3 hover:bg-purple-600 transition-colors duration-500"
+          className="w-full hover:bg-purple-600 transition-colors duration-500 break-inside-avoid"
           onClick={void handleClick}>
           <div
             className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full last:border-b-1`}
