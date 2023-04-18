@@ -25,6 +25,22 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
     });
   }
 
+  function isUrl(str:string) {
+    try {
+      new URL(str);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function stripUrl(url: string) {
+    return url
+      .replace(/^(https?:\/\/)?(www\.)?/, '')
+      .replace(/\/$/, '');
+  }
+
+
   return (
     <>
       <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative "></div>
@@ -48,23 +64,44 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {field === 'Casted By' || field === 'Cast Hash' || field === 'Referrer' ?
-             <Link href={field === 'Casted By' ? `/users/${result.substring(1)}` : field === 'Referrer' ? `/users/${result}` : `/casts/${result}`}>
-                <p
-                  className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300"
-                >
-                  {/* If result is a hash, it truncates the hash */}
-                  {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
-                </p>
+            {(field === 'Casted By' || field === 'Cast Hash' || field === 'Referrer') && (
+              <Link href={field === 'Casted By' ? `/users/${result.substring(1)}` : field === 'Referrer' ? `/users/${result}` : `/casts/${result}`}>
+               <p className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300" >
+                 {/* If result is a hash, it truncates the hash */}
+                 {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
+               </p>
               </Link>
-              :
-              <p
-                  className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300"
-                >
-                  {/* If result is a hash, it truncates the hash */}
-                  {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
-              </p>
-            }
+            )}
+
+            { isUrl(result) ? (
+              <a
+                target="_blank"
+                referrerPolicy='no-referrer'
+                href={result}
+                className="
+                  font-medium text-gray-300
+                  text-sm ml-2 
+                  overflow-x-auto whitespace-nowrap
+              ">{stripUrl(result)}</a>
+            ) : (
+              field === "ENS" ? (
+                <a href={`https://alpha.ens.domains/${result}`}
+                  target="_blank"
+                  referrerPolicy='no-referrer'
+                  className="
+                    font-medium text-gray-300
+                    text-sm ml-2 
+                    overflow-x-auto whitespace-nowrap
+                ">{result}</a>
+              ) : (
+                <p className="
+                  font-medium text-gray-300
+                  text-sm ml-2 
+                  overflow-x-auto whitespace-nowrap
+                ">{result}</p>
+              )
+            )}
+
           </motion.div>
         </div>
       </div>

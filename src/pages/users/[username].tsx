@@ -176,23 +176,20 @@ const UserByUsername = () => {
               <>
                 <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
                 {nftdInfo.ensData && 
-                <>
-                <TableRow
-                  field={'ENS'}
-                  image={false}
-                  result={nftdInfo?.ensData[0]?.name || ''}
-                />
-                </>}
-                {nftdInfo.all_links.filter((link => link.type !== 'header')).map((link, index) => {
-                    return (
-                      <TableRow
-                      field={link.label ?? ''}
-                      image={false}
-                      result={link.url ?? ''}
-                      key={`${link.url ?? ''}-${index}`}
-                      />
-                    )
-                })}
+                  <TableRow
+                    field={'ENS'}
+                    image={false}
+                    result={nftdInfo?.ensData[0]?.name || ''}
+                  />
+                }
+                {nftdInfo.all_links.filter((link => link.type !== 'header')).map((link, index) => (
+                  <TableRow
+                    field={link.label ?? ''}
+                    image={false}
+                    result={link.url ?? ''}
+                    key={`${link.url ?? ''}-${index}`}
+                  />
+                ))}
               </>}
             </div>
             {/* fix line <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative block"></div> */}
