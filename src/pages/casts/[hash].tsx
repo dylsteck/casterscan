@@ -15,9 +15,20 @@ const CastByHash = () => {
     { refetchOnWindowFocus: false}
   );
 
+  const [expanded, setExpanded] = useState<string>('');
+
   interface ExpandableImageProps {
     imageUrl: string;
   }    
+
+  function handleOnClick(name: string){
+    if(expanded.length === 0){
+      setExpanded(name)
+    }
+    else{
+      setExpanded('')
+    }
+  }
 
   const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -115,10 +126,12 @@ const CastByHash = () => {
                 field="Casted At" 
                 image={false} 
                 result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
+           {/* <div onClick={() => handleOnClick("Likes")}> */}
             <TableRow 
                 field="Likes" 
                 image={false} 
                 result={String(queryResult.data?.cast?.reactions_count || 0)} imageUrl={''} imageAlt={''} />
+          {/* </div> */}
             <TableRow 
                 field="Recasts" 
                 image={false} 
@@ -127,6 +140,11 @@ const CastByHash = () => {
                 field="Replies" 
                 image={false} 
                 result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
+          {/* TODO: show expanded info like likers, recasters, etc {expanded.length > 0 && (
+            <div className="mt-10 ml-5">
+              {expanded}
+            </div>
+          )} */}
           </div>
           <div className="lg:w-1/2 md:w-full">
             <Gallery user={queryResult.data?.cast?.author_username as string} />

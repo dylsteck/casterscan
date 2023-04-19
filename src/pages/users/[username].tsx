@@ -65,14 +65,14 @@ const UserByUsername = () => {
           className="max-w-[20ch] max-h-[20ch] object-contain cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <Image src={`${imageUrl}.png`} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[12.5vh] pt-2.5 pb-5" />
+          <Image src={imageUrl} alt="imgur image" width={400} height={400} className="w-auto h-auto max-h-[12.5vh] pt-2.5 pb-5" />
         </div>
         {isExpanded && (
           <div
             className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
             onClick={() => setIsExpanded(false)}
           >
-            <Image src={`${imageUrl}.png`} alt="imgur image" width={700} height={700} className="max-w-full max-h-full" />
+            <Image src={imageUrl} alt="imgur image" width={700} height={700} className="max-w-full max-h-full" />
           </div>
         )}
       </div>
@@ -170,11 +170,13 @@ const UserByUsername = () => {
                 <TableRow 
                   field="Referrer" 
                   image={false} 
-                  result={user.referrer} />
+                  result={user?.referrer ?? ''} />
               }
               {nftdInfo && 
               <>
-                <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
+                <Link href={`https://nf.td/${nftdInfo?.slug}`}>
+                  <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
+                </Link>
                 {nftdInfo.ensData && 
                   <TableRow
                     field={'ENS'}

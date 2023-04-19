@@ -24,12 +24,14 @@ const Filters: React.FC<FiltersProps> = ({ user, sort, changeSort, filter, chang
           <>
             <span className={`pt-1 ${filter === 'Casts' ? 'font-bold' : ''}`} onClick={() => changeFilter('Casts')}>Casts</span>
             <span className={`pt-2 ${filter === 'Casts + Replies' ? 'font-bold' : ''}`} onClick={() => changeFilter('Casts + Replies')}>Casts + Replies</span>
+            <span className={`pt-2 ${filter === 'Images' ? 'font-bold' : ''}`} onClick={() => changeFilter('Images')}>Images</span>
             {/* On hold until we index likes(could use Warpcast API though) <span className={`pt-2 ${filter === 'Likes' ? 'font-bold' : ''}`} onClick={() => changeFilter('Likes')}>Likes</span> */}
           </>
         ) : (
           <>
             <span className={`pt-1 ${filter === 'Casts' ? 'font-bold' : ''}`} onClick={() => changeFilter('Casts')}>Casts</span>
             <span className={`pt-2 ${filter === 'Profiles' ? 'font-bold' : ''}`} onClick={() => changeFilter('Profiles')}>Profiles</span>
+            <span className={`pt-2 ${filter === 'Images' ? 'font-bold' : ''}`} onClick={() => changeFilter('Images')}>Images</span>
           </>
         )}
       </div>

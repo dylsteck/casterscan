@@ -68,7 +68,12 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         return casts.filter((cast) => cast.parent_hash !== null);
       }
       return casts;
-    };    
+    };   
+    
+    const sortImages = (casts: Database['public']['Tables']['casts']['Row'][]) => {
+        const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
+        return sortCasts(casts.filter((cast) => cast.text.match(imgurRegex)));
+    }
     
 
     const sortProfiles = (profiles: Database['public']['Tables']['profile']['Row'][]) => {
@@ -110,9 +115,10 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
-      )) : null}
+      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => ( 
+        <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
+      )): null}
       </div>
-
 
      <div className='flex flex-row self-center'>
 

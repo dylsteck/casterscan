@@ -31,12 +31,12 @@ const Header: React.FC = () => {
       if (usernameFetch.error?.message == "PGRST116") {
         console.log("PGRST116 yes");
         // early return as query matches username regex, but username not found => query is a text-query
-        await router.push(`/?q=${input}`);
+        await router.push(`/?q=${encodeURIComponent(input)}`);
         return;
       }
 
       // query matches username regex and does not throw => userame exists;
-      await router.push(`/users/${usernameFetch.data?.user?.username ?? ''}`);
+      await router.push(`/users/${usernameFetch.data?.user?.username?.toLowerCase() ?? ''}`);
       return;
     }
 
@@ -47,9 +47,9 @@ const Header: React.FC = () => {
       return;
     }
 
-
+    console.log(encodeURIComponent(input))
     // If input not cast or user, push as search query
-    await router.push(`/?q=${input ?? ''}`);
+    await router.push(`/?q=${encodeURIComponent(input) ?? ''}`);
     return;
   };  
 
@@ -88,7 +88,7 @@ const Header: React.FC = () => {
               placeholder="Search by hash or username" 
               value={input}
               className="min-w-[30vw] form-input rounded-lg py-3 px-4 bg-white placeholder-gray-400 text-gray-500 appearance-none w-full block pl-5 focus:outline-none sm:min-w-[50vw]"
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => setInput(e.target.value.toLowerCase())}
             />
 
             <button type="submit" className="

@@ -64,44 +64,48 @@ const TableRow: React.FC<TableRowProps> = ({ field, image, imageUrl, imageAlt, r
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {(field === 'Casted By' || field === 'Cast Hash' || field === 'Referrer') && (
-              <Link href={field === 'Casted By' ? `/users/${result.substring(1)}` : field === 'Referrer' ? `/users/${result}` : `/casts/${result}`}>
-               <p className="font-medium text-sm ml-2 overflow-x-auto whitespace-nowrap text-gray-300" >
-                 {/* If result is a hash, it truncates the hash */}
-                 {result.length === 66 ? `${result.slice(0, 4)}...${result.slice(-4)}` : result}
-               </p>
-              </Link>
-            )}
 
             { isUrl(result) ? (
-              <a
-                target="_blank"
-                referrerPolicy='no-referrer'
+              <Link
                 href={result}
                 className="
                   font-medium text-gray-300
                   text-sm ml-2 
                   overflow-x-auto whitespace-nowrap
-              ">{stripUrl(result)}</a>
+              ">{stripUrl(result)}</Link>
             ) : (
               field === "ENS" ? (
-                <a href={`https://alpha.ens.domains/${result}`}
-                  target="_blank"
-                  referrerPolicy='no-referrer'
+                <Link href={`https://rainbow.me/${result}`}
                   className="
                     font-medium text-gray-300
                     text-sm ml-2 
                     overflow-x-auto whitespace-nowrap
-                ">{result}</a>
+                ">{result}</Link>
               ) : (
+                field === "Referrer" ? (
+                  <Link href={`/users/${result}`}
+                  className="
+                    font-medium text-gray-300
+                    text-sm ml-2 
+                    overflow-x-auto whitespace-nowrap
+                ">{result}</Link>
+              )
+              : (
+                field === "Casted By" ? (
+                  <Link href={`/users/${result.substr(1)}`}
+                  className="
+                    font-medium text-gray-300
+                    text-sm ml-2 
+                    overflow-x-auto whitespace-nowrap
+                ">{result}</Link>
+              ):
+              (
                 <p className="
                   font-medium text-gray-300
                   text-sm ml-2 
                   overflow-x-auto whitespace-nowrap
                 ">{result}</p>
-              )
-            )}
-
+              ))))}
           </motion.div>
         </div>
       </div>

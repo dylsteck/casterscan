@@ -105,29 +105,20 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         return value === null || value === undefined ? '' : String(value);
       }
 
-      const handleClick = async (): Promise<void> => {
-        try {
-          await router.push(`/casts/${cast?.hash ?? ''}`);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-
+      const path = (typeof profile === 'undefined' ? `/casts/${cast?.hash ?? ''}` : `/users/${profile?.username}`)
       return (
         <div
           key={`${typeof profile === 'undefined'
             ? `cast-${stringify(cast?.hash ?? '')}-${stringify(index)}`
             : `profile-${stringify(profile?.username ?? '')}-${stringify(index)}`}`}
-          className="w-full hover:bg-purple-600 transition-colors duration-500 break-inside-avoid"
-          onClick={void handleClick}>
+          className="w-full hover:bg-purple-600 transition-colors duration-500 break-inside-avoid">
           <div
             className={`border-t-2 border-purple-800 ${index === 0 ? 'pt-1' : ''} p-2 border-l-2 border-purple-800 md:border-l-0 h-full last:border-b-1`}
             style={{ borderLeft: '2px solid #6b21a8' }}
             onClick={(e) => {
               e.stopPropagation();
               try {
-                void router.push(`/casts/${cast?.hash ?? ''}`);
+                void router.push(path);
               } catch (error) {
                 console.error(error);
               }
@@ -146,7 +137,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
               </Link>
       
               <div className="relative ml-auto group text-sm text-gray-300">
-                <p className="block group-hover:hidden">
+                <p className="block group-hover:hidden xs:hidden">
                   {getRelativeTime(new Date(cast?.published_at ?? new Date()))}
                 </p>
                 <p className="hidden group-hover:block">
@@ -155,7 +146,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
               </div>
             </div>
             <div className="p-3 break-words justify-center cursor-default" onClick={(e) => e.stopPropagation()}>
-              {renderCastText(cast?.text ?? '')}
+              {renderCastText(cast?.text ?? profile?.bio ?? `${profile?.followers} followers & ${profile?.following} following` ?? '')}
             </div>
             {/*
             <div className="pt-3 pb-3 float-left">

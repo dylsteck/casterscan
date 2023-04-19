@@ -19,7 +19,7 @@ export const castsRouter = createTRPCRouter({
         .order('published_at', { ascending: false })
         .range(
           input.startRow,
-          input.startRow + 32
+          input.startRow + 34
         );
 
       if (castError || !casts) {
