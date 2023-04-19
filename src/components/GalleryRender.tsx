@@ -105,7 +105,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         return value === null || value === undefined ? '' : String(value);
       }
 
-      const path = (typeof profile === 'undefined' ? `/casts/${cast?.hash ?? ''}` : `/users/${profile?.username}`)
+      const path = (typeof profile === 'undefined' ? `/casts/${cast?.hash as string ?? ''}` : `/users/${profile?.username as string ?? ''}`)
       return (
         <div
           key={`${typeof profile === 'undefined'
@@ -146,7 +146,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
               </div>
             </div>
             <div className="p-3 break-words justify-center cursor-default" onClick={(e) => e.stopPropagation()}>
-              {renderCastText(cast?.text ?? profile?.bio ?? `${profile?.followers} followers & ${profile?.following} following` ?? '')}
+              {renderCastText(cast?.text ?? profile?.bio ?? `${profile?.followers || 0} followers & ${profile?.following || 0} following` ?? '')}
             </div>
             {/*
             <div className="pt-3 pb-3 float-left">

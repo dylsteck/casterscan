@@ -21,15 +21,6 @@ const CastByHash = () => {
     imageUrl: string;
   }    
 
-  function handleOnClick(name: string){
-    if(expanded.length === 0){
-      setExpanded(name)
-    }
-    else{
-      setExpanded('')
-    }
-  }
-
   const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
   
@@ -126,7 +117,6 @@ const CastByHash = () => {
                 field="Casted At" 
                 image={false} 
                 result={queryResult.data?.cast ? new Date(queryResult.data.cast.published_at).toLocaleString() : ''} imageUrl={''} imageAlt={''} />
-           {/* <div onClick={() => handleOnClick("Likes")}> */}
             <TableRow 
                 field="Likes" 
                 image={false} 
