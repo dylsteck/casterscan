@@ -23,7 +23,7 @@ export default function Layout({ children }: LayoutProps) {
         <meta property="og:title" content="Casterscan"/>
         <meta property="og:description" content="A block explorer for the Farcaster network"/>
         <meta property="og:image" content="https://i.imgur.com/L4g6fCh.jpg"/>
-        { /* Casterscan Logo JPG: https://i.imgur.com/O53Yr4g.png */ }
+        { /* Casterscan Logo image: https://i.imgur.com/O53Yr4g.png */ }
 
         {/* Twitter */}
         <meta property="twitter:card" content="https://i.imgur.com/L4g6fCh.jpg" />
