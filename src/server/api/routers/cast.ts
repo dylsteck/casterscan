@@ -3,6 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
+import type { MergedCast } from "~/types/database.t";
 
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
@@ -13,16 +14,37 @@ export const castsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       input.startRow;
-      const { data: casts, error: castError } = await supabase
+
+      // fix input type
+      const getProfilesAndMergeWithCasts = async(castList: any): Promise<any> => {
+        const profilePromises = castList.map(async (c: any) => {
+          const { data: profile, error: profileError } = await supabase
+            .from("profile")
+            .select()
+            .eq("id", c.fid)
+            .single();
+          if (profileError || !profile) {
+            console.log("Error:\n", profileError);
+            throw new TRPCError({
+              message: `Failed to fetch profile for fid ${c.fid}.`,
+              code: "NOT_FOUND",
+              cause: "An error occurred while fetching the profile.",
+            });
+          }
+          const cast = { ...c, user: profile } as MergedCast;
+          // Merge the profile data into the cast object
+          return cast;
+      })
+      return Promise.all(profilePromises);
+    };
+
+      const { data: castData, error: castError } = await supabase
         .from('casts')
         .select()
         .order('published_at', { ascending: false })
-        .range(
-          input.startRow,
-          input.startRow + 34
-        );
+        .range(input.startRow, input.startRow + 34);
 
-      if (castError || !casts) {
+      if (castError || !castData) {
         console.log("Error:\n", castError);
         throw new TRPCError({
           message: "Failed to fetch latest casts.",
@@ -30,6 +52,8 @@ export const castsRouter = createTRPCRouter({
           cause: "An error occurred while fetching the latest casts."
         });
       }
+
+      const casts = await getProfilesAndMergeWithCasts(castData);
 
       return {
         casts,
@@ -58,7 +82,6 @@ export const castsRouter = createTRPCRouter({
           cause: "An error occurred while fetching the user's casts."
         });
       }
-
       return {
         casts,
       };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import type { Database } from '~/types/database.t';
+import type { Database, MergedCast } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -45,7 +45,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         setFilter(value)
     }
 
-    const sortCasts = (casts: Database['public']['Tables']['casts']['Row'][]) => {
+    const sortCasts = (casts: MergedCast[]) => {
       if (sort === 'Date') {
         return casts.sort(
           (a, b) =>
@@ -53,24 +53,25 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
             new Date(a.published_at).getTime()
         );
       } else if (sort === 'Trending') {
-        return casts.sort((a, b) => {
-          const aTrendFactor =
-            (a.reactions_count || 0) +
-            (a.recasts_count || 0) +
-            (a.replies_count || 0);
-          const bTrendFactor =
-            (b.reactions_count || 0) +
-            (b.recasts_count || 0) +
-            (b.replies_count || 0);
-          return bTrendFactor - aTrendFactor;
-        });
+        // return casts.sort((a, b) => {
+        //   const aTrendFactor =
+        //     (a.reactions_count || 0) +
+        //     (a.recasts_count || 0) +
+        //     (a.replies_count || 0);
+        //   const bTrendFactor =
+        //     (b.reactions_count || 0) +
+        //     (b.recasts_count || 0) +
+        //     (b.replies_count || 0);
+        //   return bTrendFactor - aTrendFactor;
+        // });
+        return casts;
       } else if (filter === 'Casts') {
         return casts.filter((cast) => cast.parent_hash !== null);
       }
       return casts;
     };   
     
-    const sortImages = (casts: Database['public']['Tables']['casts']['Row'][]) => {
+    const sortImages = (casts: MergedCast[]) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         return sortCasts(casts.filter((cast) => cast.text.match(imgurRegex)));
     }
@@ -111,11 +112,11 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         </svg>
       }
       <div className="columns-3 gap-0 mt-[5vh] text-white">
-      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
+      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: MergedCast, index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
-      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => ( 
+      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: MergedCast, index: number) => ( 
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )): null}
       </div>

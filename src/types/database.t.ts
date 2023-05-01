@@ -242,3 +242,19 @@ export interface Database {
     }
   }
 }
+
+export interface MergedCast {
+    deleted: boolean
+    fid: number
+    hash: string
+    mentions: Json | null
+    parent_fid: number | null
+    parent_hash: string | null
+    pruned: boolean | null
+    published_at: string
+    signature: string
+    signer: string
+    text: string
+    thread_hash: string | null
+    user: Database['public']['Tables']['profile']['Row']
+}
