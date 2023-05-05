@@ -126,14 +126,14 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           >
             <div className="flex flex-row p-2 w-full ml-auto">
               <Image
-                src={cast?.user.avatar_url ?? profile?.avatar_url ?? ''}
-                alt={`@${cast?.user.username ?? profile?.username ?? 'unknown'}'s PFP`}
+                src={cast?.userAvatarUrl ?? profile?.avatar_url ?? ''}
+                alt={`@${cast?.userUsername ?? profile?.username ?? 'unknown'}'s PFP`}
                 width={20}
                 height={20}
                 className="rounded-full w-6 h-6 pointer-events-none"
               />
-              <Link href={`/users/${cast?.user.username || profile?.username || ''}`}>
-                <p className="ml-3">@{cast?.user.username ?? profile?.username}</p>
+              <Link href={`/users/${cast?.userUsername || profile?.username || ''}`}>
+                <p className="ml-3">@{cast?.userUsername ?? profile?.username}</p>
               </Link>
       
               <div className="relative ml-auto group text-sm text-gray-300">

@@ -5,6 +5,9 @@ import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 import type { MergedCast } from "~/types/database.t";
 
+import { Kysely, PostgresDialect } from 'kysely'
+import Pool from 'pg-pool'
+
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
     .input(
@@ -15,46 +18,26 @@ export const castsRouter = createTRPCRouter({
     .query(async ({ input }) => {
       input.startRow;
 
-      // fix input type
-      const getProfilesAndMergeWithCasts = async(castList: any): Promise<any> => {
-        const profilePromises = castList.map(async (c: any) => {
-          const { data: profile, error: profileError } = await supabase
-            .from("profile")
-            .select()
-            .eq("id", c.fid)
-            .single();
-          if (profileError || !profile) {
-            console.log("Error:\n", profileError);
-            throw new TRPCError({
-              message: `Failed to fetch profile for fid ${c.fid}.`,
-              code: "NOT_FOUND",
-              cause: "An error occurred while fetching the profile.",
-            });
-          }
-          const cast = { ...c, user: profile } as MergedCast;
-          // Merge the profile data into the cast object
-          return cast;
-      })
-      return Promise.all(profilePromises);
-    };
+      const db = new Kysely({
+        dialect: new PostgresDialect({
+          pool: new Pool({
+            connectionString: process.env.PG_CONNECTION_STRING,
+          }),
+        }),
+      });
 
-      const { data: castData, error: castError } = await supabase
-        .from('casts')
-        .select()
-        .order('published_at', { ascending: false })
-        .range(input.startRow, input.startRow + 34);
+      //const casts = db.selectFrom('casts').selectAll();
+      const castsRequest = await db
+      .selectFrom('casts')
+      .innerJoin('profile', 'profile.id', 'casts.fid')
+      .select(['deleted', 'fid', 'hash', 'mentions', 'parent_fid', 'parent_hash', 'pruned', 'published_at', 'signature', 'signer', 'text', 'thread_hash', 'profile.avatar_url as userAvatarUrl', 'profile.bio as userBio', 'profile.display_name as userDisplayName', 'profile.registered_at as userRegisteredAt', 'profile.url as userUrl', 'profile.username as userUsername'])
+      .orderBy('published_at', 'desc')
+      .offset(input.startRow)
+      .limit(32)
+      .execute();
 
-      if (castError || !castData) {
-        console.log("Error:\n", castError);
-        throw new TRPCError({
-          message: "Failed to fetch latest casts.",
-          code: "NOT_FOUND",
-          cause: "An error occurred while fetching the latest casts."
-        });
-      }
-
-      const casts = await getProfilesAndMergeWithCasts(castData);
-
+      const casts = castsRequest as MergedCast[];
+      console.log(casts)
       return {
         casts,
       };

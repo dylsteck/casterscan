@@ -256,5 +256,10 @@ export interface MergedCast {
     signer: string
     text: string
     thread_hash: string | null
-    user: Database['public']['Tables']['profile']['Row']
+    userAvatarUrl: string | null
+    userBio: string | null
+    userDisplayName: string | null
+    userRegisteredAt: string | null
+    userUrl: string | null
+    userUsername: string | null
 }
