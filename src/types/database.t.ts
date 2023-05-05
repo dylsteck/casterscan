@@ -243,6 +243,25 @@ export interface Database {
   }
 }
 
+export interface CastWithReactions {
+    deleted: boolean
+    fid: number
+    hash: string
+    mentions: Json | null
+    parent_fid: number | null
+    parent_hash: string | null
+    pruned: boolean | null
+    published_at: string
+    signature: string
+    signer: string
+    text: string
+    thread_hash: string | null
+    replies: number | null
+    reactions: number | null
+    recasts: number | null
+    watches: number | null
+}
+
 export interface MergedCast {
     deleted: boolean
     fid: number
@@ -277,4 +296,10 @@ export interface MergedUser {
   followers: number
   following: number
   referrer: string | null
+  userAvatarUrl: string | null
+  userBio: string | null
+  userDisplayName: string | null
+  userRegisteredAt: string | null
+  userUrl: string | null
+  userUsername: string | null
 }

@@ -3,7 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
-import type { MergedCast } from "~/types/database.t";
+import type { MergedCast, CastWithReactions } from "~/types/database.t";
 import { db } from "~/lib/kysely";
 
 export const castsRouter = createTRPCRouter({
@@ -27,7 +27,7 @@ export const castsRouter = createTRPCRouter({
       .execute();
 
       const casts = castsRequest as MergedCast[];
-      console.log(casts)
+
       return {
         casts,
       };
@@ -40,21 +40,26 @@ export const castsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const { data: casts, error: castError } = await supabase
-        .from('casts')
-        .select()
-        .eq('author_username', input.username)
-        .order('published_at', {ascending: false})
-        .range(input.startRow, input.startRow + 32);
+      const castData = await db
+        .selectFrom('casts')
+        .innerJoin('profile', 'profile.id', 'casts.fid')
+        .where('profile.username', '=', input.username)
+        .offset(input.startRow)
+        .select(['deleted', 'fid', 'hash', 'mentions', 'parent_fid', 'parent_hash', 'pruned', 'published_at', 'signature', 'signer', 'text', 'thread_hash', 'profile.avatar_url as userAvatarUrl', 'profile.bio as userBio', 'profile.display_name as userDisplayName', 'profile.registered_at as userRegisteredAt', 'profile.url as userUrl', 'profile.username as userUsername'])
+        .orderBy('published_at', 'desc')
+        .limit(32)
+        .execute();
 
-      if (castError || !casts) {
-        console.log("Error:\n", castError);
+      if (!castData) {
+        console.log("Error:\n", castData);
         throw new TRPCError({
           message: "Failed to fetch user casts.",
           code: "NOT_FOUND",
           cause: "An error occurred while fetching the user's casts."
         });
       }
+
+      const casts = castData as MergedCast[]
       return {
         casts,
       };
@@ -66,21 +71,43 @@ export const castsRouter = createTRPCRouter({
         })
       )
       .query(async ({ input }) => {
-        const { data: castData, error: castError } = await supabase
-        .from('casts')
-        .select()
-        .eq('hash', input.hash);
+        const castData = await db
+        .selectFrom('casts')
+        .innerJoin('profile', 'profile.id', 'casts.fid')
+        .select(['deleted', 'fid', 'hash', 'mentions', 'parent_fid', 'parent_hash', 'pruned', 'published_at', 'signature', 'signer', 'text', 'thread_hash', 'profile.avatar_url as userAvatarUrl', 'profile.bio as userBio', 'profile.display_name as userDisplayName', 'profile.registered_at as userRegisteredAt', 'profile.url as userUrl', 'profile.username as userUsername'])
+        .where('hash', '=', input.hash)
+        .executeTakeFirst();
 
-        if (castError || !castData) {
-          console.log("Error:\n", castError);
+        if (!castData) {
+          console.log("Error:\n", castData);
           throw new TRPCError({
             message: "Failed to fetch cast.",
             code: "NOT_FOUND",
             cause: "An error occurred while fetching the cast."
           });
         }
-        
-        const cast = castData[0];
+
+        const currentCast = castData as MergedCast;
+
+        const options: RequestInit = {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+            'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN}`,
+          },
+        };
+  
+        const warpUserData = await fetch(`https://api.warpcast.com/v2/cast?hash=${currentCast?.hash}`, options)
+        const finalWarpData = await warpUserData.json();
+      
+        const cast = {
+          ...currentCast,
+          replies: finalWarpData.result.cast.replies.count,
+          reactions: finalWarpData.result.cast.reactions.count,
+          recasts: finalWarpData.result.cast.recasts.count,
+          watches: finalWarpData.result.cast.watches.count,
+        } as CastWithReactions;
+
         return {
           cast
         };

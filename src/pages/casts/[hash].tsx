@@ -5,6 +5,7 @@ import TableRow from '../../components/TableRow';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
 import Image from 'next/image';
+// import type { MergedCast } from '~/types/database.t';
 
 const CastByHash = () => {
 
@@ -110,9 +111,9 @@ const CastByHash = () => {
             <TableRow 
                 field="Casted By" 
                 image={true} 
-                imageUrl={queryResult.data?.cast?.author_pfp_url as string || ''} 
-                imageAlt={`@${queryResult.data?.cast?.author_username as string || ''}'s PFP`} 
-                result={`@${queryResult.data?.cast?.author_username as string || ''}`} />
+                imageUrl={queryResult.data?.cast?.userAvatarUrl as string || ''} 
+                imageAlt={`@${queryResult.data?.cast?.userUsername as string || ''}'s PFP`} 
+                result={`@${queryResult.data?.cast?.userUsername as string || ''}`} />
             <TableRow 
                 field="Casted At" 
                 image={false} 
@@ -120,16 +121,19 @@ const CastByHash = () => {
             <TableRow 
                 field="Likes" 
                 image={false} 
-                result={String(queryResult.data?.cast?.reactions_count || 0)} imageUrl={''} imageAlt={''} />
-          {/* </div> */}
+                result={String(queryResult.data?.cast?.reactions || 0)} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Recasts" 
                 image={false} 
-                result={String(queryResult.data?.cast?.recasts_count || 0)} imageUrl={''} imageAlt={''} />
+                result={String(queryResult.data?.cast?.recasts || 0)} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Replies" 
                 image={false} 
-                result={String(queryResult.data?.cast?.replies_count || 0)} imageUrl={''} imageAlt={''} />
+                result={String(queryResult.data?.cast?.replies || 0)} imageUrl={''} imageAlt={''} />
+            <TableRow 
+                field="Watches" 
+                image={false} 
+                result={String(queryResult.data?.cast?.watches || 0)} imageUrl={''} imageAlt={''} />
           {/* TODO: show expanded info like likers, recasters, etc {expanded.length > 0 && (
             <div className="mt-10 ml-5">
               {expanded}
@@ -137,7 +141,7 @@ const CastByHash = () => {
           )} */}
           </div>
           <div className="lg:w-1/2 md:w-full">
-            <Gallery user={queryResult.data?.cast?.author_username as string} />
+            <Gallery user={queryResult.data?.cast?.userUsername as string} />
           </div>
         </div>
       )}
