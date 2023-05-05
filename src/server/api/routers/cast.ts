@@ -4,9 +4,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 import type { MergedCast } from "~/types/database.t";
-
-import { Kysely, PostgresDialect } from 'kysely'
-import Pool from 'pg-pool'
+import { db } from "~/lib/kysely";
 
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
@@ -17,14 +15,6 @@ export const castsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       input.startRow;
-
-      const db = new Kysely({
-        dialect: new PostgresDialect({
-          pool: new Pool({
-            connectionString: process.env.PG_CONNECTION_STRING,
-          }),
-        }),
-      });
 
       //const casts = db.selectFrom('casts').selectAll();
       const castsRequest = await db

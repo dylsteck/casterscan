@@ -2,12 +2,10 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from "../../../lib/supabase";
 import { TRPCError } from "@trpc/server";
-import type { Database } from "~/types/database.t";
+import type { MergedUser, Database } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
+import { db } from "~/lib/kysely";
 
-type UserPageData = {
-  user: Database["public"]["Tables"]["profile"]["Row"];
-};
 
 type LatestProfilesData = {
   profiles: Database["public"]["Tables"]["profile"]["Row"][];
@@ -21,38 +19,47 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      console.log("initing query to supabase for username:", input.username);
-      const { data: userData, error: userError } = await supabase
-        .from("profile")
-        .select()
-        .eq("username", input.username)
-        .limit(1)
-        .single();
 
-      if (userError || !userData) {
-        console.log(userError);
+      const userRequest = await db
+        .selectFrom('profile')
+        .select(['avatar_url', 'bio', 'display_name', 'id', 'owner', 'registered_at', 'updated_at', 'url', 'username'])
+        .where('profile.username', '=', input.username)
+        .executeTakeFirst();
 
-        if (userError.code == "PGRST116") {
-          throw new TRPCError({
-            message: "PGRST116",
-            code: "NOT_FOUND",
-            cause: "Query matches username regex, but username not found; likely to be a text-query."
-          })
-        } else {
+      const options: RequestInit = {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN}`,
+        },
+      };
+
+      const warpUserData = await fetch(`https://api.warpcast.com/v2/user?fid=${userRequest?.id}`, options)
+      const finalWarpData = await warpUserData.json();
+      
+      const finalUserObject = {
+        ...userRequest,
+        followers: finalWarpData.result.user.followerCount,
+        following: finalWarpData.result.user.followingCount,
+        referrer: finalWarpData.result.user.referrerUsername
+      };
+
+      if (!userRequest) {
+        console.log(userRequest);
           throw new TRPCError({
             message: "Invalid user.",
             code: "NOT_FOUND",
             cause: "User username may not be registered.",
           });
-        }
       }
 
-      const user = userData
-      console.log(user);
+      const user = finalUserObject as MergedUser
+
       return {
         user,
-      } as UserPageData;
+      }
     }),
+
     getUserNFTDData: publicProcedure
     .input(
       z.object({
@@ -60,15 +67,17 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const { data: verificationData } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
+      const { data: verificationData, error: verificationError } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
       const wallet = verificationData?.address;
       if(typeof wallet !== 'undefined'){
         try {
           const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${wallet ?? ''}`);
+          console.log("RESP", response);
           if (!response.ok) {
             // handle non-2xx responses
             throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
           }
+          const jsonData = await response.json()
           const data = await response.json() as NFTDData;
           return data;
         } catch (error) {

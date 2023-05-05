@@ -263,3 +263,18 @@ export interface MergedCast {
     userUrl: string | null
     userUsername: string | null
 }
+
+export interface MergedUser {
+  avatar_url: string | null
+  bio: string | null
+  display_name: string | null
+  id: number
+  owner: string | null
+  registered_at: string | null
+  updated_at: string | null
+  url: string | null
+  username: string | null
+  followers: number
+  following: number
+  referrer: string | null
+}
