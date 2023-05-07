@@ -36,9 +36,12 @@ export const userRouter = createTRPCRouter({
 
       const warpUserData = await fetch(`https://api.warpcast.com/v2/user?fid=${userRequest?.id}`, options)
       const finalWarpData = await warpUserData.json();
+
+      var finalUserRequest = userRequest;
+      finalUserRequest.id = parseInt(finalUserRequest?.id);
       
       const finalUserObject = {
-        ...userRequest,
+        ...finalUserRequest,
         followers: finalWarpData.result.user.followerCount,
         following: finalWarpData.result.user.followingCount,
         referrer: finalWarpData.result.user.referrerUsername
@@ -54,6 +57,7 @@ export const userRouter = createTRPCRouter({
       }
 
       const user = finalUserObject as MergedUser
+      console.log("FINAL", user)
 
       return {
         user,
@@ -67,26 +71,22 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
+      console.log("INPUT", input);
       const { data: verificationData, error: verificationError } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
       const wallet = verificationData?.address;
       if(typeof wallet !== 'undefined'){
         try {
           const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${wallet ?? ''}`);
-          console.log("RESP", response);
           if (!response.ok) {
             // handle non-2xx responses
             throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
           }
-          const jsonData = await response.json()
-          const data = await response.json() as NFTDData;
+          const allData = await response.json();
+          const data = allData.data as NFTDData[];
+          console.log(allData, data)
           return data;
         } catch (error) {
           console.error(error);
-          // throw new TRPCError({
-          //   message: 'Failed to fetch NF.TD data.',
-          //   code: 'INTERNAL_SERVER_ERROR',
-          //   cause: error.message,
-          // });
         }
       }
     }),

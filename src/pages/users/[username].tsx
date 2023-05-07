@@ -14,7 +14,7 @@ const UserByUsername = () => {
   const router = useRouter();
   const t = api.useContext();
   const [user, setUser] = useState<MergedUser>();
-  const [nftdInfo, setNftdInfo] = useState<NFTDData>();
+  const [nftdInfo, setNftdInfo] = useState<NFTDData[]>();
 
   useEffect(() => {
     if (!router.isReady) {
@@ -32,7 +32,8 @@ const UserByUsername = () => {
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
         setUser(profile);
-        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: 616 });
+        console.log("PROFILE", profile);
+        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: parseInt(profile?.id) });
         if (nftdDataResponse) {
           setNftdInfo(nftdDataResponse);
         } else {
@@ -172,24 +173,30 @@ const UserByUsername = () => {
               }
               {nftdInfo && 
               <>
-                <Link href={`https://nf.td/${nftdInfo?.slug}`}>
-                  <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
-                </Link>
-                {nftdInfo.ensData && 
-                  <TableRow
-                    field={'ENS'}
-                    image={false}
-                    result={nftdInfo?.ensData[0]?.name || ''}
-                  />
-                }
-                {nftdInfo.all_links.filter((link => link.type !== 'header')).map((link, index) => (
-                  <TableRow
-                    field={link.label ?? ''}
-                    image={false}
-                    result={link.url ?? ''}
-                    key={`${link.url ?? ''}-${index}`}
-                  />
-                ))}
+                {nftdInfo.map((item: NFTDData) => {
+                  return(
+                    <>
+                      <Link href={`https://nf.td/${nftdInfo?.slug}`}>
+                        <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
+                      </Link>
+                      {item.ensData && 
+                        <TableRow
+                          field={'ENS'}
+                          image={false}
+                          result={item?.ensData[0]?.name || ''}
+                        />
+                      }
+                      {item.content.filter((link => link.type !== 'header')).map((link, index) => (
+                        <TableRow
+                          field={link.label ?? ''}
+                          image={false}
+                          result={link.url ?? ''}
+                          key={`${link.url ?? ''}-${index}`}
+                        />
+                      ))}
+                    </>
+                  )
+                })}
               </>}
             </div>
             {/* fix line <div className="w-[100%] border-dotted border-t-2 border-purple-900 relative block"></div> */}

@@ -28,6 +28,8 @@ export const castsRouter = createTRPCRouter({
 
       const casts = castsRequest as MergedCast[];
 
+      console.log("LATEST CASTS ", casts);
+
       return {
         casts,
       };

@@ -7,7 +7,7 @@ export interface NFTDData {
     ensData: ENSData[];
     primary_social: PrimarySocial[];
     verified_links: VerifiedLink[];
-    all_links: AllLink[];
+    content: Content[];
   }
   
   export interface ENSData {
@@ -60,7 +60,7 @@ export interface NFTDData {
     verified: boolean;
   }
   
-  export interface AllLink {
+  export interface Content {
     type: string;
     label: string;
     connectedAddress: string;
