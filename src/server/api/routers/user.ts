@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from "../../../lib/supabase";
 import { TRPCError } from "@trpc/server";
-import type { MergedUser, Database } from "~/types/database.t";
+import type { MergedUser, Database, Profile } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
 import { db } from "~/lib/kysely";
 
@@ -121,16 +121,21 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         limit: z.number().optional(),
+        startRow: z.number(),
       })
     )
     .query(async ({ input }) => {
-      const { data: profiles, error: profileError } = await supabase
-        .from("profile")
-        .select()
-        .limit(input.limit || 100);
+      // todo: work on desc, doesn't work because of so much null data
+      const profilesRequest = await db
+      .selectFrom('profile')
+      .select(['id', 'owner', 'username', 'display_name', 'avatar_url', 'bio', 'registered_at', 'updated_at', 'url'])
+      .orderBy('id', 'asc')
+      .offset(input.startRow)
+      .limit(32)
+      .execute();
 
-      if (profileError || !profiles) {
-        console.log("Error:\n", profileError);
+      if (!profilesRequest) {
+        console.log("Error:\n", profilesRequest);
         throw new TRPCError({
           message: "Failed to fetch latest profiles.",
           code: "NOT_FOUND",
@@ -139,7 +144,9 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      if (profiles.length === 0) {
+      const profiles = profilesRequest as Profile[];
+
+      if (profilesRequest.length === 0) {
         throw new TRPCError({
           message: "No profiles found.",
           code: "NOT_FOUND",
@@ -149,6 +156,6 @@ export const userRouter = createTRPCRouter({
 
       return {
         profiles,
-      } as LatestProfilesData;
+      };
     }),
 });

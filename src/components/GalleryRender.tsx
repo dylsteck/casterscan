@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 //import { getRelativeTime } from '../lib/time';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Database, MergedCast } from '~/types/database.t';
+import type { Database, MergedCast, Profile } from '~/types/database.t';
 import { getRelativeTime } from '~/lib/time';
 import { useRouter } from 'next/router'
 //import warpcastIcon from '../../public/warpcastIcon.png';
@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 
 type GalleryRenderProps = {
     cast?: MergedCast;
-    profile?: Database['public']['Tables']['profile']['Row'];
+    profile?: Profile;
     index: number;
   };
   
@@ -127,14 +127,14 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           >
             <div className="flex flex-row p-2 w-full ml-auto">
               <Image
-                src={cast?.userAvatarUrl ?? profile?.avatar_url ?? ''}
+                src={cast?.userAvatarUrl ?? profile?.avatar_url ?? 'https://explorer.farcaster.xyz/avatar.png'}
                 alt={`@${cast?.userUsername ?? profile?.username ?? 'unknown'}'s PFP`}
                 width={20}
                 height={20}
                 className="rounded-full w-6 h-6 pointer-events-none"
               />
               <Link href={`/users/${cast?.userUsername || profile?.username || ''}`}>
-                <p className="ml-3">@{cast?.userUsername ?? profile?.username}</p>
+                <p className="ml-3">@{cast?.userUsername ?? profile?.username ?? ''}</p>
               </Link>
       
               <div className="relative ml-auto group text-sm text-gray-300">

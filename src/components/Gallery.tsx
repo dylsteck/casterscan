@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import type { Database, MergedCast } from '~/types/database.t';
+import type { Database, MergedCast, Profile } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -33,7 +33,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       );
 
     const profilesQueryResult = api.user.getLatestProfiles.useQuery(
-      { limit: 30 },
+      { limit: 30, startRow: (parseInt(page as string) - 1) * 30 || 0 },
       { refetchOnWindowFocus: false } // for development
     );
 
@@ -77,7 +77,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
     }
     
 
-    const sortProfiles = (profiles: Database['public']['Tables']['profile']['Row'][]) => {
+    const sortProfiles = (profiles: Profile[]) => {
       console.log(profiles.filter((profile) => profile.username !== null))
       return profiles.filter((profile) => profile.username !== null);
     }
@@ -114,7 +114,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       <div className="w-[100%] lg:columns-3 md:columns-2 auto-cols-auto gap-0 mt-[5vh] text-white">
       {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: MergedCast, index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
-      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
+      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Profile, index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
       )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: MergedCast, index: number) => ( 
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />

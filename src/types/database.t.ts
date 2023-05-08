@@ -243,6 +243,18 @@ export interface Database {
   }
 }
 
+export interface Profile {
+  id: string;
+  owner: string | null;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  registered_at: string | null;
+  updated_at: string | null;
+  url: string | null; 
+}
+
 export interface CastWithReactions {
     deleted: boolean
     fid: number
