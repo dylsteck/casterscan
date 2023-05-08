@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import type { Database, MergedCast, Profile } from '~/types/database.t';
+import type { MergedCast, Profile } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -112,11 +112,11 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         </svg>
       }
       <div className="w-[100%] lg:columns-3 md:columns-2 auto-cols-auto gap-0 mt-[5vh] text-white">
-      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: MergedCast, index: number) => (        
+      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts as MergedCast[]).map((cast: MergedCast, index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Profile, index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
-      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: MergedCast, index: number) => ( 
+      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts as MergedCast[]).map((cast: MergedCast, index: number) => ( 
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )): null}
       </div>

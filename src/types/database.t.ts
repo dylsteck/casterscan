@@ -268,6 +268,12 @@ export interface CastWithReactions {
     signer: string
     text: string
     thread_hash: string | null
+    userAvatarUrl: string | null
+    userBio: string | null
+    userDisplayName: string | null
+    userRegisteredAt: string | null
+    userUrl: string | null
+    userUsername: string | null
     replies: number | null
     reactions: number | null
     recasts: number | null

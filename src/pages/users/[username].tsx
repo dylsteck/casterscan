@@ -5,7 +5,7 @@ import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MergedUser, Database } from '~/types/database.t';
+import type { MergedUser } from '~/types/database.t';
 import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
 
@@ -32,7 +32,7 @@ const UserByUsername = () => {
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
         setUser(profile);
-        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: parseInt(profile?.id) });
+        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: profile.id });
         if (nftdDataResponse) {
           console.log(nftdDataResponse)
           setNftdInfo(nftdDataResponse);
@@ -206,7 +206,7 @@ const UserByUsername = () => {
                         <TableRow
                         field={'Is OG'}
                         image={false}
-                        result={`${item.isOG}`}/>
+                        result={item.isOG.toString()}/>
                       </> : null}
                     </>
                   )

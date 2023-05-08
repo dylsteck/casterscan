@@ -16,8 +16,6 @@ const CastByHash = () => {
     { refetchOnWindowFocus: false}
   );
 
-  const [expanded, setExpanded] = useState<string>('');
-
   interface ExpandableImageProps {
     imageUrl: string;
   }    
