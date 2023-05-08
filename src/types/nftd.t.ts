@@ -8,6 +8,7 @@ export interface NFTDData {
     primary_social: PrimarySocial[];
     verified_links: VerifiedLink[];
     content: Content[];
+    tokenId: string;
   }
   
   export interface ENSData {

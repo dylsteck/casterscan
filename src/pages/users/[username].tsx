@@ -32,9 +32,9 @@ const UserByUsername = () => {
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
         setUser(profile);
-        console.log("PROFILE", profile);
         const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: parseInt(profile?.id) });
         if (nftdDataResponse) {
+          console.log(nftdDataResponse)
           setNftdInfo(nftdDataResponse);
         } else {
           console.log("NFTD data is missing or malformed:", nftdDataResponse);
@@ -176,7 +176,7 @@ const UserByUsername = () => {
                 {nftdInfo.map((item: NFTDData) => {
                   return(
                     <>
-                      <Link href={`https://nf.td/${nftdInfo?.slug}`}>
+                      <Link href={`https://nf.td/${item?.slug}`}>
                         <Image src={nftdIcon} width={100} height={43} alt="NF.TD icon" className="pt-5 ml-5 mb-2" />
                       </Link>
                       {item.ensData && 
@@ -194,6 +194,20 @@ const UserByUsername = () => {
                           key={`${link.url ?? ''}-${index}`}
                         />
                       ))}
+                      {item.content.length === 0 || item.content.length < 5 ? <>
+                        <TableRow
+                        field={'Slug'}
+                        image={false}
+                        result={item.slug}/>
+                        <TableRow
+                        field={'Token ID'}
+                        image={false}
+                        result={item.tokenId}/>
+                        <TableRow
+                        field={'Is OG'}
+                        image={false}
+                        result={`${item.isOG}`}/>
+                      </> : null}
                     </>
                   )
                 })}

@@ -22,6 +22,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         imageUrl: string;
       }    
   
+      // TODO: support svgs(eg. lot of avatar_urls are OpenSea SVGs)
       const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
         const [isExpanded, setIsExpanded] = useState(false);
     

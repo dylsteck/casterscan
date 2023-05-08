@@ -89,6 +89,7 @@ export const userRouter = createTRPCRouter({
             }
           }
         `;
+        // TODO: if verification in db, grab from db, if not, request from Airstack *and* add record to db
         const response = await fetch(process.env.AIRSTACK_GQL_ENDPOINT ?? '', {
           headers: { "Content-Type": "application/json" },
           method: "POST",
@@ -109,7 +110,7 @@ export const userRouter = createTRPCRouter({
           }
           const allData = await response.json();
           const data = allData.data as NFTDData[];
-          console.log(data)
+          //console.log(data)
           return data;
         } catch (error) {
           console.error(error);
