@@ -71,19 +71,45 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      console.log("INPUT", input);
-      const { data: verificationData, error: verificationError } = await supabase.from('verification').select('*').eq('fid', input.fid).limit(1).single();
-      const wallet = verificationData?.address;
-      if(typeof wallet !== 'undefined'){
+        const query = `
+          query MyQuery {
+            Socials(
+              input: {
+                filter: {
+                  dappName: {_eq: farcaster},
+                  userId: {_eq: "${input.fid}"}
+                },
+                blockchain: ethereum
+              }
+            ) {
+              Social{
+                userAddress
+                userAssociatedAddresses
+              }
+            }
+          }
+        `;
+        const response = await fetch(process.env.AIRSTACK_GQL_ENDPOINT ?? '', {
+          headers: { "Content-Type": "application/json" },
+          method: "POST",
+          body: JSON.stringify({ query }),
+        });
+    
+        const { data } = await response.json();
+        const final = data.Socials.Social[0];
+        const associatedAddress = final.userAssociatedAddresses
+        .filter((address: string) => address !== final.userAddress)
+        .find(Boolean);
+      if(typeof associatedAddress !== 'undefined'){
         try {
-          const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${wallet ?? ''}`);
+          const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress ?? ''}`);
           if (!response.ok) {
             // handle non-2xx responses
             throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
           }
           const allData = await response.json();
           const data = allData.data as NFTDData[];
-          console.log(allData, data)
+          console.log(data)
           return data;
         } catch (error) {
           console.error(error);
