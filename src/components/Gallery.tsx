@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import type { Database } from '~/types/database.t';
+import type { KyselyDB } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -33,7 +33,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       );
 
     const profilesQueryResult = api.user.getLatestProfiles.useQuery(
-      { limit: 30 },
+      { limit: 30, startRow: (parseInt(page as string) - 1) * 30 || 0 },
       { refetchOnWindowFocus: false } // for development
     );
 
@@ -45,7 +45,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         setFilter(value)
     }
 
-    const sortCasts = (casts: Database['public']['Tables']['casts']['Row'][]) => {
+    const sortCasts = (casts: KyselyDB['mergedCast'][]) => {
       if (sort === 'Date') {
         return casts.sort(
           (a, b) =>
@@ -53,30 +53,31 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
             new Date(a.published_at).getTime()
         );
       } else if (sort === 'Trending') {
-        return casts.sort((a, b) => {
-          const aTrendFactor =
-            (a.reactions_count || 0) +
-            (a.recasts_count || 0) +
-            (a.replies_count || 0);
-          const bTrendFactor =
-            (b.reactions_count || 0) +
-            (b.recasts_count || 0) +
-            (b.replies_count || 0);
-          return bTrendFactor - aTrendFactor;
-        });
+        // return casts.sort((a, b) => {
+        //   const aTrendFactor =
+        //     (a.reactions_count || 0) +
+        //     (a.recasts_count || 0) +
+        //     (a.replies_count || 0);
+        //   const bTrendFactor =
+        //     (b.reactions_count || 0) +
+        //     (b.recasts_count || 0) +
+        //     (b.replies_count || 0);
+        //   return bTrendFactor - aTrendFactor;
+        // });
+        return casts;
       } else if (filter === 'Casts') {
         return casts.filter((cast) => cast.parent_hash !== null);
       }
       return casts;
     };   
     
-    const sortImages = (casts: Database['public']['Tables']['casts']['Row'][]) => {
+    const sortImages = (casts: KyselyDB['mergedCast'][]) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         return sortCasts(casts.filter((cast) => cast.text.match(imgurRegex)));
     }
     
 
-    const sortProfiles = (profiles: Database['public']['Tables']['profile']['Row'][]) => {
+    const sortProfiles = (profiles: KyselyDB['profile'][]) => {
       console.log(profiles.filter((profile) => profile.username !== null))
       return profiles.filter((profile) => profile.username !== null);
     }
@@ -110,12 +111,12 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
         </svg>
       }
-      <div className="columns-3 gap-0 mt-[5vh] text-white">
-      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => (        
+      <div className="w-[100%] lg:columns-3 md:columns-2 auto-cols-auto gap-0 mt-[5vh] text-white">
+      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts as KyselyDB['mergedCast'][]).map((cast: KyselyDB['mergedCast'], index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
-      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Database['public']['Tables']['profile']['Row'], index: number) => (
+      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: KyselyDB['profile'], index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
-      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts).map((cast: Database['public']['Tables']['casts']['Row'], index: number) => ( 
+      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts as KyselyDB['mergedCast'][]).map((cast: KyselyDB['mergedCast'], index: number) => ( 
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )): null}
       </div>

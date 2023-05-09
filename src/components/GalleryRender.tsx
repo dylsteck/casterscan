@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 //import { getRelativeTime } from '../lib/time';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Database } from '~/types/database.t';
+import type { KyselyDB } from '~/types/database.t';
 import { getRelativeTime } from '~/lib/time';
 import { useRouter } from 'next/router'
 //import warpcastIcon from '../../public/warpcastIcon.png';
 //import { ArrowPathRoundedSquareIcon, HandThumbUpIcon } from '@heroicons/react/24/solid';
 
 type GalleryRenderProps = {
-    cast?: Database['public']['Tables']['casts']['Row'];
-    profile?: Database['public']['Tables']['profile']['Row'];
+    cast?: KyselyDB['mergedCast'];
+    profile?: KyselyDB['profile'];
     index: number;
   };
   
@@ -22,6 +22,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
         imageUrl: string;
       }    
   
+      // TODO: support svgs(eg. lot of avatar_urls are OpenSea SVGs)
       const ExpandableImage = ({ imageUrl }: ExpandableImageProps) => {
         const [isExpanded, setIsExpanded] = useState(false);
     
@@ -126,14 +127,14 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
           >
             <div className="flex flex-row p-2 w-full ml-auto">
               <Image
-                src={cast?.author_pfp_url ?? profile?.avatar_url ?? ''}
-                alt={`@${cast?.author_username ?? profile?.username ?? 'unknown'}'s PFP`}
+                src={cast?.userAvatarUrl ?? profile?.avatar_url ?? 'https://explorer.farcaster.xyz/avatar.png'}
+                alt={`@${cast?.userUsername ?? profile?.username ?? 'unknown'}'s PFP`}
                 width={20}
                 height={20}
                 className="rounded-full w-6 h-6 pointer-events-none"
               />
-              <Link href={`/users/${cast?.author_username || profile?.username || ''}`}>
-                <p className="ml-3">@{cast?.author_username ?? profile?.username}</p>
+              <Link href={`/users/${cast?.userUsername || profile?.username || ''}`}>
+                <p className="ml-3">@{cast?.userUsername ?? profile?.username ?? ''}</p>
               </Link>
       
               <div className="relative ml-auto group text-sm text-gray-300">
@@ -146,7 +147,7 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
               </div>
             </div>
             <div className="p-3 break-words justify-center cursor-default" onClick={(e) => e.stopPropagation()}>
-              {renderCastText(cast?.text ?? profile?.bio ?? `${profile?.followers || 0} followers & ${profile?.following || 0} following` ?? '')}
+              {renderCastText(cast?.text ?? profile?.bio ?? '')}
             </div>
             {/*
             <div className="pt-3 pb-3 float-left">

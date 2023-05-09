@@ -37,15 +37,6 @@ const Home: NextPage = () => {
             decoration-wavy
             transition-colors ease-in-out duration-200
           ">Dylan Steck</Link>
-          and
-          <Link href="/users/yashkarthik" className="
-            text-purple-900
-            underline decoration-1
-            decoration-transparent
-            hover:decoration-purple-900
-            decoration-wavy
-            transition-colors ease-in-out duration-200
-          ">Yash Karthik</Link>
           |
           <Link href="https://github.com/dylsteck/casterscan" className="
             text-purple-900
