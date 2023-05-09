@@ -242,82 +242,94 @@ export interface Database {
     }
   }
 }
+export interface KyselyDB {
 
-export interface Profile {
-  id: string;
-  owner: string | null;
-  username: string | null;
-  display_name: string | null;
-  avatar_url: string | null;
-  bio: string | null;
-  registered_at: string | null;
-  updated_at: string | null;
-  url: string | null; 
-}
+  casts: {
+    deleted: boolean;
+    fid: number;
+    hash: string;
+    mentions: Json | null;
+    parent_fid: number | null;
+    parent_hash: string | null;
+    pruned: boolean | null;
+    published_at: string;
+    signature: string;
+    signer: string;
+    text: string;
+    thread_hash: string | null;
+  }
 
-export interface CastWithReactions {
-    deleted: boolean
-    fid: number
-    hash: string
-    mentions: Json | null
-    parent_fid: number | null
-    parent_hash: string | null
-    pruned: boolean | null
-    published_at: string
-    signature: string
-    signer: string
-    text: string
-    thread_hash: string | null
-    userAvatarUrl: string | null
-    userBio: string | null
-    userDisplayName: string | null
-    userRegisteredAt: string | null
-    userUrl: string | null
-    userUsername: string | null
-    replies: number | null
-    reactions: number | null
-    recasts: number | null
-    watches: number | null
-}
+  profile: {
+    id: string;
+    owner: string | null;
+    username: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+    bio: string | null;
+    registered_at: string | null;
+    updated_at: string | null;
+    url: string | null; 
+  };
 
-export interface MergedCast {
-    deleted: boolean
-    fid: number
-    hash: string
-    mentions: Json | null
-    parent_fid: number | null
-    parent_hash: string | null
-    pruned: boolean | null
-    published_at: string
-    signature: string
-    signer: string
-    text: string
-    thread_hash: string | null
-    userAvatarUrl: string | null
-    userBio: string | null
-    userDisplayName: string | null
-    userRegisteredAt: string | null
-    userUrl: string | null
-    userUsername: string | null
-}
+  castWithReactions: {
+    deleted: boolean;
+    fid: number;
+    hash: string;
+    mentions: Json | null;
+    parent_fid: number | null;
+    parent_hash: string | null;
+    pruned: boolean | null;
+    published_at: string;
+    signature: string;
+    signer: string;
+    text: string;
+    thread_hash: string | null;
+    userAvatarUrl: string | null;
+    userBio: string | null;
+    userDisplayName: string | null;
+    userRegisteredAt: string | null;
+    userUrl: string | null;
+    userUsername: string | null;
+    replies: number | null;
+    reactions: number | null;
+    recasts: number | null;
+    watches: number | null;
+  };
 
-export interface MergedUser {
-  avatar_url: string | null
-  bio: string | null
-  display_name: string | null
-  id: number
-  owner: string | null
-  registered_at: string | null
-  updated_at: string | null
-  url: string | null
-  username: string | null
-  followers: number
-  following: number
-  referrer: string | null
-  userAvatarUrl: string | null
-  userBio: string | null
-  userDisplayName: string | null
-  userRegisteredAt: string | null
-  userUrl: string | null
-  userUsername: string | null
+  mergedCast: {
+    deleted: boolean;
+    fid: number;
+    hash: string;
+    mentions: Json | null;
+    parent_fid: number | null;
+    parent_hash: string | null;
+    pruned: boolean | null;
+    published_at: string;
+    signature: string;
+    signer: string;
+    text: string;
+    thread_hash: string | null;
+    userAvatarUrl: string | null;
+    userBio: string | null;
+    userDisplayName: string | null;
+    userRegisteredAt: string | null;
+    userUrl: string | null;
+    userUsername: string | null;
+  };
+
+  mergedUser: {
+    username: string | null;
+    id: string;
+    owner: string | null;
+    display_name: string | null;
+    avatar_url: string | null;
+    bio: string | null;
+    registered_at: string | null;
+    updated_at: string | null;
+    url: string | null;
+    followers: number;
+    following: number;
+    referrer: string | null;
+  };
 }
+  

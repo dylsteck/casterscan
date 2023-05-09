@@ -3,7 +3,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
-import type { MergedCast, CastWithReactions } from "~/types/database.t";
+import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";
 
 export const castsRouter = createTRPCRouter({
@@ -26,7 +26,7 @@ export const castsRouter = createTRPCRouter({
       .limit(32)
       .execute();
 
-      const casts = castsRequest as MergedCast[];
+      const casts = castsRequest as KyselyDB['mergedCast'][];
 
       return {
         casts,
@@ -59,7 +59,7 @@ export const castsRouter = createTRPCRouter({
         });
       }
 
-      const casts = castData as MergedCast[]
+      const casts = castData as KyselyDB['mergedCast'][];
       return {
         casts,
       };
@@ -87,7 +87,7 @@ export const castsRouter = createTRPCRouter({
           });
         }
 
-        const currentCast = castData as MergedCast;
+        const currentCast = castData as KyselyDB['mergedCast'];
 
         const options: RequestInit = {
           method: 'GET',
@@ -106,7 +106,7 @@ export const castsRouter = createTRPCRouter({
           reactions: finalWarpData.result.cast.reactions.count,
           recasts: finalWarpData.result.cast.recasts.count,
           watches: finalWarpData.result.cast.watches.count,
-        } as CastWithReactions;
+        } as KyselyDB['castWithReactions'];
 
         return {
           cast

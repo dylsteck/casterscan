@@ -5,7 +5,7 @@ import Gallery from '../../components/Gallery';
 import TableRow from '../../components/TableRow';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MergedUser } from '~/types/database.t';
+import type { KyselyDB } from '~/types/database.t';
 import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
 
@@ -13,7 +13,7 @@ const UserByUsername = () => {
 
   const router = useRouter();
   const t = api.useContext();
-  const [user, setUser] = useState<MergedUser>();
+  const [user, setUser] = useState<KyselyDB['mergedUser']>();
   const [nftdInfo, setNftdInfo] = useState<NFTDData[]>();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const UserByUsername = () => {
       try {
         const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
         setUser(profile);
-        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: profile.id });
+        const nftdDataResponse = await t.user.getUserNFTDData.fetch({ fid: parseInt(profile.id) });
         if (nftdDataResponse) {
           console.log(nftdDataResponse)
           setNftdInfo(nftdDataResponse);

@@ -2,13 +2,13 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { supabase } from "../../../lib/supabase";
 import { TRPCError } from "@trpc/server";
-import type { MergedUser, Database, Profile } from "~/types/database.t";
+import type { KyselyDB } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
 import { db } from "~/lib/kysely";
 
 
 type LatestProfilesData = {
-  profiles: Database["public"]["Tables"]["profile"]["Row"][];
+  profiles: KyselyDB["profile"][];
 };
 
 export const userRouter = createTRPCRouter({
@@ -38,7 +38,9 @@ export const userRouter = createTRPCRouter({
       const finalWarpData = await warpUserData.json();
 
       var finalUserRequest = userRequest;
-      finalUserRequest.id = parseInt(finalUserRequest?.id);
+      if(finalUserRequest?.id){
+        finalUserRequest.id = finalUserRequest?.id;
+      }
       
       const finalUserObject = {
         ...finalUserRequest,
@@ -56,7 +58,7 @@ export const userRouter = createTRPCRouter({
           });
       }
 
-      const user = finalUserObject as MergedUser
+      const user = finalUserObject as KyselyDB['mergedUser'];
       console.log("FINAL", user)
 
       return {
@@ -144,7 +146,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      const profiles = profilesRequest as Profile[];
+      const profiles = profilesRequest as KyselyDB['profile'][];
 
       if (profilesRequest.length === 0) {
         throw new TRPCError({

@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 //import { getRelativeTime } from '../lib/time';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { MergedCast, Profile } from '~/types/database.t';
+import type { KyselyDB } from '~/types/database.t';
 import { getRelativeTime } from '~/lib/time';
 import { useRouter } from 'next/router'
 //import warpcastIcon from '../../public/warpcastIcon.png';
 //import { ArrowPathRoundedSquareIcon, HandThumbUpIcon } from '@heroicons/react/24/solid';
 
 type GalleryRenderProps = {
-    cast?: MergedCast;
-    profile?: Profile;
+    cast?: KyselyDB['mergedCast'];
+    profile?: KyselyDB['profile'];
     index: number;
   };
   

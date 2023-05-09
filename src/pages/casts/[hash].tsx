@@ -100,12 +100,12 @@ const CastByHash = () => {
             <div className="pt-[3.5vh] p-5">
                <div className="flex items-center">
                </div>
-               <p className="text-2xl text-white break-words">{renderCastText(queryResult.data?.cast?.text as string) || ''}</p>
+               <p className="text-2xl text-white break-words">{renderCastText(queryResult.data?.cast?.text)}</p>
             </div>
             <TableRow 
               field="Cast Hash"
               image={false}
-              result={queryResult.data?.cast?.hash as string} imageUrl={''} imageAlt={''} />
+              result={queryResult.data?.cast?.hash} imageUrl={''} imageAlt={''} />
             <TableRow 
                 field="Casted By" 
                 image={true} 

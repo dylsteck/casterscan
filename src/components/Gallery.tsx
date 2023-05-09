@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Filters from './Filters';
 import { api } from '~/utils/api';
-import type { MergedCast, Profile } from '~/types/database.t';
+import type { KyselyDB } from '~/types/database.t';
 import { useRouter } from 'next/router';
 import GalleryRender from './GalleryRender';
 
@@ -45,7 +45,7 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         setFilter(value)
     }
 
-    const sortCasts = (casts: MergedCast[]) => {
+    const sortCasts = (casts: KyselyDB['mergedCast'][]) => {
       if (sort === 'Date') {
         return casts.sort(
           (a, b) =>
@@ -71,13 +71,13 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
       return casts;
     };   
     
-    const sortImages = (casts: MergedCast[]) => {
+    const sortImages = (casts: KyselyDB['mergedCast'][]) => {
         const imgurRegex = /(https?:\/\/)?(www\.)?(i\.)?imgur\.com\/[a-zA-Z0-9]+(\.(jpg|jpeg|png|gif|bmp))?/g;
         return sortCasts(casts.filter((cast) => cast.text.match(imgurRegex)));
     }
     
 
-    const sortProfiles = (profiles: Profile[]) => {
+    const sortProfiles = (profiles: KyselyDB['profile'][]) => {
       console.log(profiles.filter((profile) => profile.username !== null))
       return profiles.filter((profile) => profile.username !== null);
     }
@@ -112,11 +112,11 @@ const Gallery: React.FC<{user: string}> = ({user}) => {
         </svg>
       }
       <div className="w-[100%] lg:columns-3 md:columns-2 auto-cols-auto gap-0 mt-[5vh] text-white">
-      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts as MergedCast[]).map((cast: MergedCast, index: number) => (        
+      {queryResult?.data?.casts && (filter === 'Casts' || filter === 'Casts + Replies') ? sortCasts(queryResult.data.casts as KyselyDB['mergedCast'][]).map((cast: KyselyDB['mergedCast'], index: number) => (        
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
-      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: Profile, index: number) => (
+      )) : filter === 'Profiles' && profilesQueryResult?.data?.profiles ? sortProfiles(profilesQueryResult?.data?.profiles).map((profile: KyselyDB['profile'], index: number) => (
         <GalleryRender key={`profile-${profile.id}`} profile={profile} index={index} />
-      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts as MergedCast[]).map((cast: MergedCast, index: number) => ( 
+      )) : filter === 'Images' && queryResult?.data?.casts ? sortImages(queryResult?.data?.casts as KyselyDB['mergedCast'][]).map((cast: KyselyDB['mergedCast'], index: number) => ( 
         <GalleryRender key={`cast-${cast.hash}`} cast={cast} index={index} />
       )): null}
       </div>
