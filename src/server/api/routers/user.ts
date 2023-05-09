@@ -1,15 +1,36 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { supabase } from "../../../lib/supabase";
 import { TRPCError } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
 import { db } from "~/lib/kysely";
 
+interface Social {
+  userAddress: string;
+  userAssociatedAddresses: string[];
+}
 
-type LatestProfilesData = {
-  profiles: KyselyDB["profile"][];
-};
+interface QueryResponse {
+  data: {
+    Socials: {
+      Social: Social[];
+    }
+  }
+}
+
+interface UserResponse {
+  result?: {
+    user?: {
+      followerCount?: number;
+      followingCount?: number;
+      referrerUsername?: string;
+    }
+  }
+}
+
+interface NFTDResponse {
+  data: NFTDData[];
+}
 
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
@@ -30,23 +51,24 @@ export const userRouter = createTRPCRouter({
         method: 'GET',
         headers: {
           'accept': 'application/json',
-          'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN}`,
+          'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN ?? ''}`,
         },
       };
 
-      const warpUserData = await fetch(`https://api.warpcast.com/v2/user?fid=${userRequest?.id}`, options)
-      const finalWarpData = await warpUserData.json();
+      const warpUserData = await fetch(`https://api.warpcast.com/v2/user?fid=${userRequest?.id as string}`, options)
+      const finalWarpData = await warpUserData.json() as UserResponse;
 
-      var finalUserRequest = userRequest;
+      const finalUserRequest = userRequest;
+      // double check this works
       if(finalUserRequest?.id){
         finalUserRequest.id = finalUserRequest?.id;
       }
       
       const finalUserObject = {
         ...finalUserRequest,
-        followers: finalWarpData.result.user.followerCount,
-        following: finalWarpData.result.user.followingCount,
-        referrer: finalWarpData.result.user.referrerUsername
+        followers: finalWarpData?.result?.user?.followerCount ?? 0,
+        following: finalWarpData?.result?.user?.followingCount ?? 0,
+        referrer: finalWarpData?.result?.user?.referrerUsername ?? ''
       };
 
       if (!userRequest) {
@@ -65,7 +87,6 @@ export const userRouter = createTRPCRouter({
         user,
       }
     }),
-
     getUserNFTDData: publicProcedure
     .input(
       z.object({
@@ -73,51 +94,57 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-        const query = `
-          query MyQuery {
-            Socials(
-              input: {
-                filter: {
-                  dappName: {_eq: farcaster},
-                  userId: {_eq: "${input.fid}"}
-                },
-                blockchain: ethereum
-              }
-            ) {
-              Social{
-                userAddress
-                userAssociatedAddresses
-              }
+      const query = `
+        query MyQuery {
+          Socials(
+            input: {
+              filter: {
+                dappName: {_eq: farcaster},
+                userId: {_eq: "${input.fid}"}
+              },
+              blockchain: ethereum
+            }
+          ) {
+            Social{
+              userAddress
+              userAssociatedAddresses
             }
           }
-        `;
-        // TODO: if verification in db, grab from db, if not, request from Airstack *and* add record to db
-        const response = await fetch(process.env.AIRSTACK_GQL_ENDPOINT ?? '', {
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-          body: JSON.stringify({ query }),
-        });
-    
-        const { data } = await response.json();
-        const final = data.Socials.Social[0];
-        const associatedAddress = final.userAssociatedAddresses
-        .filter((address: string) => address !== final.userAddress)
-        .find(Boolean);
-      if(typeof associatedAddress !== 'undefined'){
-        try {
-          const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress ?? ''}`);
-          if (!response.ok) {
-            // handle non-2xx responses
-            throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
+        }
+      `;
+      // TODO: if verification in db, grab from db, if not, request from Airstack *and* add record to db
+      const response = await fetch(process.env.AIRSTACK_GQL_ENDPOINT ?? '', {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ query }),
+      });
+
+      const json = await response.json() as QueryResponse;
+      const data = json.data;
+      const final: Social | undefined = data?.Socials?.Social?.[0];
+
+      if (final) {
+        const associatedAddress: string | undefined = final.userAssociatedAddresses
+          .filter((address: string): address is string => Boolean(address) && address !== final.userAddress)
+          .find(Boolean);
+
+        if (associatedAddress) {
+          try {
+            const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress}`);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
+            }
+            const allData = (await response.json()) as NFTDResponse;
+            const data = allData.data;
+
+            return data;
+          } catch (error) {
+            console.error(error);
           }
-          const allData = await response.json();
-          const data = allData.data as NFTDData[];
-          //console.log(data)
-          return data;
-        } catch (error) {
-          console.error(error);
         }
       }
+
+      return null;
     }),
   getLatestProfiles: publicProcedure
     .input(
@@ -127,7 +154,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      // todo: work on desc, doesn't work because of so much null data
+      // todo: work on sort by desc, doesn't work because of so much null data
       const profilesRequest = await db
       .selectFrom('profile')
       .select(['id', 'owner', 'username', 'display_name', 'avatar_url', 'bio', 'registered_at', 'updated_at', 'url'])

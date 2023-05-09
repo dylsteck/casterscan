@@ -6,6 +6,25 @@ import { TRPCError } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";
 
+interface CastResponse {
+  result?: {
+    cast?: {
+      replies?: {
+        count?: number;
+      },
+      reactions?: {
+        count?: number;
+      },
+      recasts?: {
+        count?: number;
+      },
+      watches?: {
+        count?: number;
+      }
+    }
+  }
+}
+
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
     .input(
@@ -93,19 +112,19 @@ export const castsRouter = createTRPCRouter({
           method: 'GET',
           headers: {
             'accept': 'application/json',
-            'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN}`,
+            'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN ?? ''}`,
           },
         };
   
-        const warpUserData = await fetch(`https://api.warpcast.com/v2/cast?hash=${currentCast?.hash}`, options)
-        const finalWarpData = await warpUserData.json();
+        const warpUserData = await fetch(`https://api.warpcast.com/v2/cast?hash=${currentCast.hash}`, options)
+        const finalWarpData = await warpUserData.json() as CastResponse;
       
         const cast = {
           ...currentCast,
-          replies: finalWarpData.result.cast.replies.count,
-          reactions: finalWarpData.result.cast.reactions.count,
-          recasts: finalWarpData.result.cast.recasts.count,
-          watches: finalWarpData.result.cast.watches.count,
+          replies: finalWarpData?.result?.cast?.replies?.count ?? 0,
+          reactions: finalWarpData?.result?.cast?.reactions?.count ?? 0,
+          recasts: finalWarpData?.result?.cast?.recasts?.count ?? 0,
+          watches: finalWarpData?.result?.cast?.watches?.count ?? 0,
         } as KyselyDB['castWithReactions'];
 
         return {
