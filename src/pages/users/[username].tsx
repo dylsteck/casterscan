@@ -186,7 +186,7 @@ const UserByUsername = () => {
                           result={item?.ensData[0]?.name || ''}
                         />
                       }
-                      {item.content.filter((link => link.type !== 'header')).map((link, index) => (
+                      {item.content !== null && item.content.filter((link => link.type !== 'header')).map((link, index) => (
                         <TableRow
                           field={link.label ?? ''}
                           image={false}
@@ -194,7 +194,7 @@ const UserByUsername = () => {
                           key={`${link.url ?? ''}-${index}`}
                         />
                       ))}
-                      {item.content.length === 0 || item.content.length < 5 ? <>
+                      {item.content === null || item.content.length < 5 ? <>
                         <TableRow
                         field={'Slug'}
                         image={false}
