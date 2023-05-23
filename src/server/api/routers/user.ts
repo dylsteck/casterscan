@@ -130,7 +130,12 @@ export const userRouter = createTRPCRouter({
 
         if (associatedAddress) {
           try {
-            const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress}`);
+            const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress}`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `${process.env.NFTD_API_KEY ?? ''}`,
+              },
+            });
             if (!response.ok) {
               throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
             }
