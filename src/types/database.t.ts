@@ -1,335 +1,130 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json }
-  | Json[]
-
-export interface Database {
-  public: {
-    Tables: {
-      casts: {
-        Row: {
-          deleted: boolean
-          fid: number
-          hash: string
-          mentions: Json | null
-          parent_fid: number | null
-          parent_hash: string | null
-          pruned: boolean | null
-          published_at: string
-          signature: string
-          signer: string
-          text: string
-          thread_hash: string | null
-        }
-        Insert: {
-          deleted?: boolean
-          fid: number
-          hash: string
-          mentions?: Json | null
-          parent_fid?: number | null
-          parent_hash?: string | null
-          pruned?: boolean | null
-          published_at: string
-          signature: string
-          signer: string
-          text: string
-          thread_hash?: string | null
-        }
-        Update: {
-          deleted?: boolean
-          fid?: number
-          hash?: string
-          mentions?: Json | null
-          parent_fid?: number | null
-          parent_hash?: string | null
-          pruned?: boolean | null
-          published_at?: string
-          signature?: string
-          signer?: string
-          text?: string
-          thread_hash?: string | null
-        }
-      }
-      event: {
-        Row: {
-          created_at: string | null
-          id: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-        }
-      }
-      profile: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          display_name: string | null
-          id: number
-          owner: string | null
-          registered_at: string | null
-          updated_at: string | null
-          url: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          display_name?: string | null
-          id: number
-          owner?: string | null
-          registered_at?: string | null
-          updated_at?: string | null
-          url?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          display_name?: string | null
-          id?: number
-          owner?: string | null
-          registered_at?: string | null
-          updated_at?: string | null
-          url?: string | null
-          username?: string | null
-        }
-      }
-      reaction: {
-        Row: {
-          created_at: string | null
-          fid: number
-          pruned: boolean | null
-          signer: string
-          target_cast: string
-          target_fid: number
-          type: string
-        }
-        Insert: {
-          created_at?: string | null
-          fid?: number
-          pruned?: boolean | null
-          signer: string
-          target_cast: string
-          target_fid: number
-          type: string
-        }
-        Update: {
-          created_at?: string | null
-          fid?: number
-          pruned?: boolean | null
-          signer?: string
-          target_cast?: string
-          target_fid?: number
-          type?: string
-        }
-      }
-      signer: {
-        Row: {
-          created_at: string | null
-          fid: number
-          name: string | null
-          pruned: boolean | null
-          signer: string
-        }
-        Insert: {
-          created_at?: string | null
-          fid?: number
-          name?: string | null
-          pruned?: boolean | null
-          signer: string
-        }
-        Update: {
-          created_at?: string | null
-          fid?: number
-          name?: string | null
-          pruned?: boolean | null
-          signer?: string
-        }
-      }
-      verification: {
-        Row: {
-          address: string
-          created_at: string | null
-          fid: number
-          pruned: boolean | null
-          signature: string
-          signer: string
-        }
-        Insert: {
-          address: string
-          created_at?: string | null
-          fid: number
-          pruned?: boolean | null
-          signature: string
-          signer: string
-        }
-        Update: {
-          address?: string
-          created_at?: string | null
-          fid?: number
-          pruned?: boolean | null
-          signature?: string
-          signer?: string
-        }
-      }
-    }
-    Views: {
-      profile_with_verification: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          display_name: string | null
-          id: number | null
-          owner: string | null
-          registered_at: string | null
-          updated_at: string | null
-          url: string | null
-          username: string | null
-          verifications: Json | null
-        }
-      }
-    }
-    Functions: {
-      casts_regex: {
-        Args: {
-          regex: string
-        }
-        Returns: {
-          deleted: boolean
-          fid: number
-          hash: string
-          mentions: Json | null
-          parent_fid: number | null
-          parent_hash: string | null
-          pruned: boolean | null
-          published_at: string
-          signature: string
-          signer: string
-          text: string
-          thread_hash: string | null
-        }[]
-      }
-      get_profile_by_address: {
-        Args: {
-          connected_address: string
-        }
-        Returns: {
-          avatar_url: string | null
-          bio: string | null
-          display_name: string | null
-          id: number
-          owner: string | null
-          registered_at: string | null
-          updated_at: string | null
-          url: string | null
-          username: string | null
-        }[]
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
+enum UserDataType {
+  USER_DATA_TYPE_NONE = 0,
+  USER_DATA_TYPE_PFP = 1, // Profile Picture for the user
+  USER_DATA_TYPE_DISPLAY = 2, // Display Name for the user
+  USER_DATA_TYPE_BIO = 3, // Bio for the user
+  USER_DATA_TYPE_URL = 5, // URL of the user
+  USER_DATA_TYPE_FNAME = 6, // Preferred Farcaster Name for the user
 }
+
 export interface KyselyDB {
-
+  messages: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    pruned_at: string;
+    revoked_at: string;
+    timestamp: string;
+    fid: bigint;
+    message_type: number;
+    hash: Buffer;
+    hash_scheme: number;
+    signature: Buffer;
+    signature_scheme: number;
+    signer: Buffer;
+    raw: Buffer;
+  };
   casts: {
-    deleted: boolean;
-    fid: number;
-    hash: string;
-    mentions: Json | null;
-    parent_fid: number | null;
-    parent_hash: string | null;
-    pruned: boolean | null;
-    published_at: string;
-    signature: string;
-    signer: string;
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    timestamp: string;
+    fid: bigint;
+    hash: Buffer;
+    parent_hash: Buffer | null;
+    parent_fid: bigint | null;
+    parent_url: string | null;
     text: string;
-    thread_hash: string | null;
-  }
-
-  profile: {
-    id: string;
-    owner: string | null;
-    username: string | null;
-    display_name: string | null;
-    avatar_url: string | null;
+    embeds: string[];
+    mentions: bigint[];
+    mentions_positions: number[];
+  };
+  casts_with_reactions_materialized: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    timestamp: string;
+    fid: bigint;
+    hash: Buffer;
+    parent_hash: Buffer | null;
+    parent_fid: bigint | null;
+    parent_url: string | null;
+    text: string;
+    embeds: string[];
+    mentions: bigint[];
+    mentions_positions: number[];
+    likes: number;
+    recasts: number;
+    comments: number;
+    pfp: string | null;
+    display: string | null;
     bio: string | null;
-    registered_at: string | null;
-    updated_at: string | null;
-    url: string | null; 
-  };
-
-  castWithReactions: {
-    deleted: boolean;
-    fid: number;
-    hash: string;
-    mentions: Json | null;
-    parent_fid: number | null;
-    parent_hash: string | null;
-    pruned: boolean | null;
-    published_at: string;
-    signature: string;
-    signer: string;
-    text: string;
-    thread_hash: string | null;
-    userAvatarUrl: string | null;
-    userBio: string | null;
-    userDisplayName: string | null;
-    userRegisteredAt: string | null;
-    userUrl: string | null;
-    userUsername: string | null;
-    replies: number | null;
-    reactions: number | null;
-    recasts: number | null;
-    watches: number | null;
-  };
-
-  mergedCast: {
-    deleted: boolean;
-    fid: number;
-    hash: string;
-    mentions: Json | null;
-    parent_fid: number | null;
-    parent_hash: string | null;
-    pruned: boolean | null;
-    published_at: string;
-    signature: string;
-    signer: string;
-    text: string;
-    thread_hash: string | null;
-    userAvatarUrl: string | null;
-    userBio: string | null;
-    userDisplayName: string | null;
-    userRegisteredAt: string | null;
-    userUrl: string | null;
-    userUsername: string | null;
-  };
-
-  mergedUser: {
-    username: string | null;
-    id: string;
-    owner: string | null;
-    display_name: string | null;
-    avatar_url: string | null;
-    bio: string | null;
-    registered_at: string | null;
-    updated_at: string | null;
     url: string | null;
-    followers: number;
-    following: number;
-    referrer: string | null;
+    fname: string | null;
+  };
+  reactions: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    timestamp: string;
+    fid: bigint;
+    reaction_type: number;
+    hash: Buffer;
+    target_hash: Buffer | null;
+    target_fid: bigint | null;
+    target_url: string | null;
+  };
+  verifications: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    timestamp: string;
+    fid: bigint;
+    hash: Buffer;
+    claim: object;
+  };
+  signers: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    timestamp: string;
+    fid: bigint;
+    hash: Buffer;
+    custody_address: Buffer;
+    signer: Buffer;
+    name: string;
+  };
+  user_data: {
+    id: bigint;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+    timestamp: string;
+    fid: bigint;
+    hash: Buffer;
+    type: UserDataType;
+    value: string;
+  };
+  fids: {
+    fid: bigint;
+    created_at: string;
+    updated_at: string;
+    custody_address: Buffer;
+  };
+  profiles: {
+    fid: bigint;
+    created_at: string;
+    custody_address: Buffer;
+    pfp: string | null;
+    display: string | null;
+    bio: string | null;
+    url: string | null;
+    fname: string | null;
   };
 }
-  

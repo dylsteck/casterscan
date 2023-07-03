@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
         <meta property="twitter:description" content="A block explorer for the Farcaster network" />
         <meta property="twitter:image" content="https://i.imgur.com/L4g6fCh.jpg" />
       </Head>
-      <main className="bg-gradient-to-r from-[#6E569C] via-[#775CAC]/90 to-[#6E569C] w-[100vw] min-h-[100vh] h-auto overflow-y-hidden">
+      <main className="bg-white w-[100vw] min-h-[100vh] h-auto overflow-y-hidden">
         <Header />
         {children}
       </main>
