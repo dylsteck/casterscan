@@ -32,7 +32,7 @@ export interface KyselyDB {
     deleted_at: string;
     timestamp: string;
     fid: bigint;
-    hash: Buffer;
+    hash: String;
     parent_hash: Buffer | null;
     parent_fid: bigint | null;
     parent_url: string | null;
@@ -48,8 +48,8 @@ export interface KyselyDB {
     deleted_at: string | null;
     timestamp: string;
     fid: bigint;
-    hash: Buffer;
-    parent_hash: Buffer | null;
+    hash: string;
+    parent_hash: string | null;
     parent_fid: bigint | null;
     parent_url: string | null;
     text: string;

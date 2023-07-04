@@ -6,24 +6,6 @@ import { TRPCError } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";
 
-interface CastResponse {
-  result?: {
-    cast?: {
-      replies?: {
-        count?: number;
-      },
-      reactions?: {
-        count?: number;
-      },
-      recasts?: {
-        count?: number;
-      },
-      watches?: {
-        count?: number;
-      }
-    }
-  }
-}
 
 export const castsRouter = createTRPCRouter({
   getLatestCasts: publicProcedure
@@ -35,17 +17,26 @@ export const castsRouter = createTRPCRouter({
     .query(async ({ input }) => {
       input.startRow;
 
-      //const casts = db.selectFrom('casts').selectAll();
       const castsRequest = await db
-      .selectFrom('casts')
-      .innerJoin('profile', 'profile.id', 'casts.fid')
-      .select(['deleted', 'fid', 'hash', 'mentions', 'parent_fid', 'parent_hash', 'pruned', 'published_at', 'signature', 'signer', 'text', 'thread_hash', 'profile.avatar_url as userAvatarUrl', 'profile.bio as userBio', 'profile.display_name as userDisplayName', 'profile.registered_at as userRegisteredAt', 'profile.url as userUrl', 'profile.username as userUsername'])
-      .orderBy('published_at', 'desc')
+      .selectFrom('casts_with_reactions_materialized')
+      .selectAll('casts_with_reactions_materialized')
+      .orderBy('timestamp', 'desc')
       .offset(input.startRow)
       .limit(32)
       .execute();
 
-      const casts = castsRequest as KyselyDB['mergedCast'][];
+      const casts = castsRequest.map((cast) => {
+        let finalCast = cast
+        if(finalCast.hash){
+          finalCast.hash = `0x${cast.hash.toString('hex')}`;
+        }
+        if(finalCast.parent_hash){
+          finalCast.parent_hash = `0x${cast.parent_hash.toString('hex')}`;
+        }
+        return finalCast
+      }) as KyselyDB['casts_with_reactions_materialized'][];
+      
+
 
       return {
         casts,
