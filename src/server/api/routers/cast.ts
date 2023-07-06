@@ -5,6 +5,8 @@ import { supabase } from '../../../lib/supabase';
 import { TRPCError } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";
+import { sql } from "kysely";
+import type { ListRowProps, SearchListRowProps } from "~/components/Search";
 
 
 export const castsRouter = createTRPCRouter({
@@ -123,28 +125,65 @@ export const castsRouter = createTRPCRouter({
         };
       }),
       getCastsByKeyword: publicProcedure
-      .input(
-        z.object({
-          keyword: z.string(),
-        })
-      )
-      .query(async ({ input }) => {
-        const { data: castsData, error: castsError } = await supabase
-        .from('casts')
-        .select()
-        .textSearch('text', `'${input.keyword}'`, { type: 'plain', config: 'english' });
+  .input(
+    z.object({
+      keyword: z.string(),
+    })
+  )
+  .query(async ({ input }) => {
+    const query = sql<SearchListRowProps[]>`
+  SELECT type, username, text, link, timestamp, expanded
+  FROM (
+    SELECT 'cast' AS type,
+           casts.fname AS username,
+           casts.text AS text,
+           CAST(casts.hash AS text) AS link,
+           casts.timestamp AS timestamp,
+           false AS expanded,
+           0 AS sort_order
+    FROM casts_with_reactions_materialized AS casts
+    WHERE to_tsvector('english', casts.text) @@ to_tsquery('english', ${input.keyword})
+    UNION ALL
+    SELECT 'profile' AS type,
+           profiles.fname AS username,
+           profiles.bio AS text,
+           '/' || profiles.fname AS link,
+           profiles.created_at AS timestamp,
+           false AS expanded,
+           CASE WHEN profiles.fname ILIKE ${input.keyword} THEN 0 ELSE 1 END AS sort_order
+    FROM profiles AS profiles
+    WHERE to_tsvector('english', profiles.bio) @@ to_tsquery('english', ${input.keyword})
+       OR profiles.fname ILIKE ${input.keyword}
+  ) AS results
+  ORDER BY sort_order, CASE WHEN type = 'cast' THEN random() * 0.6 ELSE random() * 0.4 END DESC
+  LIMIT 50;
+`;
 
-        if (castsError || !castsData) {
-          console.log("Error:\n", castsError);
-          throw new TRPCError({
-            message: "Failed to fetch casts.",
-            code: "NOT_FOUND",
-            cause: "An error occurred while fetching casts."
-          });
-        }
-        const casts = castsData
-        return {
-          casts
-        };
-      }),
+    const listData = await query.execute(db);
+
+    if (!listData) {
+      throw new TRPCError({
+        message: "Failed to fetch search list.",
+        code: "NOT_FOUND",
+        cause: "An error occurred while fetching the search list.",
+      });
+    }
+    // note: when query changes from search, gotta cancel other requests so they dont come
+
+    // const finalData = listData.rows.map((item) => {
+    //   return {
+    //     type: item.type,
+    //     username: item.username,
+    //     text: item.text,
+    //     link: item.type === 'cast' ? `0x${item.link.toString('hex')}` : item.link,
+    //     timestamp: item.timestamp,
+    //     expanded: item.expanded
+    //   } as SearchListRowProps;
+    // });
+
+    const list = listData;
+    return {
+      list,
+    };
+  }),
 });
