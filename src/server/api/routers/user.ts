@@ -4,33 +4,7 @@ import { TRPCError } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
 import { db } from "~/lib/kysely";
-
-interface Social {
-  userAddress: string;
-  userAssociatedAddresses: string[];
-}
-
-interface QueryResponse {
-  data: {
-    Socials: {
-      Social: Social[];
-    }
-  }
-}
-
-interface UserResponse {
-  result?: {
-    user?: {
-      followerCount?: number;
-      followingCount?: number;
-      referrerUsername?: string;
-    }
-  }
-}
-
-interface NFTDResponse {
-  data: NFTDData[];
-}
+import { url } from "inspector";
 
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
@@ -42,46 +16,29 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input }) => {
 
       const userRequest = await db
-        .selectFrom('profile')
-        .select(['avatar_url', 'bio', 'display_name', 'id', 'owner', 'registered_at', 'updated_at', 'url', 'username'])
-        .where('profile.username', '=', input.username)
-        .executeTakeFirst();
-
-      const options: RequestInit = {
-        method: 'GET',
-        headers: {
-          'accept': 'application/json',
-          'authorization': `Bearer ${process.env.FARCASTER_BEARER_TOKEN ?? ''}`,
-        },
-      };
-
-      const warpUserData = await fetch(`https://api.warpcast.com/v2/user?fid=${userRequest?.id as string}`, options)
-      const finalWarpData = await warpUserData.json() as UserResponse;
-
-      const finalUserRequest = userRequest;
-      // double check this works
-      if(finalUserRequest?.id){
-        finalUserRequest.id = finalUserRequest?.id;
-      }
-      
-      const finalUserObject = {
-        ...finalUserRequest,
-        followers: finalWarpData?.result?.user?.followerCount ?? 0,
-        following: finalWarpData?.result?.user?.followingCount ?? 0,
-        referrer: finalWarpData?.result?.user?.referrerUsername ?? ''
-      };
+      .selectFrom('profiles')
+      .selectAll()
+      .where('profiles.fname', '=', input.username)
+      .executeTakeFirst();
 
       if (!userRequest) {
-        console.log(userRequest);
-          throw new TRPCError({
-            message: "Invalid user.",
-            code: "NOT_FOUND",
-            cause: "User username may not be registered.",
-          });
+        throw new TRPCError({
+          message: `Failed to fetch username ${input.username}.`,
+          code: "NOT_FOUND",
+          cause: `An error occurred while fetching username ${input.username}.`,
+        });
       }
 
-      const user = finalUserObject as KyselyDB['mergedUser'];
-      console.log("FINAL", user)
+      const user = {
+        fid: userRequest.fid,
+        created_at: userRequest.created_at,
+        custody_address: `0x${userRequest.custody_address.toString('hex')}`,
+        pfp: userRequest.pfp,
+        display: userRequest.display,
+        bio: userRequest.bio,
+        url: userRequest.url,
+        fname: userRequest.fname
+      };
 
       return {
         user,
@@ -94,102 +51,41 @@ export const userRouter = createTRPCRouter({
       })
     )
     .query(async ({ input }) => {
-      const query = `
-        query MyQuery {
-          Socials(
-            input: {
-              filter: {
-                dappName: {_eq: farcaster},
-                userId: {_eq: "${input.fid}"}
-              },
-              blockchain: ethereum
-            }
-          ) {
-            Social{
-              userAddress
-              userAssociatedAddresses
-            }
-          }
-        }
-      `;
-      // TODO: if verification in db, grab from db, if not, request from Airstack *and* add record to db
-      const response = await fetch(process.env.AIRSTACK_GQL_ENDPOINT ?? '', {
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ query }),
-      });
 
-      const json = await response.json() as QueryResponse;
-      const data = json.data;
-      const final: Social | undefined = data?.Socials?.Social?.[0];
+      const user = await db
+      .selectFrom('profiles')
+      .selectAll()
+      .where('profiles.fid', '=', BigInt(input.fid))
+      .executeTakeFirst();
 
-      if (final) {
-        const associatedAddress: string | undefined = final.userAssociatedAddresses
-          .filter((address: string): address is string => Boolean(address) && address !== final.userAddress)
-          .find(Boolean);
-
-        if (associatedAddress) {
-          try {
-            const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${associatedAddress}`, {
-              method: 'GET',
-              headers: {
-                'Authorization': `${process.env.NFTD_API_KEY ?? ''}`,
-              },
-            });
-            if (!response.ok) {
-              throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
-            }
-            const allData = (await response.json()) as NFTDResponse;
-            const data = allData.data;
-
-            return data;
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      }
-
-      return null;
-    }),
-  getLatestProfiles: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().optional(),
-        startRow: z.number(),
-      })
-    )
-    .query(async ({ input }) => {
-      // todo: work on sort by desc, doesn't work because of so much null data
-      const profilesRequest = await db
-      .selectFrom('profile')
-      .select(['id', 'owner', 'username', 'display_name', 'avatar_url', 'bio', 'registered_at', 'updated_at', 'url'])
-      .orderBy('id', 'asc')
-      .offset(input.startRow)
-      .limit(32)
-      .execute();
-
-      if (!profilesRequest) {
-        console.log("Error:\n", profilesRequest);
+      if (!user) {
         throw new TRPCError({
-          message: "Failed to fetch latest profiles.",
+          message: `Failed to fetch user with FID ${input.fid}.`,
           code: "NOT_FOUND",
-          cause:
-            "An error occurred while fetching the latest profiles.",
+          cause: `An error occurred while fetching user with FID ${input.fid}.`,
         });
       }
 
-      const profiles = profilesRequest as KyselyDB['profile'][];
-
-      if (profilesRequest.length === 0) {
-        throw new TRPCError({
-          message: "No profiles found.",
-          code: "NOT_FOUND",
-          cause: "No profiles were found in the database.",
+      try {
+        // hard-coding my wallet until I fix my custody_address value in the DB
+        const userAddress = Number(user.fid) === 616 ? '0x7e37C3A9349227B60503DDB1574A76d10C6bc48E' : `0x${user.custody_address.toString('hex')}`;
+        const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${userAddress}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `${process.env.NFTD_API_KEY ?? ''}`,
+          },
         });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
+        }
+        const json = await response.json();
+        const data = json.data as NFTDData[];
+
+        return data;
+
+      } catch (error) {
+        console.error(error);
       }
 
-      return {
-        profiles,
-      };
     }),
 });

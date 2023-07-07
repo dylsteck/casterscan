@@ -1,7 +1,13 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
 import { SearchContext } from '~/context/SearchContext';
 
 const Header: React.FC = () => {
+
+  const router = useRouter();
+
+  const notCastOrUser = router.pathname !== '/users/[username]' && router.pathname !== '/casts/[hash]';
 
   const { searchValue, setSearchValue } = useContext(SearchContext);
 
@@ -12,8 +18,11 @@ const Header: React.FC = () => {
   return (
     <>
       <div className="border-b-2 border-[#C1C1C1]">
-        <p className="p-5 pl-4">CASTERSCAN</p>
+        <Link href="/">
+          <p className="p-5 pl-4">CASTERSCAN</p>
+        </Link>
       </div>
+      {notCastOrUser && 
       <div className="border-b-2 border-[#C1C1C1] justify-center">
         <input
           type="text"
@@ -23,6 +32,7 @@ const Header: React.FC = () => {
           placeholder="search"
         />
       </div>
+      }
     </>
   );
 };
