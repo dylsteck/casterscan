@@ -17,4 +17,4 @@ export const addHyperlinksToText = (text: string): JSX.Element => {
       }
     });
     return <>{content}</>;
-  };
+};

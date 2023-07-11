@@ -1,9 +1,12 @@
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import { getRelativeTime } from '~/lib/time';
 import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import { addHyperlinksToText } from '~/lib/text';
+import Image from 'next/image';
+import { ExpandableImage } from './ExpandableImage';
+import CopyText from './CopyText';
 
 interface ListRowProps{
     username: string;
@@ -15,20 +18,20 @@ interface ListRowProps{
 
 const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
 
-      const checkImages = (): string[] => {
-        const pattern = /(https?:\/\/[^\s]+)/g;
-        const imgurLinks: string[] = [];
+    const checkImages = (): string[] => {
+        const pattern = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/g;
+        const imageLinks: string[] = [];
       
         let match;
         while ((match = pattern.exec(text)) !== null) {
-          if (match[0].includes('imgur.com')) {
-            imgurLinks.push(match[0]);
-          }
+          imageLinks.push(match[0]);
         }
       
-        return imgurLinks;
-      };
+        return imageLinks;
+    };
+      
     const images = checkImages();
+
     return(
         <tr className="bg-white">
                 <th scope="row" className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${expanded && 'h-[10vh]'}`}>
@@ -36,6 +39,16 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
                 </th>
                 <td className="px-6 py-4">
                     {addHyperlinksToText(text)}
+                    {expanded && 
+                    <div className="flex flex-row gap-2 items-end">
+                        {images.map((image, index) => {
+                            return <ExpandableImage imageUrl={image} />
+                        })}
+                        <p className={`text-xs text-black/80 ${images.length === 0 && 'mt-2'} flex flex-row gap-1`}>
+                            hash: <CopyText text={hash} />
+                        </p>
+                    </div>}
+
                 </td>
                 <td className="px-6 py-4">
                 {images && images.length > 0 && 
