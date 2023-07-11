@@ -13,18 +13,17 @@ interface GridItemProps{
 }
 
 const GridItem = ({ cast }: GridItemProps) => {
-    console.log(cast);
     return(
         <div className="p-3">
             <div className="relative mb-3">
                 <div className="float-left flex flex-row gap-2 items-center">
                     {cast.pfp && <Image src={cast.pfp} alt="User PFP" width={4} height={4} className="w-4 h-4 rounded-full" />}
-                    <p>{cast.fname}</p>
+                    <p className="text-sm">{cast.fname}</p>
                 </div>
-                <p className="float-right">{getRelativeTime(new Date(cast.timestamp))}</p>
+                <p className="float-right text-sm">{getRelativeTime(new Date(cast.timestamp))}</p>
                     <div style={{ clear: 'both' }}></div>
             </div>
-            <p className="text-sm overflow-x-scroll text-wrap" style={{ clear: 'both' }}>
+            <p className="text-md overflow-x-scroll text-wrap" style={{ clear: 'both' }}>
             {addHyperlinksToText(cast.text)}
             </p>
       </div>

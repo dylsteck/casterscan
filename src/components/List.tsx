@@ -35,7 +35,9 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
     return(
         <tr className="bg-white">
                 <th scope="row" className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${expanded && 'h-[10vh]'}`}>
-                    {username}
+                    <Link href={`/users/${username}`}>
+                        {username}
+                    </Link>
                 </th>
                 <td className="px-6 py-4">
                     {addHyperlinksToText(text)}
@@ -58,7 +60,7 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
                 }
                 </td>
                 <td className="px-6 py-4 w-[15%] max-w-[20%]">
-                <Link href={`https://warpcast.com/${username}/${hash.substring(0, 8)}`}>
+                <Link href={`/casts/${hash}`}>
                     <p className="underline text-[#71579E]">{`link =>`}</p>
                 </Link>
                 </td>

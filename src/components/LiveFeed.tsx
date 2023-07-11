@@ -31,9 +31,11 @@ const LiveFeed: React.FC = () => {
             <p>|</p>
             <p className={`${filter === 'grid' && 'font-bold'}`} onClick={() => handleFilterChange('grid')}>grid</p>
         </div>
+        {filter == 'list' && 
         <div className="mr-4 float-right" onClick={() => setExpanded(!expanded)}>
             {expanded ? <p>collapse [-]</p> : <p>expand [+]</p>}
         </div>
+        }
     </div>
     {castsRequest.isLoading && 
     <>
