@@ -8,7 +8,8 @@ import Link from 'next/link';
 import type { KyselyDB } from '~/types/database.t';
 import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
-import { NFTDPopup } from '~/components/NFTDPopup';
+import LiveFeed from '~/components/LiveFeed';
+import NFTDPopup from '~/components/NFTDPopup';
 
 const UserPage = () => {
 
@@ -66,9 +67,11 @@ const UserPage = () => {
             className="pl-4 pt-2 pb-5"
             onClick={() => setNftdPopupPresent(true)}
           />
-          {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo} handleClose={() => setNftdPopupPresent(false)} />}
+          {nftdPopupPresent && <NFTDPopup nftdData={[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
+      {/* TODO: Config feed so it can switch between user and home view */ }
+      <LiveFeed />
     </>
   )
 }
