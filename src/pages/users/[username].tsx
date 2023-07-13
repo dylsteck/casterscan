@@ -67,7 +67,7 @@ const UserPage = () => {
             className="pl-4 pt-2 pb-5"
             onClick={() => setNftdPopupPresent(true)}
           />
-          {nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
+          {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
       <LiveFeed user={user?.fname} />
