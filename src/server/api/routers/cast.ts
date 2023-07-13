@@ -53,7 +53,26 @@ export const castsRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
 
-      const casts = [];
+      const castsRequest = await db
+      .selectFrom('casts_with_reactions_materialized')
+      .selectAll('casts_with_reactions_materialized')
+      .where('fname', '=', input.username)
+      .where('text', '>', '0')
+      .orderBy('timestamp', 'desc')
+      .offset(input.startRow)
+      .limit(32)
+      .execute();
+
+      const casts = castsRequest.map((cast) => {
+        let finalCast = cast
+        if(finalCast.hash){
+          finalCast.hash = `0x${cast.hash.toString('hex')}`;
+        }
+        if(finalCast.parent_hash){
+          finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
+        }
+        return finalCast
+      }) as KyselyDB['casts_with_reactions_materialized'][];
 
       return {
         casts,

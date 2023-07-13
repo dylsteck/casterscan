@@ -4,7 +4,7 @@ import List from './List';
 import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 
-const LiveFeed: React.FC = () => {
+const LiveFeed: React.FC = ({ user }: { user?: string }) => {
     const [filter, setFilter] = useState<string>('list');
     const [expanded, setExpanded] = useState<boolean>(false);
 
@@ -14,7 +14,12 @@ const LiveFeed: React.FC = () => {
         }
     }
 
-    const castsRequest = api.casts.getLatestCasts.useQuery(
+    // If user, get their casts -- otherwise get all casts
+    const request = user ? api.casts.getCastsByUsername.useQuery(
+        { startRow: 0, username: user },
+        { refetchOnWindowFocus: false }
+    ) 
+    : api.casts.getLatestCasts.useQuery(
         { startRow: 0 },
         { refetchOnWindowFocus: false }
     );
@@ -37,11 +42,11 @@ const LiveFeed: React.FC = () => {
         </div>
         }
     </div>
-    {castsRequest.isLoading && 
+    {request.isLoading && 
     <>
     <p>loading...</p>
     </>}
-    {filter === 'list' ? <List expanded={expanded} casts={castsRequest?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={castsRequest?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} />}
+    {filter === 'list' ? <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={request?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} />}
     </>
     )
 };

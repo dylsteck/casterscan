@@ -70,8 +70,7 @@ const UserPage = () => {
           {nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
-      {/* TODO: Config feed so it can switch between user and home view */ }
-      <LiveFeed />
+      <LiveFeed user={user?.fname} />
     </>
   )
 }
