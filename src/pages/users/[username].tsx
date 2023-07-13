@@ -67,7 +67,7 @@ const UserPage = () => {
             className="pl-4 pt-2 pb-5"
             onClick={() => setNftdPopupPresent(true)}
           />
-          {nftdPopupPresent && <NFTDPopup nftdData={[]} handleClose={() => setNftdPopupPresent(false)} />}
+          {nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
       {/* TODO: Config feed so it can switch between user and home view */ }

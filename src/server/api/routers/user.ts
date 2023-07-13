@@ -69,6 +69,7 @@ export const userRouter = createTRPCRouter({
       try {
         // hard-coding my wallet until I fix my custody_address value in the DB
         const userAddress = Number(user.fid) === 616 ? '0x7e37C3A9349227B60503DDB1574A76d10C6bc48E' : `0x${user.custody_address.toString('hex')}`;
+        // falls back for some users too, so switch fallback to airstack endpoint
         const response = await fetch(`${process.env.NFTD_USER_ENDPOINT ?? ''}${userAddress}`, {
           method: 'GET',
           headers: {
