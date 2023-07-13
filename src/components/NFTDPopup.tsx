@@ -5,6 +5,7 @@ import nftdIcon from '../../public/nftdIcon.png';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getRelativeTime } from '~/lib/time';
+import { XCircleIcon } from '@heroicons/react/24/solid';
 
 interface NFTDPopupProps {
   nftdData: NFTDData[];
@@ -15,15 +16,15 @@ interface NFTDPopupProps {
 const DataRendererRow = ({content}: {content: Content}) => {
     return(
         <tr className="bg-white">
-            <th scope="row" className={`px-6 py-4 whitespace-nowrap font-normal`}>
+            <th scope="row" className={`pr-6 py-4 whitespace-nowrap font-normal`}>
                 {content.label}
             </th>
-            <td className="px-6 py-4 underline text-[#71579E]">
+            <td className="pr-6 py-4 underline text-[#71579E]">
                 <Link href={content.url || ''}>
                     {`link =>`}
                 </Link>
             </td>
-            <td className="px-6 py-4">
+            <td className="pr-6 py-4">
                 {getRelativeTime(new Date(content.timestamp))}
             </td>
         </tr>
@@ -36,19 +37,19 @@ const DataRenderer = ({data}: {data: NFTDData}) => {
       <table className="w-[100%] text-sm text-left">
         <thead className="text-md text-[#494949]">
             <tr>
-                <th scope="col" className="px-6 py-3 font-normal">
+                <th scope="col" className="pr-6 py-3 font-normal">
                     name
                 </th>
-                <th scope="col" className="px-6 py-3 font-normal">
+                <th scope="col" className="pr-6 py-3 font-normal">
                     link
                 </th>
-                <th scope="col" className="px-6 py-3 font-normal">
+                <th scope="col" className="pr-6 py-3 font-normal">
                     time
                 </th>
             </tr>
         </thead>
         <tbody>
-            {data.content && data.content.map((content) => {
+            {data.content && data.content.filter((item) => item.type !== 'header').map((content) => {
                 return <DataRendererRow content={content} />
             })}
         </tbody>
@@ -70,11 +71,14 @@ const NFTDPopup = ({ nftdData, handleClose }: NFTDPopupProps) => {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg max-h-[75vh] overflow-y-scroll">
-        <div className="flex items-center mb-4">
-          <Image src={nftdIcon} width={100 / 1.3} height={43 / 1.3} alt="NF.TD icon" className="mr-4" />
-          <p className="cursor-pointer" onClick={handleClose}>Close</p>
+      <Link href={`https://nf.td/${nftdData[0]?.slug}`}>
+        <Image src={nftdIcon} width={100 / 2} height={43 / 2} alt="NF.TD icon" className="mr-4" />
+      </Link>
+        <div className="mt-1">
+          <p className="float-left text-lg font-medium">{nftdData[0]?.slug}</p>
+          <XCircleIcon width={20} height={20} className="text-[#EA3323] cursor-pointer float-right mr-4" onClick={handleClose} />
         </div>
-        {nftdData && <DataRenderer data={nftdData[0]} />}
+        {nftdData[0] && <DataRenderer data={nftdData[0]} />}
       </div>
     </div>,
     document.body
