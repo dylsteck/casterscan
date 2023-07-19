@@ -18,7 +18,7 @@ export interface SearchListRowProps{
 }
 
 const SearchListRow = ({type, username, text, link, timestamp, expanded}: SearchListRowProps) => {
-    const finalLink = type === 'cast' ? `/${username}/${link.replace(/\\/g, "0").substring(0, 8)}` : link;
+    const finalLink = type === 'cast' ? `/casts/${link.replace(/\\/g, "0")}` : `/users/${username}`;
     return(
         <tr className="bg-white">
                 <th scope="row" className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${expanded && 'h-[10vh]'}`}>
@@ -137,6 +137,8 @@ const Search: React.FC = () => {
     const listRequest = api.casts.getCastsByKeyword.useQuery(
         { keyword: searchValue }
     );
+    // TODO: change so if the keyword is a username or hash, takes you there directly
+    // also, clear SearchContext value after the search request goes through
 
     return(
     <>

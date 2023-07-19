@@ -1,18 +1,27 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useContext } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { SearchContext } from '~/context/SearchContext';
 
 const Header: React.FC = () => {
 
   const router = useRouter();
+  const inputRef = useRef(null);
 
   const notCastOrUser = router.pathname !== '/users/[username]' && router.pathname !== '/casts/[hash]';
 
   const { searchValue, setSearchValue } = useContext(SearchContext);
+  const [search, setSearch] = useState<string>('');
 
   const handleChangeSearchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      // alert("Enter key pressed!");
+      setSearchValue(search)
+    }
   }
 
   return (
@@ -26,10 +35,12 @@ const Header: React.FC = () => {
       <div className="border-b-2 border-[#C1C1C1] justify-center">
         <input
           type="text"
-          value={searchValue}
-          onChange={(e) => handleChangeSearchValue(e)}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e)}
           className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-7 focus:outline-none"
           placeholder="search"
+          ref={inputRef}
         />
       </div>
       }

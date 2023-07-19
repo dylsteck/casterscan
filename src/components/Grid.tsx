@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 import { addHyperlinksToText } from '~/lib/text';
 import { getRelativeTime } from '~/lib/time';
@@ -18,7 +19,9 @@ const GridItem = ({ cast }: GridItemProps) => {
             <div className="relative mb-3">
                 <div className="float-left flex flex-row gap-2 items-center">
                     {cast.pfp && <Image src={cast.pfp} alt="User PFP" width={4} height={4} className="w-4 h-4 rounded-full" />}
-                    <p className="text-sm">{cast.fname}</p>
+                    <Link href={`/users/${cast.fname}`}>
+                        <p className="text-sm text-[#71579E]">{cast.fname}</p>
+                    </Link>
                 </div>
                 <p className="float-right text-sm">{getRelativeTime(new Date(cast.timestamp))}</p>
                     <div style={{ clear: 'both' }}></div>

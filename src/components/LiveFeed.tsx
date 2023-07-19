@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from './Grid';
 import List from './List';
 import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { castsRouter } from '~/server/api/routers/cast';
 
 const LiveFeed: React.FC = ({ user }: { user?: string }) => {
     const [filter, setFilter] = useState<string>('list');
     const [expanded, setExpanded] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(0);
 
     const handleFilterChange = (input: string) => {
         if(filter !== input){
@@ -19,11 +22,13 @@ const LiveFeed: React.FC = ({ user }: { user?: string }) => {
         { startRow: 0, username: user },
         { refetchOnWindowFocus: false }
     ) 
-    : api.casts.getLatestCasts.useQuery(
-        { startRow: 0 },
-        { refetchOnWindowFocus: false }
+    : api.casts.getLatestCasts.useInfiniteQuery(
+        { limit: 30}, 
+        { getNextPageParam: (lastPage: any) => lastPage.nextCursor}
     );
-
+    useEffect(() => {
+        console.log(request?.data?.pages)
+    }, [request?.data?.pages])
     return(
     <>
     <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
@@ -46,7 +51,7 @@ const LiveFeed: React.FC = ({ user }: { user?: string }) => {
     <>
     <p>loading...</p>
     </>}
-    {filter === 'list' ? <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={request?.data?.casts as KyselyDB['casts_with_reactions_materialized'][]} />}
+    {filter === 'list' ? <List expanded={expanded} casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} />}
     </>
     )
 };

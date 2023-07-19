@@ -2,46 +2,49 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 import { supabase } from '../../../lib/supabase';
-import { TRPCError } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";
 import { sql } from "kysely";
 import type { SearchListRowProps } from "~/components/Search";
 
+export const t = initTRPC.create();
 
-export const castsRouter = createTRPCRouter({
-  getLatestCasts: publicProcedure
+export const castsRouter = t.router({
+  getLatestCasts: t.procedure
     .input(
       z.object({
-        startRow: z.number(),
+        limit: z.number().optional(),
+        cursor: z.number().nullish(),
       })
     )
-    .query(async ({ input }) => {
-      input.startRow;
-
-      const castsRequest = await db
+    .query(async (opts) => {
+      const { input } = opts;
+      const limit = input.limit || 32;
+    const castsRequest = await db
       .selectFrom('casts_with_reactions_materialized')
       .selectAll('casts_with_reactions_materialized')
       .where('fname', '>', '0')
       .where('text', '>', '0')
       .orderBy('timestamp', 'desc')
-      .offset(input.startRow)
-      .limit(32)
+      .offset(input.cursor || 0)
+      .limit(limit + 1) // Fetch an extra item at the end for the next cursor
       .execute();
 
-      const casts = castsRequest.map((cast) => {
-        let finalCast = cast
-        if(finalCast.hash){
-          finalCast.hash = `0x${cast.hash.toString('hex')}`;
-        }
-        if(finalCast.parent_hash){
-          finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
-        }
-        return finalCast
-      }) as KyselyDB['casts_with_reactions_materialized'][];
-
+    const casts = castsRequest.map((cast) => {
+      let finalCast = cast;
+      if (finalCast.hash) {
+        finalCast.hash = `0x${cast.hash.toString('hex')}`;
+      }
+      if (finalCast.parent_hash) {
+        finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
+      }
+      return finalCast;
+    }) as KyselyDB['casts_with_reactions_materialized'][];
+      const nextCursor = input.cursor ? Number(input.cursor) + 1 : 1
       return {
         casts,
+        nextCursor,
       };
     }),
     getCastsByUsername: publicProcedure
@@ -86,13 +89,28 @@ export const castsRouter = createTRPCRouter({
         })
       )
       .query(async ({ input }) => {
-        
-        const cast = { hash: input.hash };
+      const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
+      const castsRequest = await db
+        .selectFrom('casts_with_reactions_materialized')
+        .selectAll('casts_with_reactions_materialized')
+        .where(sql<string>`encode(hash, 'hex') = ${hashAsHex}`)
+        .executeTakeFirst();
 
-        return {
-          cast
-        };
-      }),
+      const finalCast = () => {
+        let cast = castsRequest;
+        if(cast?.hash){
+          cast.hash = `0x${cast.hash.toString('hex')}`;
+        }
+        if(cast?.parent_hash){
+          cast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
+        }
+        return cast as KyselyDB['casts_with_reactions_materialized'];
+      };
+      const cast = finalCast();
+      return {
+        cast
+      };
+    }),
  getCastsByKeyword: publicProcedure
   .input(
     z.object({
@@ -128,7 +146,8 @@ export const castsRouter = createTRPCRouter({
       ORDER BY sort_order, CASE WHEN type = 'cast' THEN random() * 0.6 ELSE random() * 0.4 END DESC
       LIMIT 50;
     `;
-
+    // need to work on this the most
+    // and instant right?
     const list = await query.execute(db);
 
     if (!list) {

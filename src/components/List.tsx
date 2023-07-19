@@ -29,7 +29,9 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
       
         return imageLinks;
     };
-      
+    // note: some images not showing up
+    // eg. search 'casterscan', casts have images, none show up in expanded
+    // TODO: fix
     const images = checkImages();
 
     return(
