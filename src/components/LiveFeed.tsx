@@ -5,6 +5,12 @@ import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { castsRouter } from '~/server/api/routers/cast';
+import dynamic from 'next/dynamic'
+import { motion } from 'framer-motion';
+import LiveIndicator from './LiveIndicator';
+const LoadingTable = dynamic(() => import('./LoadingTable'), {
+    ssr: false
+});
 
 const LiveFeed: React.FC = ({ user }: { user?: string }) => {
     const [filter, setFilter] = useState<string>('list');
@@ -17,24 +23,25 @@ const LiveFeed: React.FC = ({ user }: { user?: string }) => {
         }
     }
 
-    // If user, get their casts -- otherwise get all casts
+    //If user, get their casts -- otherwise get all casts
     const request = user ? api.casts.getCastsByUsername.useQuery(
         { startRow: 0, username: user },
         { refetchOnWindowFocus: false }
     ) 
     : api.casts.getLatestCasts.useInfiniteQuery(
-        { limit: 30}, 
-        { getNextPageParam: (lastPage: any) => lastPage.nextCursor}
+        { limit: 30 }, 
+        { getNextPageParam: (lastPage) => { return lastPage.nextCursor ?? null },
+          initialCursor: 0,
+          keepPreviousData: true}
     );
     useEffect(() => {
-        console.log(request?.data?.pages)
     }, [request?.data?.pages])
     return(
     <>
     <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
         <div className="ml-4 flex flex-row gap-2 float-left items-center">
             <p>LIVE FEED</p>
-            <div className="w-2 h-2 rounded-full bg-[#FF0000]" />
+            <LiveIndicator />
         </div>
         <div className="ml-4 flex flex-row gap-1 float-left">
             <p className={`${filter === 'list' && 'font-bold'}`} onClick={() => handleFilterChange('list')}>list</p>
@@ -47,11 +54,9 @@ const LiveFeed: React.FC = ({ user }: { user?: string }) => {
         </div>
         }
     </div>
-    {request.isLoading && 
-    <>
-    <p>loading...</p>
-    </>}
-    {filter === 'list' ? <List expanded={expanded} casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} />}
+    {request.isLoading ? 
+    <LoadingTable />
+    : filter === 'list' ? <List expanded={expanded} casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} /> : <Grid casts={request?.data?.pages[0].casts as KyselyDB['casts_with_reactions_materialized'][]} />}
     </>
     )
 };

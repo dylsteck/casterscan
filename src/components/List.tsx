@@ -7,6 +7,7 @@ import { addHyperlinksToText } from '~/lib/text';
 import Image from 'next/image';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
+import { motion } from 'framer-motion';
 
 interface ListRowProps{
     username: string;
@@ -29,6 +30,13 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
       
         return imageLinks;
     };
+
+    const containerAnimation = {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+      };
+
     // note: some images not showing up
     // eg. search 'casterscan', casts have images, none show up in expanded
     // TODO: fix
@@ -36,11 +44,20 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
 
     return(
         <tr className="bg-white">
-                <th scope="row" className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${expanded && 'h-[10vh]'}`}>
+                <motion.th
+                    scope="row"
+                    className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${
+                        expanded ? "h-[10vh]" : ''
+                    }`}
+                    variants={containerAnimation}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    >
                     <Link href={`/users/${username}`}>
                         {username}
                     </Link>
-                </th>
+                </motion.th>
                 <td className="px-6 py-4">
                     {addHyperlinksToText(text)}
                     {expanded && 

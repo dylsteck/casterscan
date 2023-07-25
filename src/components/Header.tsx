@@ -26,9 +26,12 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <div className="border-b-2 border-[#C1C1C1]">
-        <Link href="/">
+      <div className="flex justify-between items-center border-b-2 border-[#C1C1C1]">
+        <Link href="/" className="float-left">
           <p className="p-5 pl-4">CASTERSCAN</p>
+        </Link>
+        <Link href="/dashboard" className="float-right">
+          <p className="p-5 pl-4">DASHBOARD [+]</p>
         </Link>
       </div>
       {notCastOrUser && 

@@ -20,15 +20,15 @@ export const castsRouter = t.router({
     )
     .query(async (opts) => {
       const { input } = opts;
-      const limit = input.limit || 32;
+      const limit = input.limit || 30;
     const castsRequest = await db
       .selectFrom('casts_with_reactions_materialized')
       .selectAll('casts_with_reactions_materialized')
       .where('fname', '>', '0')
       .where('text', '>', '0')
       .orderBy('timestamp', 'desc')
-      .offset(input.cursor || 0)
-      .limit(limit + 1) // Fetch an extra item at the end for the next cursor
+      .offset(input.cursor ?? 0)
+      .limit(limit + 1)
       .execute();
 
     const casts = castsRequest.map((cast) => {
@@ -41,7 +41,8 @@ export const castsRouter = t.router({
       }
       return finalCast;
     }) as KyselyDB['casts_with_reactions_materialized'][];
-      const nextCursor = input.cursor ? Number(input.cursor) + 1 : 1
+       console.log("BEFORE NEXT CURSOR SET", input, input.cursor)
+      const nextCursor = input.cursor !== null ? input.cursor + 1 : 10;
       return {
         casts,
         nextCursor,

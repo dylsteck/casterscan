@@ -36,9 +36,10 @@ const GridItem = ({ cast }: GridItemProps) => {
 const Grid = ({ casts }: GridProps) => {
 
     return(
-        <div className="grid grid-cols-4 gap-4 p-3">
-            {casts && casts.map((cast) => {
-                return <GridItem cast={cast} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-3">
+        {casts &&
+            casts.map((cast) => {
+            return <GridItem key={cast.hash} cast={cast} />;
             })}
         </div>
     )

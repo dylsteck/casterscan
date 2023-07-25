@@ -24,7 +24,7 @@ const SearchListRow = ({type, username, text, link, timestamp, expanded}: Search
                 <th scope="row" className={`px-6 py-4 whitespace-nowrap text-[#71579E] font-normal ${expanded && 'h-[10vh]'}`}>
                     {type}
                 </th>
-                <Link href={`/${username}`}>
+                <Link href={`/users/${username}`}>
                     <td className="px-6 py-4">
                         {username}
                     </td>
@@ -145,7 +145,7 @@ const Search: React.FC = () => {
     <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
         <div className="ml-4 flex flex-row gap-2 float-left items-center">
             <p>LIVE FEED</p>
-            <div className="w-2 h-2 rounded-full bg-[#FF0000]" />
+            <LiveIndicator />
         </div>
         <div className="ml-4 flex flex-row gap-1 float-left">
             <p className={`${filter === 'list' && 'font-bold'}`} onClick={() => handleFilterChange('list')}>list</p>
