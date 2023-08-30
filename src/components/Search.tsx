@@ -7,6 +7,7 @@ import { getRelativeTime } from '~/lib/time';
 import { SearchContext } from '~/context/SearchContext';
 import { addHyperlinksToText } from '~/lib/text';
 import Link from 'next/link';
+import LiveIndicator from './LiveIndicator';
 
 export interface SearchListRowProps{
     type: string;

@@ -95,7 +95,8 @@ export const castsRouter = t.router({
       const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
       const castsRequest = await db
         .selectFrom('casts')
-        .selectAll('casts')
+        .innerJoin('users', 'users.fid', 'casts.fid')
+        .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
         .where(sql<string>`encode(hash, 'hex') = ${hashAsHex}`)
         .executeTakeFirst();
 
@@ -123,32 +124,33 @@ export const castsRouter = t.router({
   .query(async ({ input }) => {
 
     const query = sql<SearchListRowProps[]>`
-      SELECT type, username, text, link, timestamp, expanded
-      FROM (
-        SELECT 'cast' AS type,
-              casts.fname AS username,
-              casts.text AS text,
-              CAST(casts.hash AS text) AS link,
-              casts.timestamp AS timestamp,
-              false AS expanded,
-              0 AS sort_order
-        FROM casts AS casts
-        WHERE to_tsvector('english', casts.text) @@ to_tsquery('english', ${input.keyword})
-        UNION ALL
-        SELECT 'profile' AS type,
-              profiles.fname AS username,
-              profiles.bio AS text,
-              '/' || profiles.fname AS link,
-              profiles.created_at AS timestamp,
-              false AS expanded,
-              CASE WHEN profiles.fname ILIKE ${input.keyword} THEN 0 ELSE 1 END AS sort_order
-        FROM profiles AS profiles
-        WHERE to_tsvector('english', profiles.bio) @@ to_tsquery('english', ${input.keyword})
-          OR profiles.fname ILIKE ${input.keyword}
-      ) AS results
-      ORDER BY sort_order, CASE WHEN type = 'cast' THEN random() * 0.6 ELSE random() * 0.4 END DESC
-      LIMIT ${DB_REQUEST_LIMIT};
-    `;
+  SELECT type, username, text, link, timestamp, expanded
+  FROM (
+    SELECT 'cast' AS type,
+           users.fname AS username,
+           casts.text AS text,
+           CAST(casts.hash AS text) AS link,
+           casts.timestamp AS timestamp,
+           false AS expanded,
+           0 AS sort_order
+    FROM casts AS casts
+    JOIN users ON casts.fid = users.fid
+    WHERE to_tsvector('english', casts.text) @@ to_tsquery('english', ${input.keyword})
+    UNION ALL
+    SELECT 'users' AS type,
+           users.fname AS username,
+           users.bio AS text,
+           '/' || users.fname AS link,
+           users.created_at AS timestamp,
+           false AS expanded,
+           CASE WHEN users.fname ILIKE ${input.keyword} THEN 0 ELSE 1 END AS sort_order
+    FROM users AS users
+    WHERE to_tsvector('english', users.bio) @@ to_tsquery('english', ${input.keyword})
+      OR users.fname ILIKE ${input.keyword}
+  ) AS results
+  ORDER BY sort_order, CASE WHEN type = 'cast' THEN random() * 0.6 ELSE random() * 0.4 END DESC
+  LIMIT ${DB_REQUEST_LIMIT};
+`;
     // need to work on this the most
     // and instant right?
     const list = await query.execute(db);
@@ -200,5 +202,42 @@ export const castsRouter = t.router({
         casts,
       };
 
+    }),
+    getCastReplies: t.procedure
+    .input(
+      z.object({
+        hash: z.string().min(5),
+        startRow: z.number(),
+      })
+    )
+    .query(async (opts) => {
+      const { input } = opts;
+      const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
+      const startRow = input.startRow || 0;
+    const castsRequest = await db
+      .selectFrom('casts')
+      .innerJoin('users', 'users.fid', 'casts.fid')
+      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+      // created_at and updated_at show errors but are correct
+      .where('text', '>', '0')
+      .where(sql<string>`encode(parent_hash, 'hex') = ${hashAsHex}`)
+      .orderBy('timestamp', 'desc')
+      .offset(startRow)
+      .limit(50)
+      .execute();
+
+    const casts = castsRequest.map((cast) => {
+      const finalCast = cast;
+      if (finalCast.hash) {
+        finalCast.hash = `0x${cast.hash.toString('hex')}`;
+      }
+      if (finalCast.parent_hash) {
+        finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
+      }
+      return finalCast;
+    }).filter((cast) => cast.hash !== input.hash) as KyselyDB['casts'][];
+      return {
+        casts
+      };
     }),
 });

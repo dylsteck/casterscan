@@ -6,6 +6,7 @@ import Image from 'next/image';
 import LiveFeed from '~/components/LiveFeed';
 import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';
+import { ExpandableImage } from '~/components/ExpandableImage';
 
 const CastByHash = () => {
 
@@ -19,18 +20,24 @@ const CastByHash = () => {
   return(
     <>
       <div className="border-b-2 border-[#C1C1C1] justify-center">
-        <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-center">
+        <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-center align-top">
           {queryResult?.data?.cast.pfp && 
-          <Image 
-            src={queryResult?.data?.cast.pfp} 
-            className="rounded-full w-[30px] h-[30px]"
-            width={30} height={30} 
-            alt={`${queryResult?.data?.cast.fname}'s PFP`} /> 
+            <div className="w-[60px] h-[60px] flex items-center justify-center">
+              <ExpandableImage 
+                imageUrl={queryResult?.data?.cast.pfp} 
+                rounded={false}
+              /> 
+          </div>
           }
           <div className="flex flex-col gap-2">
-            <p className="text-black text-xl">
-              {queryResult.isLoading ? 'Loading...' : queryResult?.data ? addHyperlinksToText(queryResult?.data?.cast.text) : 'Error: could not load cast text'}
-            </p>
+            <div className="flex flex-col gap-1">
+              <Link href={`/users/${queryResult?.data?.cast.fname}`}>
+                <p className="text-sm font-medium">@{queryResult?.data?.cast.fname}</p>
+              </Link>
+              <p className="text-black text-xl">
+                {queryResult.isLoading ? 'Loading...' : queryResult?.data ? addHyperlinksToText(queryResult?.data?.cast.text) : 'Error: could not load cast text'}
+              </p>
+            </div>
             {queryResult?.data?.cast.hash && 
               <p className="text-xs text-black/80 mt-2 w-[100%] flex flex-row gap-1">
                 hash: <CopyText text={queryResult?.data?.cast.hash as string} />
@@ -39,7 +46,7 @@ const CastByHash = () => {
           </div>
         </div>
       </div>
-      <LiveFeed />
+      <LiveFeed hash={hash} />
     </>
   )
 }

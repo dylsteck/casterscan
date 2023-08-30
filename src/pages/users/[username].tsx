@@ -11,6 +11,9 @@ import nftdIcon from '../../../public/nftdIcon.png';
 import LiveFeed from '~/components/LiveFeed';
 import NFTDPopup from '~/components/NFTDPopup';
 import { ExpandableImage } from '~/components/ExpandableImage';
+import { CalendarIcon, IdentificationIcon } from '@heroicons/react/24/solid';
+import { renderText } from '~/lib/text';
+import CopyText from '~/components/CopyText';
 
 const UserPage = () => {
 
@@ -53,16 +56,17 @@ const UserPage = () => {
   return(
     <>
       <div className="border-b-2 border-[#C1C1C1] justify-center">
-        <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-center">
-          {user?.pfp && 
-            <div className="w-[60px] h-[60px]">
-              <ExpandableImage 
-                imageUrl={user?.pfp} 
-              /> 
-            </div>
-          }
+        <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-start align-top">
+        {user?.pfp && 
+          <div className="w-[60px] h-[60px] flex items-center justify-center">
+            <ExpandableImage 
+              imageUrl={user?.pfp} 
+              rounded={false}
+            /> 
+          </div>
+        }
           <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-row gap-2 pt-2">
               <p className="text-black text-xl font-medium">{user?.fname}</p>
               {typeof nftdInfo !== 'undefined' && 
                 <div className="w-[75px] h-[34.5px]">
@@ -75,7 +79,13 @@ const UserPage = () => {
                 </div>
               }
             </div>
-            <p className="text-black text-md">{user?.bio}</p>
+            <p className="text-black text-md">{renderText(user?.bio ?? '')}</p>
+            <div className="flex flex-row gap-1 text-sm">
+              <p className="text-[#71579E]">FID:</p> 
+              <div className="pt-[2px]">
+                <CopyText text={user?.fid} />
+              </div>
+            </div>
           </div>
           {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>

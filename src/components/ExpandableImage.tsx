@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-export const ExpandableImage = ({ imageUrl }: { imageUrl: string}) => {
+export const ExpandableImage = ({ imageUrl, rounded }: { imageUrl: string, rounded: boolean}) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -18,7 +18,7 @@ export const ExpandableImage = ({ imageUrl }: { imageUrl: string}) => {
             alt="Cast image"
             width={400}
             height={400}
-            className="w-auto h-auto max-h-[20vh] mt-2.5"
+            className={`w-auto h-auto max-h-[20vh] mt-2.5 ${rounded ? 'rounded-full' : ''}`}
           />
         </div>
         {isExpanded && (
@@ -26,7 +26,7 @@ export const ExpandableImage = ({ imageUrl }: { imageUrl: string}) => {
             className="fixed top-0 left-0 w-full h-full p-10 bg-black bg-opacity-50 flex justify-center items-center z-50"
             onClick={() => setIsExpanded(false)}
           >
-            <Image src={`${imageUrl}`} alt="Cast image" width={700} height={700} className="max-h-[75vh] object-contain" />
+            <Image src={`${imageUrl}`} alt="Cast image" width={700} height={700} className={`max-h-[75vh] object-contain {rounded ? 'rounded-full' : ''}`} />
           </div>
         )}
       </div>

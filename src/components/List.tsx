@@ -62,11 +62,13 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                 </motion.th>
                 <td className="px-6 py-4">
                     {addHyperlinksToText(text)}
-                    {warpcastChannels.find(channel => channel.parent_url === parentUrl) && <RenderChannelIcon parentUrl={parentUrl} />}
+                    <div className="pt-2">
+                        {warpcastChannels.find(channel => channel.parent_url === parentUrl) && <RenderChannelIcon parentUrl={parentUrl} />}
+                    </div>
                     {expanded && 
                     <div className="flex flex-row gap-2 items-end">
                         {images.map((image, index) => {
-                            return <ExpandableImage imageUrl={image} />
+                            return <ExpandableImage imageUrl={image} rounded={false} />
                         })}
                         <p className={`text-xs text-black/80 ${images.length === 0 && 'mt-2'} flex flex-row gap-1`}>
                             hash: <CopyText text={hash} />

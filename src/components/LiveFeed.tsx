@@ -12,7 +12,7 @@ const LoadingTable = dynamic(() => import('./LoadingTable'), {
     ssr: false
 });
 
-const LiveFeed: React.FC = ({ channel, user }: {channel?: string, user?: string }) => {
+const LiveFeed: React.FC = ({ channel, hash, user }: {channel?: string, hash?: string, user?: string }) => {
     const [filter, setFilter] = useState<string>('list');
     const [expanded, setExpanded] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
@@ -31,6 +31,9 @@ const LiveFeed: React.FC = ({ channel, user }: {channel?: string, user?: string 
     : channel ? api.casts.getCastsByChannel.useQuery(
         { startRow: page, channelUrl: channel },
         { refetchOnWindowFocus: false }
+    ) : hash ? api.casts.getCastReplies.useQuery(
+        { startRow: page, hash: hash },
+        { refetchOnWindowFocus: false }
     ) : api.casts.getLatestCasts.useQuery(
         { startRow: page, limit: 50 },
         { refetchOnWindowFocus: false }
@@ -40,7 +43,7 @@ const LiveFeed: React.FC = ({ channel, user }: {channel?: string, user?: string 
         console.log("HERE", back);
         if(back){
             if(page > 0){
-                setPage(page - 1)
+                setPage(page - 50)
             }
         }
         else{
@@ -51,7 +54,7 @@ const LiveFeed: React.FC = ({ channel, user }: {channel?: string, user?: string 
             if(request.data){
                 const castsLength = request.data.casts.length;
                 if(castsLength === 50){
-                    setPage(page + 1);
+                    setPage(page + 50);
                 }
             }
         }
@@ -82,6 +85,7 @@ const LiveFeed: React.FC = ({ channel, user }: {channel?: string, user?: string 
     {request.isLoading ? 
     <LoadingTable />
     : filter === 'list' ? <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts'][]} /> : <Grid casts={request?.data?.casts as KyselyDB['casts'][]} />}
+    {request?.data?.casts.length === 0 && <p className="text-center relative text-black/20 text-7xl pt-[10%]">no casts or replies</p> }
     </>
     )
 };
