@@ -1,10 +1,11 @@
 import { PlusCircleIcon } from "@heroicons/react/24/solid"
+import CreateBlock from "~/components/CreateBlock";
 
 // Todo: Change Page Header
 export default function Dashboard(){
 
     const handleCreateBlock = () => {
-
+        console.log('creating block');
     }
 
     return(
@@ -15,6 +16,7 @@ export default function Dashboard(){
                     className="text-[#333333] cursor-pointer float-left" onClick={handleCreateBlock}
                 />
                 <p>CREATE BLOCK</p>
+                <CreateBlock />
             </div>
         </div>
     )

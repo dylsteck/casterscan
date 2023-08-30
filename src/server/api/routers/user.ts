@@ -16,9 +16,9 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input }) => {
 
       const userRequest = await db
-      .selectFrom('profiles')
+      .selectFrom('users')
       .selectAll()
-      .where('profiles.fname', '=', input.username)
+      .where('users.fname', '=', input.username)
       .executeTakeFirst();
 
       if (!userRequest) {
@@ -53,9 +53,9 @@ export const userRouter = createTRPCRouter({
     .query(async ({ input }) => {
 
       const user = await db
-      .selectFrom('profiles')
+      .selectFrom('users')
       .selectAll()
-      .where('profiles.fid', '=', BigInt(input.fid))
+      .where('users.fid', '=', BigInt(input.fid))
       .executeTakeFirst();
 
       if (!user) {

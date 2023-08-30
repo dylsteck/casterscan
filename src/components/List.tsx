@@ -8,16 +8,19 @@ import Image from 'next/image';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
 import { motion } from 'framer-motion';
+import { warpcastChannels } from '~/utils/warpcast-channels';
+import RenderChannelIcon from './RenderChannelIcon';
 
 interface ListRowProps{
     username: string;
     text: string;
     hash: string;
+    parentUrl: string;
     timestamp: string;
     expanded: boolean;
 }
 
-const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
+const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRowProps) => {
 
     const checkImages = (): string[] => {
         const pattern = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/g;
@@ -41,7 +44,6 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
     // eg. search 'casterscan', casts have images, none show up in expanded
     // TODO: fix
     const images = checkImages();
-
     return(
         <tr className="bg-white">
                 <motion.th
@@ -60,6 +62,7 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
                 </motion.th>
                 <td className="px-6 py-4">
                     {addHyperlinksToText(text)}
+                    {warpcastChannels.find(channel => channel.parent_url === parentUrl) && <RenderChannelIcon parentUrl={parentUrl} />}
                     {expanded && 
                     <div className="flex flex-row gap-2 items-end">
                         {images.map((image, index) => {
@@ -92,7 +95,7 @@ const ListRow = ({username, text, hash, timestamp, expanded}: ListRowProps) => {
 
 interface ListProps{
     expanded: boolean;
-    casts: KyselyDB['casts_with_reactions_materialized'][];
+    casts: KyselyDB['casts'][];
 }
 
 const List = ({ expanded, casts }: ListProps) => {
@@ -128,6 +131,7 @@ const List = ({ expanded, casts }: ListProps) => {
                             username={cast.fname || ''}
                             text={cast.text}
                             hash={cast.hash}
+                            parentUrl={cast.parentUrl}
                             timestamp={cast.timestamp}
                             expanded={expanded}
                         />

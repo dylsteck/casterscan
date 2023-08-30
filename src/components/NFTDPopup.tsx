@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import type { Content, NFTDData } from '~/types/nftd.t';
-import nftdIcon from '../../public/nftdIcon.png';
+import nftdIconNoDots from '../../public/nftdIconNoDots.png';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getRelativeTime } from '~/lib/time';
@@ -71,12 +71,23 @@ const NFTDPopup = ({ nftdData, handleClose }: NFTDPopupProps) => {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-8 rounded-lg shadow-lg max-h-[75vh] overflow-y-scroll">
-      <Link href={`https://nf.td/${nftdData[0]?.slug}`}>
-        <Image src={nftdIcon} width={100 / 2} height={43 / 2} alt="NF.TD icon" className="mr-4" />
-      </Link>
-        <div className="mt-1">
-          <p className="float-left text-lg font-medium">{nftdData[0]?.slug}</p>
-          <XCircleIcon width={20} height={20} className="text-[#EA3323] cursor-pointer float-right mr-4" onClick={handleClose} />
+        <div className="w-[100%] flex flex-row justify-between items-center">
+          <Link href={`https://nf.td/${nftdData[0]?.slug ?? ''}`}>
+            <div className="flex flex-row items-center">
+              <div className="w-[60px] h-[34.5px]">
+                <Image 
+                  src={nftdIconNoDots}
+                  width={100} height={46} alt="NF.TD icon w-[100%] h-[100%]" 
+                />
+              </div>
+              <p className="text-lg font-medium pb-2">{nftdData[0]?.slug}</p>
+            </div>
+          </Link>
+          <div className="ml-auto">
+            <div className="flex items-center" style={{ height: '100%' }}>
+              <XCircleIcon width={20} height={20} className="text-[#EA3323] cursor-pointer pb-1" onClick={handleClose} />
+            </div>
+          </div>
         </div>
         {nftdData[0] && <DataRenderer data={nftdData[0]} />}
       </div>

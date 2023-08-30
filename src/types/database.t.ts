@@ -1,3 +1,5 @@
+import { Generated, GeneratedAlways } from "kysely";
+
 enum UserDataType {
   USER_DATA_TYPE_NONE = 0,
   USER_DATA_TYPE_PFP = 1, // Profile Picture for the user
@@ -25,45 +27,50 @@ export interface KyselyDB {
     signer: Buffer;
     raw: Buffer;
   };
+  // casts: {
+  //   id: bigint;
+  //   created_at: string;
+  //   updated_at: string;
+  //   deleted_at: string | null;
+  //   timestamp: string;
+  //   fid: bigint;
+  //   hash: string;
+  //   parent_hash: string | null;
+  //   parent_fid: bigint | null;
+  //   parent_url: string | null;
+  //   text: string;
+  //   embeds: string[];
+  //   mentions: bigint[];
+  //   mentions_positions: number[];
+  //   likes: number;
+  //   recasts: number;
+  //   comments: number;
+  //   pfp: string | null;
+  //   display: string | null;
+  //   bio: string | null;
+  //   url: string | null;
+  //   fname: string | null;
+  // };
   casts: {
-    id: bigint;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string;
-    timestamp: string;
-    fid: bigint;
-    hash: String;
-    parent_hash: Buffer | null;
-    parent_fid: bigint | null;
-    parent_url: string | null;
+    id: GeneratedAlways<string>;
+    createdAt: Generated<Date>;
+    updatedAt: Generated<Date>;
+    deletedAt: Date | null;
+    timestamp: Date;
+    fid: number;
     text: string;
-    embeds: string[];
-    mentions: bigint[];
-    mentions_positions: number[];
-  };
-  casts_with_reactions_materialized: {
-    id: bigint;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string | null;
-    timestamp: string;
-    fid: bigint;
-    hash: string;
-    parent_hash: string | null;
-    parent_fid: bigint | null;
-    parent_url: string | null;
-    text: string;
-    embeds: string[];
-    mentions: bigint[];
-    mentions_positions: number[];
-    likes: number;
-    recasts: number;
-    comments: number;
-    pfp: string | null;
-    display: string | null;
-    bio: string | null;
-    url: string | null;
-    fname: string | null;
+    hash: Uint8Array;
+    parentHash: Uint8Array | null;
+    parentFid: number | null;
+    parentUrl: string | null;
+    embeds: Generated<
+      {
+        url?: string | undefined;
+        castId?: object | undefined;
+      }[]
+    >;
+    mentions: Generated<number[]>;
+    mentionsPositions: Generated<number[]>;
   };
   reactions: {
     id: bigint;
@@ -117,7 +124,7 @@ export interface KyselyDB {
     updated_at: string;
     custody_address: Buffer;
   };
-  profiles: {
+  users: {
     fid: bigint;
     created_at: string;
     custody_address: Buffer;

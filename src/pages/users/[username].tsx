@@ -10,6 +10,7 @@ import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
 import LiveFeed from '~/components/LiveFeed';
 import NFTDPopup from '~/components/NFTDPopup';
+import { ExpandableImage } from '~/components/ExpandableImage';
 
 const UserPage = () => {
 
@@ -54,19 +55,28 @@ const UserPage = () => {
       <div className="border-b-2 border-[#C1C1C1] justify-center">
         <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-center">
           {user?.pfp && 
-          <Image 
-            src={user?.pfp} 
-            className="rounded-full w-[60px] h-[60px]"
-            width={60} height={60} 
-            alt={`${user?.fname}'s PFP`} /> 
+            <div className="w-[60px] h-[60px]">
+              <ExpandableImage 
+                imageUrl={user?.pfp} 
+              /> 
+            </div>
           }
-          <p className="text-black text-5xl">{user?.fname}</p>
-          <Image 
-            src={nftdIcon}
-            width={100/1.3} height={43/1.3} alt="NF.TD icon" 
-            className="pl-4 pt-2 pb-5"
-            onClick={() => setNftdPopupPresent(true)}
-          />
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row gap-2">
+              <p className="text-black text-xl font-medium">{user?.fname}</p>
+              {typeof nftdInfo !== 'undefined' && 
+                <div className="w-[75px] h-[34.5px]">
+                  <Image 
+                    src={nftdIcon}
+                    width={100} height={46} alt="NF.TD icon" 
+                    className="pl-4"
+                    onClick={() => setNftdPopupPresent(true)}
+                  />
+                </div>
+              }
+            </div>
+            <p className="text-black text-md">{user?.bio}</p>
+          </div>
           {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
