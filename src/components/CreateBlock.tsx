@@ -188,7 +188,7 @@ export default function CreateBlock() {
             <div className="border-b border-gray-300 last:border-b-0 flex flex-row items-center gap-4">
             <p>{name}</p>
             {/* <p className="ml-auto mr-2">{type}</p> */}
-            <MatchOperators />
+            <MatchOperators type={type} />
             {/* <input
                 type="text"
                 className="ml-auto mr-2"
@@ -202,7 +202,7 @@ export default function CreateBlock() {
         );
     };
 
-    const MatchOperators = () => {
+    const MatchOperators = ({ type }: { type: string }) => {
         const [selectedOperator, setSelectedOperator] = useState('>');
         const [textInputValue, setTextInputValue] = useState('');
       
@@ -213,6 +213,38 @@ export default function CreateBlock() {
         const handleTextInputChange = (event: any) => {
           setTextInputValue(event.target.value);
         };
+
+        // TODO: when move on, make sure number operators arent strings
+        // eg >= value has to have number, not string
+        // fine for keyword though
+
+        const renderOptions = () => {
+            if(type.includes('string')){
+                return(
+                    <>
+                        <option value="keyword">{'keyword'}</option>
+                        <option value=">">{'>'}</option>
+                        <option value="<">{'<'}</option>
+                        <option value="=">{'='}</option>
+                        <option value=">=">{'>='}</option>
+                        <option value="<=">{'<='}</option>
+                        <option value="!=">{'!='}</option>
+                    </>
+                )
+            }
+            else{
+                return(
+                    <>
+                        <option value=">">{'>'}</option>
+                        <option value="<">{'<'}</option>
+                        <option value="=">{'='}</option>
+                        <option value=">=">{'>='}</option>
+                        <option value="<=">{'<='}</option>
+                        <option value="!=">{'!='}</option>
+                    </>
+                )
+            }
+        }
       
         return (
           <div className="flex items-center">
@@ -221,12 +253,7 @@ export default function CreateBlock() {
               onChange={handleOperatorChange}
               className="mr-2 px-2 py-1 border border-gray-300 rounded"
             >
-              <option value=">">{'>'}</option>
-              <option value="<">{'<'}</option>
-              <option value="=">{'='}</option>
-              <option value=">=">{'>='}</option>
-              <option value="<=">{'<='}</option>
-              <option value="!=">{'!='}</option>
+              {renderOptions()}
             </select>
             <input
               type="text"
@@ -238,8 +265,11 @@ export default function CreateBlock() {
         );
       };
 
-    const handleNextStage = (newStage: CreateBlockStage) => {
-        if(stage !== newStage){
+    const handleNextStage = (newStage: CreateBlockStage, done: boolean) => {
+        if(done){
+            
+        }
+        else if(stage !== newStage){
             setStage(newStage);
         }
     }
@@ -250,7 +280,7 @@ export default function CreateBlock() {
                 <>
                     <div className="border-b border-gray-300 p-2 flex justify-between items-center">
                         <p>1. Choose <b>one</b> table and its properties</p>
-                        <ArrowRightCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer mr-2" onClick={() => handleNextStage(CreateBlockStage.Stage2)} />
+                        <ArrowRightCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer mr-2" onClick={() => handleNextStage(CreateBlockStage.Stage2, false)} />
                     </div>
                     <div className="border-b border-gray-300 p-2 flex flex-row gap-2 overflow-x-scroll hide-scrollbar">
                         {Object.keys(db).map((value) => {
@@ -272,10 +302,10 @@ export default function CreateBlock() {
             <>
                 <div className="border-b border-gray-300 p-2 flex justify-between items-center">
                     <div className="flex flex-row gap-2">
-                        <ArrowLeftCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer ml-2" onClick={() => handleNextStage(CreateBlockStage.Stage1)} />
+                        <ArrowLeftCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer ml-2" onClick={() => handleNextStage(CreateBlockStage.Stage1, false)} />
                         <p>2. Choose filters</p>
                     </div>
-                    <ArrowRightCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer mr-2" onClick={() => console.log('clicked')} />
+                    <ArrowRightCircleIcon width={20} height={20} className="text-gray-700 cursor-pointer mr-2" onClick={() => handleNextStage(CreateBlockStage.Stage2, true)} />
                 </div>
                 {/* <div className="border-b border-gray-300 p-2 flex flex-row gap-2 overflow-x-scroll hide-scrollbar">
                     {Object.keys(db).map((value) => {
