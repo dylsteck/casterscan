@@ -6,6 +6,7 @@ import { addHyperlinksToText } from '~/lib/text';
 import Link from 'next/link';
 import LiveIndicator from './LiveIndicator';
 import LoadingTable from './LoadingTable';
+import { ListRowProps } from './List';
 
 export interface SearchListRowProps{
     type: string;
@@ -37,7 +38,7 @@ const SearchListRow = ({type, username, text, link, timestamp, expanded}: Search
                 </Link>
                 </td>
                 <td className="px-6 py-4 w-[10%] max-w-[15%]">
-                    {getRelativeTime(timestamp)}
+                    {getRelativeTime(parseInt(timestamp))}
                 </td>
             </tr>
     )

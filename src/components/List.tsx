@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { warpcastChannels } from '~/utils/warpcast-channels';
 import RenderChannelIcon from './RenderChannelIcon';
 
-interface ListRowProps{
+export interface ListRowProps{
     username: string;
     text: string;
     hash: string;
