@@ -150,9 +150,8 @@ export const castsRouter = t.router({
   ) AS results
   ORDER BY sort_order, CASE WHEN type = 'cast' THEN random() * 0.6 ELSE random() * 0.4 END DESC
   LIMIT ${DB_REQUEST_LIMIT};
-`;
-    // need to work on this the most
-    // and instant right?
+`; 
+    // TODO: add channels and add support if keyword = cast/user to go to their page, auto escape when keyword = 0 
     const list = await query.execute(db);
 
     if (!list) {

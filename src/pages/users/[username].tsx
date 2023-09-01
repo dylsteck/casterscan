@@ -58,7 +58,7 @@ const UserPage = () => {
       <div className="border-b-2 border-[#C1C1C1] justify-center">
         <div className="p-5 pl-4 pt-5 pb-7 flex flex-row gap-4 items-start align-top">
         {user?.pfp && 
-          <div className="w-[60px] h-[60px] flex items-center justify-center">
+          <div className="w-[60px] h-80px] max-h-[80px] overflow-y-hidden flex items-center justify-center">
             <ExpandableImage 
               imageUrl={user?.pfp} 
               rounded={false}

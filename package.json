@@ -23,6 +23,7 @@
     "heroicons": "^2.0.16",
     "kysely": "^0.24.2",
     "next": "^13.2.1",
+    "next-pwa": "^5.6.0",
     "nextjs-google-analytics": "^2.3.3",
     "pg-pool": "^3.6.0",
     "react": "18.2.0",

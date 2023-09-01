@@ -17,15 +17,16 @@ interface GridItemProps {
 }
 
 const GridItem = ({ cast }: GridItemProps) => {
-    //   <div className="mb-4 p-4 bg-white break-inside-avoid border  relative">
-    // ${index === 0 ? 'pt-1' : ''}
     return (
       <div className={`w[-100vw] md:w-[50vw] lg:w-[33.3vw] first:border-t-0 border-t-2 border-[#9BA4B1]-2 border-l-1  md:border-l-0 h-full border-b-1 break-inside-avoid overflow-x-scroll relative`} style={{ borderLeft: '1px solid #9BA4B1' }}>
   <div className="mb-2 flex flex-row gap-2 items-center p-3 pt-1">
     {cast.pfp && (
-      <div className="w-[20px] h-[20px] pb-1">
-        <ExpandableImage imageUrl={cast.pfp ?? ''} rounded={true} />
-      </div>
+      <Image
+        width={20}
+        height={20}
+        className="w-[20px] h-[20px] rounded-full object-cover flex items-center justify-center mt-4"
+        src={cast.pfp ?? ''}
+      />
     )}
     <Link href={`/users/${cast.fname}`}>
       <p className="text-sm pt-4 font-medium">{cast.fname}</p>
@@ -34,7 +35,7 @@ const GridItem = ({ cast }: GridItemProps) => {
   <p className="absolute top-5 right-5 text-sm">
     {getRelativeTime(new Date(cast.timestamp))}
   </p>
-  {/* TODO: fix so this link doesnt override links in renderText */}
+  {/* TODO: fix so this link doesn't override links in renderText */}
   <Link href={`/casts/${cast.hash}`}>
     <p className="text-md overflow-x-scroll text-wrap pl-4 pb-2">
       {renderText(cast.text)}

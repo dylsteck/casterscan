@@ -31,9 +31,10 @@ const CastByHash = () => {
           }
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
+              {queryResult?.data && 
               <Link href={`/users/${queryResult?.data?.cast.fname}`}>
                 <p className="text-sm font-medium">@{queryResult?.data?.cast.fname}</p>
-              </Link>
+              </Link>}
               <p className="text-black text-xl">
                 {queryResult.isLoading ? 'Loading...' : queryResult?.data ? addHyperlinksToText(queryResult?.data?.cast.text) : 'Error: could not load cast text'}
               </p>
