@@ -1,10 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
-import type { KyselyDB } from "~/types/database.t";
 import type { NFTDData } from "~/types/nftd.t";
 import { db } from "~/lib/kysely";
-import { url } from "inspector";
 
 export const userRouter = createTRPCRouter({
   getUserPageData: publicProcedure
@@ -78,8 +76,8 @@ export const userRouter = createTRPCRouter({
         if (!response.ok) {
           throw new Error(`Failed to fetch NF.TD data. Response status: ${response.status}`);
         }
-        const json = await response.json();
-        const data = json.data as NFTDData[];
+        const json = await response.json() as { data: NFTDData[] };
+        const data: NFTDData[] = (json as { data: NFTDData[] }).data;
 
         return data;
 

@@ -1,4 +1,4 @@
-import { Generated, GeneratedAlways } from "kysely";
+import { type Generated, type GeneratedAlways } from "kysely";
 
 enum UserDataType {
   USER_DATA_TYPE_NONE = 0,
