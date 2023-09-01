@@ -25,7 +25,7 @@ const DataRendererRow = ({content}: {content: Content}) => {
                 </Link>
             </td>
             <td className="pr-6 py-4">
-                {getRelativeTime(new Date(content.timestamp))}
+                {getRelativeTime(content.timestamp)}
             </td>
         </tr>
     )

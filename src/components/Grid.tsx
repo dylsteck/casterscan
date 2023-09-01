@@ -5,6 +5,7 @@ import { getRelativeTime } from '~/lib/time';
 import type { KyselyDB } from '~/types/database.t';
 import { warpcastChannels } from '~/utils/warpcast-channels';
 import RenderChannelIcon from './RenderChannelIcon';
+import { renderText } from '~/lib/text';
 
 interface GridProps {
   casts: KyselyDB['casts'][];
@@ -51,8 +52,8 @@ const Grid = ({ casts }: GridProps) => {
   return (
     <div className="lg:columns-3 md:columns-2 auto-cols-auto overflow-x-hidden overflow-y-visible">
       {casts &&
-        casts.map((cast) => (
-          <GridItem key={cast.hash} cast={cast} />
+        casts.map((cast, index) => (
+          <GridItem key={`cast-${index}`} cast={cast} />
         ))}
     </div>
   );

@@ -61,6 +61,7 @@ export interface KyselyDB {
     text: string;
     hash: Uint8Array;
     parentHash: Uint8Array | null;
+    fname: string | null;
     parentFid: number | null;
     parentUrl: string | null;
     pfp: string | null;

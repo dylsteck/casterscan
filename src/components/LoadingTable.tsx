@@ -18,11 +18,14 @@ function LoadingTableRow() {
     },
   };
 
-  const secondsAgo = (timestamp) => {
-    const now = new Date();
-    const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+  const secondsAgo = (timestamp: number) => {
+    const now = new Date().getTime();
+    const seconds = Math.floor((now - timestamp) / 1000);
     return `${seconds} seconds ago`;
   };
+
+  const isoTimestamp = new Date().toISOString();
+  const timestamp = Date.parse(isoTimestamp);
 
   return (
     <motion.tr
@@ -32,17 +35,17 @@ function LoadingTableRow() {
       animate="visible"
     >
       <th scope="row" className="px-6 py-4 whitespace-nowrap">
-        {secondsAgo(new Date().toISOString())}
+        {secondsAgo(timestamp)}
       </th>
       <td className="px-6 py-4 text-[#71579E]">
-        Awaiting RPC request from Farcaster Network hub...
+        Awaiting request from Farcaster Network hubs...
       </td>
     </motion.tr>
   );
 }
 
 export default function LoadingTable() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState<React.ReactNode[]>([]);
 
   useEffect(() => {
     const addRow = () => {

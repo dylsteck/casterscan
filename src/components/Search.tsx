@@ -37,7 +37,7 @@ const SearchListRow = ({type, username, text, link, timestamp, expanded}: Search
                 </Link>
                 </td>
                 <td className="px-6 py-4 w-[10%] max-w-[15%]">
-                    {getRelativeTime(new Date(timestamp))}
+                    {getRelativeTime(timestamp)}
                 </td>
             </tr>
     )

@@ -87,7 +87,7 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                 </Link>
                 </td>
                 <td className="px-6 py-4 w-[10%] max-w-[15%]">
-                    {getRelativeTime(timestamp.getTime())}
+                    {getRelativeTime(parseInt(timestamp))}
                 </td>
             </tr>
     )
@@ -130,9 +130,9 @@ const List = ({ expanded, casts }: ListProps) => {
                 return <ListRow 
                             username={cast.fname || ''}
                             text={cast.text}
-                            hash={cast.hash}
-                            parentUrl={cast.parentUrl}
-                            timestamp={cast.timestamp}
+                            hash={`${cast.hash}`}
+                            parentUrl={cast.parentUrl ?? ''}
+                            timestamp={`${cast.timestamp}`}
                             expanded={expanded}
                         />
             })}
