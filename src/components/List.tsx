@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
 import { getRelativeTime } from '~/lib/time';
-import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import { addHyperlinksToText } from '~/lib/text';
-import Image from 'next/image';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
 import { motion } from 'framer-motion';
@@ -67,7 +65,7 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                     </div>
                     {expanded && 
                     <div className="flex flex-row gap-2 items-end">
-                        {images.map((image, index) => {
+                        {images.map((image) => {
                             return <ExpandableImage imageUrl={image} rounded={false} />
                         })}
                         <p className={`text-xs text-black/80 ${images.length === 0 && 'mt-2'} flex flex-row gap-1`}>

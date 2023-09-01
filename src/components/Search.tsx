@@ -1,8 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Grid from './Grid';
-import List from './List';
+import React, { useContext, useState } from 'react';
 import { api } from '~/utils/api';
-import type { KyselyDB } from '~/types/database.t';
 import { getRelativeTime } from '~/lib/time';
 import { SearchContext } from '~/context/SearchContext';
 import { addHyperlinksToText } from '~/lib/text';

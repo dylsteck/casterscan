@@ -63,6 +63,7 @@ export interface KyselyDB {
     parentHash: Uint8Array | null;
     parentFid: number | null;
     parentUrl: string | null;
+    pfp: string | null;
     embeds: Generated<
       {
         url?: string | undefined;

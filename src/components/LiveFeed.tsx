@@ -3,10 +3,7 @@ import Grid from './Grid';
 import List from './List';
 import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { DB_REQUEST_LIMIT, castsRouter } from '~/server/api/routers/cast';
 import dynamic from 'next/dynamic'
-import { motion } from 'framer-motion';
 import LiveIndicator from './LiveIndicator';
 const LoadingTable = dynamic(() => import('./LoadingTable'), {
     ssr: false

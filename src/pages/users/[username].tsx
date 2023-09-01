@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
-import Gallery from '../../components/Gallery';
-import TableRow from '../../components/TableRow';
 import Image from 'next/image';
-import Link from 'next/link';
 import type { KyselyDB } from '~/types/database.t';
 import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
 import LiveFeed from '~/components/LiveFeed';
 import NFTDPopup from '~/components/NFTDPopup';
 import { ExpandableImage } from '~/components/ExpandableImage';
-import { CalendarIcon, IdentificationIcon } from '@heroicons/react/24/solid';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
 

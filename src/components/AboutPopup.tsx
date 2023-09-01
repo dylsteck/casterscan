@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import Image from 'next/image';
 import { XCircleIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 
@@ -42,7 +41,7 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
         </div>
         <p className="text-md mt-2">
             Casterscan is a block explorer for Farcaster. 
-            It lets you view and query all casts & profiles, view channels, and see raw metadata you'd otherwise have to run code to get.
+            It lets you view and query all casts & profiles, view channels, and see raw metadata you would otherwise have to run code to get.
             <br/> <br/>
             There are two goals for {casterscans} utility: <br/>
             - make it easy to access/query Farcaster data <br/>

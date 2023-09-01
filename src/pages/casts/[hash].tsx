@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { api } from '~/utils/api';
-import Image from 'next/image';
 import LiveFeed from '~/components/LiveFeed';
 import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';

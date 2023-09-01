@@ -2,8 +2,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext, useRef, useState } from 'react';
 import { SearchContext } from '~/context/SearchContext';
-import { db } from '~/lib/kysely';
-import { api } from '~/utils/api';
 import AboutPopup from './AboutPopup';
 
 const Header: React.FC = () => {
@@ -24,13 +22,10 @@ const Header: React.FC = () => {
   const handleClosePopup = () => {
     setIsPopupOpen(false);
   };
-
-  const handleChangeSearchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-  }
-
+  
   const handleKeyDown = async(e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      console.log(searchValue);
       setSearchValue(search)
     }
   }

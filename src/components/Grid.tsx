@@ -1,12 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { addHyperlinksToText, renderText } from '~/lib/text';
 import { getRelativeTime } from '~/lib/time';
 import type { KyselyDB } from '~/types/database.t';
 import { warpcastChannels } from '~/utils/warpcast-channels';
 import RenderChannelIcon from './RenderChannelIcon';
-import { ExpandableImage } from './ExpandableImage';
 
 interface GridProps {
   casts: KyselyDB['casts'][];
@@ -26,6 +24,7 @@ const GridItem = ({ cast }: GridItemProps) => {
         height={20}
         className="w-[20px] h-[20px] rounded-full object-cover flex items-center justify-center mt-4"
         src={cast.pfp ?? ''}
+        alt="Image for cast"
       />
     )}
     <Link href={`/users/${cast.fname}`}>

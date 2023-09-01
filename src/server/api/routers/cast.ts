@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import { publicProcedure } from "../trpc";
 
-import { supabase } from '../../../lib/supabase';
 import { TRPCError, initTRPC } from "@trpc/server";
 import type { KyselyDB } from "~/types/database.t";
 import { db } from "~/lib/kysely";

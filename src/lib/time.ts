@@ -12,7 +12,6 @@ export function getRelativeTime(timestamp: number) {
   const momentTimestampUTC = moment.utc(timestamp);
   const localTimeZone = moment.tz.guess(true);
   const momentTimestamp = momentTimestampUTC.tz(localTimeZone);
-  const timeZoneAbbr = momentTimestamp.format('z');
 
   momentTimestamp.tz(localTimeZone);
   const formattedTime = momentTimestamp.calendar()
