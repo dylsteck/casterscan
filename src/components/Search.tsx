@@ -8,6 +8,7 @@ import { SearchContext } from '~/context/SearchContext';
 import { addHyperlinksToText } from '~/lib/text';
 import Link from 'next/link';
 import LiveIndicator from './LiveIndicator';
+import LoadingTable from './LoadingTable';
 
 export interface SearchListRowProps{
     type: string;
@@ -157,11 +158,10 @@ const Search: React.FC = () => {
             {expanded ? <p>collapse [-]</p> : <p>expand [+]</p>}
         </div>
     </div>
-    {listRequest.isLoading && 
+    {listRequest.isLoading ?
     <>
-    <p>loading...</p>
-    </> }
-    {filter === 'list' ? <SearchList expanded={expanded} feed={listRequest?.data?.list.rows as SearchListRowProps[]} /> : <SearchGrid feed={listRequest?.data?.list.rows as SearchListRowProps[]} />}
+    <LoadingTable />
+    </> : filter === 'list' ? <SearchList expanded={expanded} feed={listRequest?.data?.list.rows as SearchListRowProps[]} /> : <SearchGrid feed={listRequest?.data?.list.rows as SearchListRowProps[]} />}
     </>
     )
 };

@@ -139,10 +139,10 @@ export default function GalleryRender({ cast, profile, index }: GalleryRenderPro
       
               <div className="relative ml-auto group text-sm text-gray-300">
                 <p className="block group-hover:hidden xs:hidden">
-                  {getRelativeTime(new Date(cast?.published_at ?? new Date()))}
+                  {getRelativeTime(new Date(cast?.published_at.getTime()))}
                 </p>
                 <p className="hidden group-hover:block">
-                  {new Date(cast?.published_at ?? new Date()).toUTCString().slice(4, 16)}
+                  {new Date(cast?.published_at.getTime()).toUTCString().slice(4, 16)}
                 </p>
               </div>
             </div>

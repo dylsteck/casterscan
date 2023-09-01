@@ -33,7 +33,7 @@ const GridItem = ({ cast }: GridItemProps) => {
     </Link>
   </div>
   <p className="absolute top-5 right-5 text-sm">
-    {getRelativeTime(new Date(cast.timestamp))}
+    {getRelativeTime(cast.timestamp.getTime())}
   </p>
   {/* TODO: fix so this link doesn't override links in renderText */}
   <Link href={`/casts/${cast.hash}`}>

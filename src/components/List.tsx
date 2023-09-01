@@ -89,7 +89,7 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                 </Link>
                 </td>
                 <td className="px-6 py-4 w-[10%] max-w-[15%]">
-                    {getRelativeTime(new Date(timestamp))}
+                    {getRelativeTime(timestamp.getTime())}
                 </td>
             </tr>
     )

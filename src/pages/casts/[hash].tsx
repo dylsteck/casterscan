@@ -7,6 +7,7 @@ import LiveFeed from '~/components/LiveFeed';
 import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from '~/components/ExpandableImage';
+import moment from 'moment-timezone';
 
 const CastByHash = () => {
 
@@ -42,6 +43,11 @@ const CastByHash = () => {
             {queryResult?.data?.cast.hash && 
               <p className="text-xs text-black/80 mt-2 w-[100%] flex flex-row gap-1">
                 hash: <CopyText text={queryResult?.data?.cast.hash as string} />
+              </p>
+            }
+            {queryResult?.data?.cast.timestamp && 
+              <p className="text-xs text-black/80 w-[100%] flex flex-row gap-1">
+                casted at: <CopyText text={moment(queryResult?.data?.cast.timestamp).format('MMMM Do YYYY, h:mm:ss a') as string} />
               </p>
             }
           </div>

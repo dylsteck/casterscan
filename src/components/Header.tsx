@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext, useRef, useState } from 'react';
 import { SearchContext } from '~/context/SearchContext';
+import { db } from '~/lib/kysely';
+import { api } from '~/utils/api';
+import AboutPopup from './AboutPopup';
 
 const Header: React.FC = () => {
 
@@ -12,14 +15,22 @@ const Header: React.FC = () => {
 
   const { searchValue, setSearchValue } = useContext(SearchContext);
   const [search, setSearch] = useState<string>('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
 
   const handleChangeSearchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = async(e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      // alert("Enter key pressed!");
       setSearchValue(search)
     }
   }
@@ -30,9 +41,15 @@ const Header: React.FC = () => {
         <Link href="/" className="float-left">
           <p className="p-5 pl-4">CASTERSCAN</p>
         </Link>
-        <Link href="/dashboard" className="float-right">
-          <p className="p-5 pl-4">DASHBOARD [+]</p>
-        </Link>
+        <div className="float-right flex flex-row">
+          <p className="p-5 pl-4" onClick={() => handleOpenPopup()}>
+            ABOUT
+          </p>
+          <AboutPopup isOpen={isPopupOpen} handleClose={handleClosePopup} />
+          <Link href="https://github.com/dylsteck/casterscan">
+            <p className="p-5 pl-4 mr-2">GITHUB</p>
+          </Link>
+        </div>
       </div>
       {notCastOrUser && 
       <div className="border-b-2 border-[#C1C1C1] justify-center">
