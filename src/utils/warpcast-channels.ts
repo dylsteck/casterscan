@@ -1,4 +1,5 @@
 // source: https://github.com/neynarxyz/farcaster-channels/blob/main/warpcast.json
+// modified to add image to each channel
 
 export const warpcastChannels = [
     {
