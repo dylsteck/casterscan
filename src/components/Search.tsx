@@ -77,7 +77,7 @@ const SearchList = ({ expanded, feed }: ListProps) => {
         <tbody>
            {feed && 
            <>
-            {feed.map((feedItem) => {
+            {feed.map((feedItem: any) => {
                 return <SearchListRow 
                             type={feedItem.type}
                             username={feedItem.username}
@@ -85,6 +85,7 @@ const SearchList = ({ expanded, feed }: ListProps) => {
                             link={feedItem.link}
                             timestamp={feedItem.timestamp}
                             expanded={expanded}
+                            key={feed.indexOf(feedItem)}
                         />
             })}
             </>}
@@ -103,7 +104,7 @@ const SearchGrid = (feed: SearchListRowProps[]) => {
                     <div className="float-left flex flex-row gap-2 items-center">
                         <p>{item.username}</p>
                     </div>
-                    <p className="float-right">{getRelativeTime(new Date(item.timestamp))}</p>
+                    <p className="float-right">{getRelativeTime(parseInt(item.timestamp))}</p>
                         <div style={{ clear: 'both' }}></div>
                 </div>
                 <p className="text-sm overflow-x-scroll text-wrap" style={{ clear: 'both' }}>
@@ -116,7 +117,7 @@ const SearchGrid = (feed: SearchListRowProps[]) => {
     return(
         <div className="grid grid-cols-4 gap-4 p-3">
             {feed.map((feedItem) => {
-                return <SearchGridItem item={feedItem as SearchListRowProps} />
+                return <SearchGridItem item={feedItem} key={feed.indexOf(feedItem)} />
             })}
         </div>
     )
