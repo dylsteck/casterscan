@@ -15,7 +15,7 @@ const UserPage = () => {
 
   const router = useRouter();
   const t = api.useContext();
-  const [user, setUser] = useState<KyselyDB['profiles']>();
+  const [user, setUser] = useState<KyselyDB['users']>();
   const [nftdInfo, setNftdInfo] = useState<NFTDData[]>();
   const [nftdPopupPresent, setNftdPopupPresent] = useState<boolean>(false);
 

@@ -7,10 +7,13 @@ const Channel = () => {
   const router = useRouter();
   const { url } = router.query;
 
-  return(
+  const channelUrl = url as string ?? '';
+
+  return (
     <>
-      <LiveFeed channel={url ?? ''} />
+      <LiveFeed channel={channelUrl} />
     </>
   )
 }
+
 export default Channel;

@@ -9,7 +9,13 @@ const LoadingTable = dynamic(() => import('./LoadingTable'), {
     ssr: false
 });
 
-const LiveFeed: React.FC = ({ channel, hash, user }: {channel?: string, hash?: string, user?: string }) => {
+interface LiveFeedProps{
+    channel?: string;
+    hash?: string;
+    user?: string;
+}
+
+export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
     const [filter, setFilter] = useState<string>('list');
     const [expanded, setExpanded] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
@@ -85,6 +91,4 @@ const LiveFeed: React.FC = ({ channel, hash, user }: {channel?: string, hash?: s
     {request?.data?.casts.length === 0 && <p className="text-center relative text-black/20 text-7xl pt-[10%]">no casts or replies</p> }
     </>
     )
-};
-
-export default LiveFeed;
+}
