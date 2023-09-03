@@ -1,11 +1,10 @@
 // source: https://github.com/neynarxyz/farcaster-channels/blob/main/warpcast.json
-// modified to add image to each channel
 
 export const warpcastChannels = [
     {
         "name": "Neynar",
         "parent_url": "chain://eip155:1/erc721:0xd4498134211baad5846ce70ce04e7c4da78931cc",
-        "image": "https://i.seadn.io/gcs/files/e519bbd276bdb3ad5ba4532a6aabd22c.png?w=500&auto=format",
+        "image": "https://ipfs.decentralized-content.com/ipfs/bafybeidupusfn5udq2sclotztyavhtopmwttymh4fzapnjwfwx5b3jh42u",
         "channel_id": "neynar"
     },
     {
@@ -409,5 +408,23 @@ export const warpcastChannels = [
         "parent_url": "chain://eip155:1/erc721:0x2A9EA02E4c2dcd56Ba20628Fe1bd46bAe2C62746",
         "image": "https://i.seadn.io/gcs/files/fe246445104ccfc298417e5e5fc49505.jpg?w=500&auto=format",
         "channel_id": "farcon"
+    },
+    {
+        "name": "Parenting",
+        "parent_url": "chain://eip155:8453/erc721:0xb7310fc4b4a31c4fb7adf90b8201546bb2bcb52c",
+        "image": "https://ipfs.decentralized-content.com/ipfs/bafybeifl46eltwvlwof5fsusgk5vk4rq7duo4qw33xq4gbdjsq4a4kbcom",
+        "channel_id": "parenting"
+    },
+    {
+        "name": "Science",
+        "parent_url": "chain://eip155:8453/erc721:0xd953664a9b9e30fa7b3ccd00a2f9c21c7b75c5f0",
+        "image": "https://ipfs.decentralized-content.com/ipfs/bafybeicwk3vf7oilmigaraj6sfnylb5upits56usthxrndnehb2gf4vty4",
+        "channel_id": "science"
+    },
+    {
+        "name": "Rust",
+        "parent_url": "https://www.rust-lang.org",
+        "image": "https://warpcast.com/~/channel-images/rust.png",
+        "channel_id": "rust"
     }
 ];
