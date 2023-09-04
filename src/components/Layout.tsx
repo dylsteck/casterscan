@@ -14,14 +14,14 @@ export default function Layout({ children }: LayoutProps) {
         <title>Casterscan</title>
 
         <meta name="title" content="Casterscan" />
-        <meta name="description" content="A block explorer for the Farcaster network" />
+        <meta name="description" content="A block explorer for Farcaster" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
         {/* OpenGraph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://casterscan.com/"/>
         <meta property="og:title" content="Casterscan"/>
-        <meta property="og:description" content="A block explorer for the Farcaster network"/>
+        <meta property="og:description" content="A block explorer for Farcaster"/>
         <meta property="og:image" content="https://i.imgur.com/mbKEweW.png"/>
         <meta property="og:site_name" content="Casterscan" />
         <meta property="og:locale" content="en_US" />
@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content="Casterscan" />
-          <meta name="description" content="A block explorer for the Farcaster network" />
+          <meta name="description" content="A block explorer for Farcaster" />
           <meta name="format-detection" content="telephone=no" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="msapplication-config" content="/icons/browserconfig.xml" />
@@ -56,7 +56,7 @@ export default function Layout({ children }: LayoutProps) {
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:url" content="https://casterscan.com/" />
           <meta name="twitter:title" content="Casterscan" />
-          <meta name="twitter:description" content="A block explorer for the Farcaster network" />
+          <meta name="twitter:description" content="A block explorer for Farcaster" />
           <meta name="twitter:image" content="https://i.imgur.com/mbKEweW.png" />
           <meta name="twitter:creator" content="@Dylan_Steck" />
       </Head>

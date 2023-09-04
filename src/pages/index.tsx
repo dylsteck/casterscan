@@ -14,7 +14,7 @@ const Home: NextPage = () => {
     <>
       <Head>
         <title>Casterscan</title>
-        <meta name="description" content="A block explorer for the Farcaster network" />
+        <meta name="description" content="A block explorer for Farcaster" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-1G0WTCHYKQ" />

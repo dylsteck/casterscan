@@ -38,7 +38,7 @@ function LoadingTableRow() {
         {secondsAgo(timestamp)}
       </th>
       <td className="px-6 py-4 text-[#71579E]">
-        Awaiting request from Farcaster Network hubs...
+        Awaiting request from Farcaster protocol hubs...
       </td>
     </motion.tr>
   );
