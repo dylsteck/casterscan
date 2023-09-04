@@ -1,20 +1,39 @@
-import moment from 'moment-timezone';
-
 /**
-  * Returns the relative time since cast was posted
-  * Eg: 5 months ago, 1 second ago, two weeks ago
-  * */
-
-
-// WIP: resolve local timezone(following all docs but it won't cooperate)
-// current function below resolves time into UTC
+ * Returns the formatted time in the local timezone with dynamic offset
+ */
 export function getRelativeTime(timestamp: number) {
-  const momentTimestampUTC = moment.utc(timestamp);
-  const localTimeZone = moment.tz.guess(true);
-  const momentTimestamp = momentTimestampUTC.tz(localTimeZone);
+  const utcDate = new Date(timestamp);
 
-  momentTimestamp.tz(localTimeZone);
-  const formattedTime = momentTimestamp.calendar()
+  const offsetMinutes = utcDate.getTimezoneOffset();
 
-  return formattedTime;
+  // Calculate the local timestamp by subtracting the offset
+  const localTimestamp = timestamp - offsetMinutes * 60 * 1000;
+
+  const localDate = new Date(localTimestamp);
+
+  // Calculate differences for time intervals
+  const now = new Date();
+  const timeDifferenceMs = now.getTime() - localDate.getTime();
+  const timeDifferenceMinutes = Math.floor(timeDifferenceMs / (60 * 1000));
+  const timeDifferenceHours = Math.floor(timeDifferenceMinutes / 60);
+  const timeDifferenceDays = Math.floor(timeDifferenceHours / 24);
+  const timeDifferenceWeeks = Math.floor(timeDifferenceDays / 7);
+  const timeDifferenceMonths = Math.floor(timeDifferenceDays / 30);
+  const timeDifferenceYears = Math.floor(timeDifferenceDays / 365);
+
+  if (timeDifferenceMinutes < 1) {
+    return "just now";
+  } else if (timeDifferenceMinutes < 60) {
+    return `${timeDifferenceMinutes} min${timeDifferenceMinutes === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceHours < 24) {
+    return `${timeDifferenceHours} hour${timeDifferenceHours === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceDays < 7) {
+    return `${timeDifferenceDays} day${timeDifferenceDays === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceWeeks < 4) {
+    return `${timeDifferenceWeeks} week${timeDifferenceWeeks === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceMonths < 12) {
+    return `${timeDifferenceMonths} month${timeDifferenceMonths === 1 ? '' : 's'} ago`;
+  } else {
+    return `${timeDifferenceYears} year${timeDifferenceYears === 1 ? '' : 's'} ago`;
+  }
 }
