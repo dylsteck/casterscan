@@ -6,14 +6,19 @@ import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from '~/components/ExpandableImage';
 import moment from 'moment-timezone';
+import { useRouter } from 'next/router';
 
 interface CastByHashProps {
   hash: string;
 }
 
 const CastByHash: React.FC<CastByHashProps> = ({ hash }) => {
+
+  const router = useRouter();
+  const routerHash = router.query.hash ?? hash;
+  
   const queryResult = api.casts.getCastByHash.useQuery(
-    { hash },
+    { hash: routerHash as string },
     { refetchOnWindowFocus: false }
   );
 

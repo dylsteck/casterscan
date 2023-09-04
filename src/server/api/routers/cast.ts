@@ -98,6 +98,7 @@ export const castsRouter = t.router({
         })
       )
       .query(async ({ input }) => {
+        console.log("cast by hash input", {input});
       const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
       const castsRequest: any = await db
         .selectFrom('casts')

@@ -14,7 +14,7 @@ export interface ListRowProps{
     text: string;
     hash: string;
     parentUrl: string;
-    timestamp: string;
+    timestamp: Date;
     expanded: boolean;
 }
 
@@ -87,7 +87,7 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                 </Link>
                 </td>
                 <td className="px-6 py-4 w-[10%] max-w-[15%]">
-                    {getRelativeTime(parseInt(timestamp))}
+                {getRelativeTime(timestamp.getTime())}
                 </td>
             </tr>
     )
@@ -132,7 +132,7 @@ const List = ({ expanded, casts }: ListProps) => {
                             text={cast.text}
                             hash={`${String(cast.hash)}`}
                             parentUrl={cast.parent_url ?? ''}
-                            timestamp={`${String(cast.timestamp)}`}
+                            timestamp={cast.timestamp}
                             expanded={expanded}
                             key={casts.indexOf(cast)}
                         />
