@@ -17,14 +17,14 @@ const Home: NextPage = () => {
         <meta name="description" content="A block explorer for Farcaster" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-1G0WTCHYKQ" />
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-B02X48B2NQ" />
       <Script id="google-analytics">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
 
-          gtag('config', 'G-1G0WTCHYKQ');
+          gtag('config', 'G-B02X48B2NQ');
         `}
       </Script>  {/* TODO: see if can remove the other Google analytics package now */}
       { searchValue.length > 0 ? <Search /> : <LiveFeed /> }
