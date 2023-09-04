@@ -5,8 +5,7 @@ You can [check it out here](https://casterscan.com)
 
 ![Casterscan v2 homepage](https://i.imgur.com/mbKEweW.png)
 
-
-### What is Casterscan
+### What is Casterscan?
 
 Casterscan is a block explorer for Farcaster. It lets you view and query all casts & profiles, view channels, and see raw metadata you would otherwise have to run code to get.
 
