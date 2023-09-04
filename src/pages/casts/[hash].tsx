@@ -5,8 +5,8 @@ import LiveFeed from '~/components/LiveFeed';
 import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from '~/components/ExpandableImage';
-import moment from 'moment-timezone';
 import { useRouter } from 'next/router';
+import { getRelativeTime } from '~/lib/time';
 
 interface CastByHashProps {
   hash: string;
@@ -51,7 +51,7 @@ const CastByHash: React.FC<CastByHashProps> = ({ hash }) => {
             }
             {queryResult?.data?.cast.timestamp && 
               <p className="text-xs text-black/80 w-[100%] flex flex-row gap-1">
-                casted at: <CopyText text={moment(queryResult?.data?.cast.timestamp).format('MMMM Do YYYY, h:mm:ss a')} />
+                casted <CopyText text={getRelativeTime(queryResult?.data?.cast.timestamp.getTime())} />
               </p>
             }
           </div>
