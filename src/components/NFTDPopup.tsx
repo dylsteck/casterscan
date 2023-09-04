@@ -50,7 +50,7 @@ const DataRenderer = ({data}: {data: NFTDData}) => {
         </thead>
         <tbody>
             {data.content && data.content.filter((item) => item.type !== 'header').map((content) => {
-                return <DataRendererRow content={content} />
+                return <DataRendererRow content={content} key={data.content.indexOf(content)} />
             })}
         </tbody>
       </table>

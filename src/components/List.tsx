@@ -66,9 +66,9 @@ const ListRow = ({username, text, hash, parentUrl, timestamp, expanded}: ListRow
                     {expanded && 
                     <div className="flex flex-row gap-2 items-end">
                         {images.map((image) => {
-                            return <ExpandableImage imageUrl={image} rounded={false} />
+                            return <ExpandableImage imageUrl={image} rounded={false} key={images.indexOf(image)} />
                         })}
-                        <p className={`text-xs text-black/80 ${images.length === 0 && 'mt-2'} flex flex-row gap-1`}>
+                        <p className={`text-xs text-black/80 ${images.length === 0 ? 'mt-2' : 'mt-0'} flex flex-row gap-1`}>
                             hash: <CopyText text={hash} />
                         </p>
                     </div>}
@@ -130,10 +130,11 @@ const List = ({ expanded, casts }: ListProps) => {
                 return <ListRow 
                             username={cast.fname || ''}
                             text={cast.text}
-                            hash={`${cast.hash}`}
-                            parentUrl={cast.parentUrl ?? ''}
-                            timestamp={`${cast.timestamp}`}
+                            hash={`${String(cast.hash)}`}
+                            parentUrl={cast.parent_url ?? ''}
+                            timestamp={`${String(cast.timestamp)}`}
                             expanded={expanded}
+                            key={casts.indexOf(cast)}
                         />
             })}
             </>}

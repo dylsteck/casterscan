@@ -21,7 +21,6 @@ export const castsRouter = t.router({
     )
     .query(async (opts) => {
       const { input } = opts;
-      const limit = input.limit || 32;
       const startRow = input.startRow || 0;
     const castsRequest = await db
       .selectFrom('casts')

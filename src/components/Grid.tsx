@@ -28,7 +28,7 @@ const GridItem = ({ cast }: GridItemProps) => {
         alt="Image for cast"
       />
     )}
-    <Link href={`/users/${cast.fname}`}>
+    <Link href={`/users/${cast.fname ?? ''}`}>
       <p className="text-sm pt-4 font-medium">{cast.fname}</p>
     </Link>
   </div>
@@ -36,11 +36,11 @@ const GridItem = ({ cast }: GridItemProps) => {
     {getRelativeTime(cast.timestamp.getTime())}
   </p>
   {/* TODO: fix so this link doesn't override links in renderText */}
-  <Link href={`/casts/${cast.hash}`}>
+  <Link href={`/casts/${String(cast.hash)}`}>
     <p className="text-md overflow-x-scroll text-wrap pl-4 pb-2">
       {renderText(cast.text)}
       <div className="mt-2">
-        {warpcastChannels.find(channel => channel.parent_url === cast.parentUrl) && <RenderChannelIcon parentUrl={cast.parentUrl ?? ''} />}
+        {warpcastChannels.find(channel => channel.parent_url === cast.parent_url) && <RenderChannelIcon parentUrl={cast.parent_url ?? ''} />}
       </div>  
     </p>
   </Link>

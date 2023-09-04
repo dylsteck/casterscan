@@ -59,11 +59,11 @@ export interface KyselyDB {
     timestamp: Date;
     fid: number;
     text: string;
-    hash: Uint8Array;
-    parentHash: Uint8Array | null;
+    hash: string;
+    parent_hash: string | null;
     fname: string | null;
     parentFid: number | null;
-    parentUrl: string | null;
+    parent_url: string | null;
     pfp: string | null;
     embeds: Generated<
       {

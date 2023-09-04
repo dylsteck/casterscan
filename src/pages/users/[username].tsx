@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
 import Image from 'next/image';
-import type { KyselyDB } from '~/types/database.t';
 import type { NFTDData } from '~/types/nftd.t';
 import nftdIcon from '../../../public/nftdIcon.png';
 import LiveFeed from '~/components/LiveFeed';
@@ -11,11 +10,15 @@ import { ExpandableImage } from '~/components/ExpandableImage';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
 
+interface LocalUser{
+  fid: bigint; created_at: string; custody_address: string; pfp: string | null; display: string | null; bio: string | null; url: string | null; fname: string | null;
+} // TODO: fix KyselyDB types, this interface is a temporary fix to some build errors
+
 const UserPage = () => {
 
   const router = useRouter();
   const t = api.useContext();
-  const [user, setUser] = useState<KyselyDB['users']>();
+  const [user, setUser] = useState<LocalUser>();
   const [nftdInfo, setNftdInfo] = useState<NFTDData[]>();
   const [nftdPopupPresent, setNftdPopupPresent] = useState<boolean>(false);
 
@@ -39,10 +42,14 @@ const UserPage = () => {
         if (nftdDataResponse) {
           setNftdInfo(nftdDataResponse);
         } else {
-          console.log(`NFTD data is missing or malformed: ${nftdDataResponse}`);
+          console.log('NFTD data is missing or malformed');
         }
       } catch (error) {
-        console.log(`Error fetching user data: ${error}`);
+        if (typeof error === 'string') {
+          console.log(`Error fetching user data: ${error}`);
+        } else {
+          console.log('Error fetching user data');
+        }
       }
     }    
     void getUser();
@@ -79,14 +86,14 @@ const UserPage = () => {
             <div className="flex flex-row gap-1 text-sm">
               <p className="text-[#71579E]">FID:</p> 
               <div className="pt-[2px]">
-                <CopyText text={user?.fid} />
+                <CopyText text={String(user?.fid)} />
               </div>
             </div>
           </div>
-          {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo as NFTDData[]} handleClose={() => setNftdPopupPresent(false)} />}
+          {nftdInfo && nftdPopupPresent && <NFTDPopup nftdData={nftdInfo} handleClose={() => setNftdPopupPresent(false)} />}
         </div>
       </div>
-      <LiveFeed user={user?.fname} />
+      <LiveFeed user={user?.fname ?? ''} />
     </>
   )
 }
