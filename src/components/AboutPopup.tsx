@@ -52,7 +52,7 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
             - <Link href="https://t.me/dylsteck">Message Dylan</Link> <br/>
             - <Link href="https://github.com/dylsteck/casterscan/issues">Create an issue</Link> <br />
             - <Link href="https://github.com/users/dylsteck/projects/1">Check out the Roadmap</Link> <br />
-            - <Link href="/users/casterscan">{casterscans} Follow on Farcaster</Link>
+            - <Link href="/users/casterscan">Follow on Farcaster</Link>
             <br /> <br />
             <p>Hope you enjoy exploring Casterscan! <br /> <Link href="https://dylansteck.com">- Dylan</Link> </p>
         </p>
