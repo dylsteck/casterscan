@@ -32,7 +32,7 @@ export const castsRouter = t.router({
     const castsRequest = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
-      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url'])
       // created_at and updated_at show errors but are correct
       .where('text', '>', '0')
       .orderBy('timestamp', 'desc')
@@ -67,7 +67,7 @@ export const castsRouter = t.router({
       const castsRequest: any = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
-      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url'])
       .where('users.fname', '=', input.username)
       .where('text', '>', '0')
       .orderBy('timestamp', 'desc')
@@ -103,7 +103,7 @@ export const castsRouter = t.router({
       const castsRequest: any = await db
         .selectFrom('casts')
         .innerJoin('users', 'users.fid', 'casts.fid')
-        .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+        .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url'])
         .where(sql<string>`encode(hash, 'hex') = ${hashAsHex}`)
         .executeTakeFirst();
 
@@ -185,7 +185,7 @@ export const castsRouter = t.router({
       const castsRequest = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
-      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url'])
       .where('parent_url', '=', input.channelUrl)
       .where('text', '>', '0')
       .orderBy('timestamp', 'desc')
@@ -223,7 +223,7 @@ export const castsRouter = t.router({
     const castsRequest: any = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
-      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
+      .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url'])
       // created_at and updated_at show errors but are correct
       .where('text', '>', '0')
       .where(sql<string>`encode(parent_hash, 'hex') = ${hashAsHex}`)
