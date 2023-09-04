@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { z } from "zod";
 import { publicProcedure } from "../trpc";
 
@@ -33,16 +40,17 @@ export const castsRouter = t.router({
       .limit(50)
       .execute();
 
-    const casts = castsRequest.map((cast) => {
-      const finalCast = cast;
-      if (finalCast.hash) {
-        finalCast.hash = `0x${cast.hash.toString('hex')}`;
-      }
-      if (finalCast.parent_hash) {
-        finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
-      }
-      return finalCast;
-    }) as KyselyDB['casts'][];
+      const casts = castsRequest.map((cast: any) => {
+        const finalCast = cast;
+        if (finalCast.hash) {
+          finalCast.hash = `0x${cast.hash.toString('hex')}`;
+        }
+        if (finalCast.parent_hash) {
+          finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
+        }
+        return finalCast;
+      }) as KyselyDB['casts'][];
+      
       return {
         casts
       };
@@ -56,7 +64,7 @@ export const castsRouter = t.router({
     )
     .query(async ({ input }) => {
 
-      const castsRequest = await db
+      const castsRequest: any = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
       .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
@@ -67,15 +75,15 @@ export const castsRouter = t.router({
       .limit(50)
       .execute();
 
-      const casts = castsRequest.map((cast) => {
-        let finalCast = cast
-        if(finalCast.hash){
+      const casts = castsRequest.map((cast: any) => {
+        const finalCast = cast;
+        if (finalCast.hash) {
           finalCast.hash = `0x${cast.hash.toString('hex')}`;
         }
-        if(finalCast.parent_hash){
+        if (finalCast.parent_hash) {
           finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
         }
-        return finalCast
+        return finalCast;
       }) as KyselyDB['casts'][];
 
       return {
@@ -91,7 +99,7 @@ export const castsRouter = t.router({
       )
       .query(async ({ input }) => {
       const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
-      const castsRequest = await db
+      const castsRequest: any = await db
         .selectFrom('casts')
         .innerJoin('users', 'users.fid', 'casts.fid')
         .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
@@ -99,7 +107,7 @@ export const castsRouter = t.router({
         .executeTakeFirst();
 
       const finalCast = () => {
-        let cast = castsRequest;
+        const cast = castsRequest;
         if(cast?.hash){
           cast.hash = `0x${cast.hash.toString('hex')}`;
         }
@@ -184,15 +192,15 @@ export const castsRouter = t.router({
       .limit(DB_REQUEST_LIMIT)
       .execute();
 
-      const casts = castsRequest.map((cast) => {
-        let finalCast = cast
-        if(finalCast.hash){
+      const casts = castsRequest.map((cast: any) => {
+        const finalCast = cast;
+        if (finalCast.hash) {
           finalCast.hash = `0x${cast.hash.toString('hex')}`;
         }
-        if(finalCast.parent_hash){
+        if (finalCast.parent_hash) {
           finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
         }
-        return finalCast
+        return finalCast;
       }) as KyselyDB['casts'][];
 
       return {
@@ -211,7 +219,7 @@ export const castsRouter = t.router({
       const { input } = opts;
       const hashAsHex = Buffer.from(input.hash.substring(2), 'hex').toString('hex');
       const startRow = input.startRow || 0;
-    const castsRequest = await db
+    const castsRequest: any = await db
       .selectFrom('casts')
       .innerJoin('users', 'users.fid', 'casts.fid')
       .select(['users.fname', 'users.fid', 'users.pfp', 'casts.embeds', 'casts.fid', 'casts.hash', 'casts.id', 'casts.mentions', 'casts.text', 'casts.timestamp', 'casts.parent_url as parentUrl'])
@@ -222,8 +230,8 @@ export const castsRouter = t.router({
       .offset(startRow)
       .limit(50)
       .execute();
-
-    const casts = castsRequest.map((cast) => {
+      
+    const casts = castsRequest.map((cast: any) => {
       const finalCast = cast;
       if (finalCast.hash) {
         finalCast.hash = `0x${cast.hash.toString('hex')}`;
@@ -232,7 +240,7 @@ export const castsRouter = t.router({
         finalCast.parent_hash = `0x${cast.parent_hash?.toString('hex')}`;
       }
       return finalCast;
-    }).filter((cast) => cast.hash !== input.hash) as KyselyDB['casts'][];
+    }).filter((cast: any) => cast.hash !== input.hash) as KyselyDB['casts'][];
       return {
         casts
       };
