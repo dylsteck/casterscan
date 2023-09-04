@@ -57,7 +57,7 @@ const CastByHash: React.FC<CastByHashProps> = ({ hash }) => {
           </div>
         </div>
       </div>
-      <LiveFeed hash={hash} /> 
+      {routerHash && <LiveFeed hash={routerHash as string} /> }
     </>
   );
 };

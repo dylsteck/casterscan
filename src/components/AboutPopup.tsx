@@ -23,7 +23,7 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-[50vw] max-h-[50vh] overflow-y-scroll">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-full sm:max-w-[50vw] max-h-[50vh] overflow-y-scroll">
         <div className="w-[100%] flex flex-row justify-between items-center">
           <div className="flex flex-row items-center">
             <p className="text-lg font-medium pb-2">About</p>
