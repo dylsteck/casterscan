@@ -22,10 +22,12 @@ export default function Layout({ children }: LayoutProps) {
         <meta property="og:url" content="https://casterscan.com/"/>
         <meta property="og:title" content="Casterscan"/>
         <meta property="og:description" content="A block explorer for Farcaster"/>
-        <meta property="og:image" content="https://i.imgur.com/mbKEweW.png"/>
+        <meta property="og:image" content="https://i.imgur.com/KJ7qfro.png"/>
         <meta property="og:site_name" content="Casterscan" />
         <meta property="og:locale" content="en_US" />
+        https://i.imgur.com/KJ7qfro.png
          {/* Casterscan Logo image: https://i.imgur.com/zRcK62L.png */ }
+         {/* Casterscan Screenshot image: https://i.imgur.com/KJ7qfro.png */ }
 
         { /* PWA Setup */ }
           <meta name="application-name" content="Casterscan" />
@@ -57,7 +59,7 @@ export default function Layout({ children }: LayoutProps) {
           <meta name="twitter:url" content="https://casterscan.com/" />
           <meta name="twitter:title" content="Casterscan" />
           <meta name="twitter:description" content="A block explorer for Farcaster" />
-          <meta name="twitter:image" content="https://i.imgur.com/mbKEweW.png" />
+          <meta name="twitter:image" content="https://i.imgur.com/KJ7qfro.png" />
           <meta name="twitter:creator" content="@Dylan_Steck" />
       </Head>
       <main className="bg-white w-[100vw] min-h-[100vh] h-auto overflow-y-hidden">
