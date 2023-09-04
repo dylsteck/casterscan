@@ -48,10 +48,11 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
             - give each atomic unit of data available on <Link href="https://www.thehubble.xyz/">Hubs</Link> its own URL, starting with casts and profiles
 
             <br /> <br />
-            👇 Have any questions/comments about Casterscan or want to contribute? <br />
-            - <Link href="https://github.com/dylsteck/casterscan">Roadmap</Link> <br />
-            - <Link href="/users/casterscan">{casterscans} FC Account</Link> <br />
-            - <Link href="https://t.me/dylsteck">Message Dylan</Link>
+            👇 Have any questions/comments or want to keep up with/contribute to Casterscan? <br />
+            - <Link href="https://t.me/dylsteck">Message Dylan</Link> <br/>
+            - <Link href="https://github.com/dylsteck/casterscan/issues">Create an issue</Link> <br />
+            - <Link href="https://github.com/users/dylsteck/projects/1">Check out the Roadmap</Link> <br />
+            - <Link href="/users/casterscan">{casterscans} Follow on Farcaster</Link> <br />
 
             <br /> <br /> <br/>
             <p>Hope you enjoy exploring Casterscan! <br /> <Link href="https://dylansteck.com">- Dylan</Link> </p>
