@@ -1,114 +1,65 @@
-import React, { useEffect, useState } from 'react';
-import { api } from '~/utils/api';
-import { MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/solid'
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import logo from '../../public/casterScanIcon.png'
+import React, { useContext, useRef, useState } from 'react';
+import { SearchContext } from '~/context/SearchContext';
+import AboutPopup from './AboutPopup';
 
 const Header: React.FC = () => {
 
-  const [input, setInput] = useState('');
-  const [searching, setSearching] = useState(false);
   const router = useRouter();
-  const fetchUser = api.user.getUserPageData.useQuery({ username: input}, { retry: false });
-  const fetchCast = api.casts.getCastByHash.useQuery({ hash: input }, { retry: false });
-  const { q } = router.query;
+  const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (typeof q === 'undefined') {
-      setInput('');
-    }
-  }, [q]);
+  const notCastOrUser = router.pathname !== '/users/[username]' && router.pathname !== '/casts/[hash]';
 
-  const search = async () => {
-    const usernameRegex = /^[a-z0-9][a-z0-9-]{0,15}$/;
-    const isSearchTermUsername = usernameRegex.test(input);
+  const { searchValue, setSearchValue } = useContext(SearchContext);
+  const [search, setSearch] = useState<string>('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-    if (isSearchTermUsername) {
-      const usernameFetch = await fetchUser.refetch();
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
 
-      if (usernameFetch.error?.message == "PGRST116") {
-        console.log("PGRST116 yes");
-        // early return as query matches username regex, but username not found => query is a text-query
-        await router.push(`/?q=${encodeURIComponent(input)}`);
-        return;
-      }
-
-      // query matches username regex and does not throw => userame exists;
-      await router.push(`/users/${usernameFetch.data?.user?.username?.toLowerCase() ?? ''}`);
-      return;
-    }
-
-    // if the search term was a username, function wouldve already exited. 
-    const castFetch = await fetchCast.refetch();
-    if (castFetch.data) {
-      await router.push(`/casts/${castFetch.data.cast?.hash ?? ''}`);
-      return;
-    }
-
-    console.log(encodeURIComponent(input))
-    // If input not cast or user, push as search query
-    await router.push(`/?q=${encodeURIComponent(input) ?? ''}`);
-    return;
-  };  
-
-  const searchAsync = async (): Promise<void> => {
-    try {
-      await search();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setSearching(false);
-    }
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
   };
   
+  const handleKeyDown = async(e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      console.log(searchValue);
+      setSearchValue(search)
+    }
+  }
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    setSearching(true);
-    searchAsync()
-      .catch((error) => console.error(error))
-      .finally(() => setSearching(false));
-  };
-  
   return (
-    <nav className="bg-transparent border-purple-800 sticky top-3">
-      <div className="container flex flex-wrap items-center justify-between mx-auto px-4 sm:px-0">
-        <Link href="/" className="flex items-center">
-            <Image className="inline-block pl-0" src={logo} width={35} height={35} alt="Casterscan logo"/>
-            <span className="self-center text-3xl font-semibold whitespace-nowrap dark:text-white ml-5 hidden md:block">Casterscan</span>
+    <>
+      <div className="flex justify-between items-center border-b-2 border-[#C1C1C1]">
+        <Link href="/" className="float-left">
+          <p className="p-5 pl-4">CASTERSCAN</p>
         </Link>
-        <div className="flex">
-
-        <form className="relative text-gray-400 block" onSubmit={(e) => handleFormSubmit(e)}>
-
-            <input 
-              type="text" 
-              placeholder="Search by hash or username" 
-              value={input}
-              className="min-w-[30vw] form-input rounded-lg py-3 px-4 bg-white placeholder-gray-400 text-gray-500 appearance-none w-full block pl-5 focus:outline-none sm:min-w-[50vw]"
-              onChange={(e) => setInput(e.target.value.toLowerCase())}
-            />
-
-            <button type="submit" className="
-              bg-[#6F5B9C]
-              rounded-md
-              p-1.5 w-8 h-8
-              absolute top-1/2 right-3
-              transform -translate-y-1/2 
-            ">
-              { searching ?
-                <ArrowPathIcon className="animate-spin w-full h-full text-white" />
-                : <MagnifyingGlassIcon className=" w-full h-full text-white" />
-              }
-            </button>
-          </form>
-
-          </div>
+        <div className="float-right flex flex-row">
+          <p className="p-5 pl-4" onClick={() => handleOpenPopup()}>
+            ABOUT
+          </p>
+          <AboutPopup isOpen={isPopupOpen} handleClose={handleClosePopup} />
+          <Link href="https://github.com/dylsteck/casterscan">
+            <p className="p-5 pl-4 mr-2">GITHUB</p>
+          </Link>
+        </div>
       </div>
-      <hr className="relative left-0 w-[100vw] mt-[2vh]"/>
-    </nav>
+      {notCastOrUser && 
+      <div className="border-b-2 border-[#C1C1C1] justify-center">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e)}
+          className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-7 focus:outline-none"
+          placeholder="search"
+          ref={inputRef}
+        />
+      </div>
+      }
+    </>
   );
 };
 

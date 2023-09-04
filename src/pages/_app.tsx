@@ -5,14 +5,17 @@ import { api } from "~/utils/api";
 
 import "~/styles/globals.css";
 import Layout from "~/components/Layout";
+import { SearchContextProvider } from "~/context/SearchContext";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <div className="">
-      <Layout>
-        <GoogleAnalytics trackPageViews/>
-        <Component {...pageProps} />
-      </Layout>
+      <SearchContextProvider>
+        <Layout>
+          <GoogleAnalytics trackPageViews/>
+          <Component {...pageProps} />
+        </Layout>
+      </SearchContextProvider>
     </div>
   );
 };

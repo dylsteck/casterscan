@@ -1,38 +1,39 @@
 /**
-  * Returns the relative time since cast was posted
-  * Eg: 5 months ago, 1 second ago, two weeks ago
-  * */
-export function getRelativeTime(castDate: Date) {
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+ * Returns the formatted time in the local timezone with dynamic offset
+ */
+export function getRelativeTime(timestamp: number) {
+  const utcDate = new Date(timestamp);
 
+  const offsetMinutes = utcDate.getTimezoneOffset();
+
+  // Calculate the local timestamp by subtracting the offset
+  const localTimestamp = timestamp - offsetMinutes * 60 * 1000;
+
+  const localDate = new Date(localTimestamp);
+
+  // Calculate differences for time intervals
   const now = new Date();
-  const diffMs = now.getTime() - castDate.getTime();
-  const diffSeconds = Math.floor(diffMs / 1000);
+  const timeDifferenceMs = now.getTime() - localDate.getTime();
+  const timeDifferenceMinutes = Math.floor(timeDifferenceMs / (60 * 1000));
+  const timeDifferenceHours = Math.floor(timeDifferenceMinutes / 60);
+  const timeDifferenceDays = Math.floor(timeDifferenceHours / 24);
+  const timeDifferenceWeeks = Math.floor(timeDifferenceDays / 7);
+  const timeDifferenceMonths = Math.floor(timeDifferenceDays / 30);
+  const timeDifferenceYears = Math.floor(timeDifferenceDays / 365);
 
-  if (Math.abs(diffSeconds) < 60) {
-    return rtf.format(-diffSeconds, 'second');
+  if (timeDifferenceMinutes < 1) {
+    return "just now";
+  } else if (timeDifferenceMinutes < 60) {
+    return `${timeDifferenceMinutes} min${timeDifferenceMinutes === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceHours < 24) {
+    return `${timeDifferenceHours} hour${timeDifferenceHours === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceDays < 7) {
+    return `${timeDifferenceDays} day${timeDifferenceDays === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceWeeks < 4) {
+    return `${timeDifferenceWeeks} week${timeDifferenceWeeks === 1 ? '' : 's'} ago`;
+  } else if (timeDifferenceMonths < 12) {
+    return `${timeDifferenceMonths} month${timeDifferenceMonths === 1 ? '' : 's'} ago`;
+  } else {
+    return `${timeDifferenceYears} year${timeDifferenceYears === 1 ? '' : 's'} ago`;
   }
-
-  const diffMinutes = Math.floor(diffSeconds / 60);
-  if (Math.abs(diffMinutes) < 60) {
-    return rtf.format(-diffMinutes, 'minute');
-  }
-
-  const diffHours = Math.floor(diffMinutes / 60);
-  if (Math.abs(diffHours) < 24) {
-    return rtf.format(-diffHours, 'hour');
-  }
-
-  const diffDays = Math.floor(diffHours / 24);
-  if (Math.abs(diffDays) < 7) {
-    return rtf.format(-diffDays, 'day');
-  }
-
-  const diffWeeks = Math.floor(diffDays / 7);
-  if (Math.abs(diffWeeks) < 4) {
-    return rtf.format(-diffWeeks, 'week');
-  }
-
-  const diffMonths = Math.floor(diffWeeks / 4);
-  return rtf.format(-diffMonths, 'month');
 }

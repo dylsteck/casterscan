@@ -1,54 +1,33 @@
 import { type NextPage } from "next";
-import { useRouter } from 'next/router'
 import Head from "next/head";
-import Gallery from '../components/Gallery';
-import { useEffect } from "react";
-import Link from "next/link";
+import Script from "next/script";
+import { useContext } from "react";
+import LiveFeed from "~/components/LiveFeed";
+import Search from "~/components/Search";
+import { SearchContext } from "~/context/SearchContext";
 
 const Home: NextPage = () => {
-  const router = useRouter()
-  const { q } = router.query
 
-  useEffect(() => {
-    console.log("New q: ", q);
-  }, [q])
+  const { searchValue } = useContext(SearchContext);
 
   return (
     <>
       <Head>
         <title>Casterscan</title>
-        <meta name="description" content="A block explorer for the Farcaster network" />
+        <meta name="description" content="A block explorer for Farcaster" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-1G0WTCHYKQ" />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
 
-      <Gallery user={''} />
-
-      <footer className="
-        flex flex-row
-        justify-center
-        gap-1 my-4
-      ">
-          Made by
-          <Link href="/users/dylsteck" className="
-            text-purple-900
-            underline decoration-1
-            decoration-transparent
-            hover:decoration-purple-900
-            decoration-wavy
-            transition-colors ease-in-out duration-200
-          ">Dylan Steck</Link>
-          |
-          <Link href="https://github.com/dylsteck/casterscan" className="
-            text-purple-900
-            underline decoration-1
-            decoration-transparent
-            hover:decoration-purple-900
-            decoration-wavy
-            transition-colors ease-in-out duration-200
-          ">GitHub</Link>
-
-
-      </footer>
+          gtag('config', 'G-1G0WTCHYKQ');
+        `}
+      </Script>  {/* TODO: see if can remove the other Google analytics package now */}
+      { searchValue.length > 0 ? <Search /> : <LiveFeed /> }
     </>
   );
 };
