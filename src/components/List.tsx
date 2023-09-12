@@ -16,6 +16,12 @@ export interface ListRowProps {
   parentUrl: string;
   timestamp: Date;
   expanded: boolean;
+  embeds?: LocalEmbed[] | undefined;
+}
+
+export interface LocalEmbed {
+  url?: string | undefined;
+  castId?: object | undefined;
 }
 
 const ListRow = ({
@@ -25,6 +31,7 @@ const ListRow = ({
   parentUrl,
   timestamp,
   expanded,
+  embeds,
 }: ListRowProps) => {
   const checkImages = (): string[] => {
     const pattern = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/g;
@@ -34,7 +41,13 @@ const ListRow = ({
     while ((match = pattern.exec(text)) !== null) {
       imageLinks.push(match[0]);
     }
-
+    if(embeds){
+      embeds.map((embed: LocalEmbed) => {
+        while ((match = pattern.exec(embed.url ?? '')) !== null) {
+          imageLinks.push(match[0]);
+        }
+      });
+    }
     return imageLinks;
   };
 
@@ -136,6 +149,7 @@ const List = ({ expanded, casts }: ListProps) => {
                 parentUrl={cast.parent_url ?? ''}
                 timestamp={cast.timestamp}
                 expanded={expanded}
+                embeds={cast.embeds as unknown as LocalEmbed[]}
                 key={index}
               />
             ))}

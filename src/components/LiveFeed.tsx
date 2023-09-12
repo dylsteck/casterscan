@@ -5,6 +5,7 @@ import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import dynamic from 'next/dynamic';
 import LiveIndicator from './LiveIndicator';
+import RenderChannelIcon from './RenderChannelIcon';
 const LoadingTable = dynamic(() => import('./LoadingTable'), {
     ssr: false
 });
@@ -68,7 +69,11 @@ export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
         <>
             <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
                 <div className="ml-4 flex flex-row gap-2 float-left items-center">
-                    <p>LIVE FEED</p>
+                    {channel ? 
+                    <div className="mt-1">
+                        <RenderChannelIcon parentUrl={channel} />
+                    </div>
+                    : <p>LIVE FEED</p>}
                     <LiveIndicator />
                 </div>
                 <div className="ml-4 flex flex-row gap-1 float-left">
