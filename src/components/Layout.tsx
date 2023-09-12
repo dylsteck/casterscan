@@ -25,9 +25,9 @@ export default function Layout({ children }: LayoutProps) {
         <meta property="og:image" content="https://i.imgur.com/KJ7qfro.png"/>
         <meta property="og:site_name" content="Casterscan" />
         <meta property="og:locale" content="en_US" />
-        https://i.imgur.com/KJ7qfro.png
          {/* Casterscan Logo image: https://i.imgur.com/zRcK62L.png */ }
-         {/* Casterscan Screenshot image: https://i.imgur.com/KJ7qfro.png */ }
+         { /* Castercan Logo w Wordmark(og:image): https://i.imgur.com/KJ7qfro.png */ }
+         {/* Casterscan Screenshot image: https://i.imgur.com/mbKEweW.png */ }
 
         { /* PWA Setup */ }
           <meta name="application-name" content="Casterscan" />
