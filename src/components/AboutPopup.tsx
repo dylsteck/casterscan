@@ -18,7 +18,6 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
   }, [isOpen]);
 
   if (!isOpen) return null;
-
   const casterscans = "Casterscan's";
 
   return createPortal(

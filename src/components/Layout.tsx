@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/google-font-display */
+/* eslint-disable @next/next/no-page-custom-font */
 import type { ReactNode } from 'react';
 import Head from 'next/head'
 import Header from './Header'

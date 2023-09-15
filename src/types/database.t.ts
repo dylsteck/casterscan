@@ -27,30 +27,6 @@ export interface KyselyDB {
     signer: Buffer;
     raw: Buffer;
   };
-  // casts: {
-  //   id: bigint;
-  //   created_at: string;
-  //   updated_at: string;
-  //   deleted_at: string | null;
-  //   timestamp: string;
-  //   fid: bigint;
-  //   hash: string;
-  //   parent_hash: string | null;
-  //   parent_fid: bigint | null;
-  //   parent_url: string | null;
-  //   text: string;
-  //   embeds: string[];
-  //   mentions: bigint[];
-  //   mentions_positions: number[];
-  //   likes: number;
-  //   recasts: number;
-  //   comments: number;
-  //   pfp: string | null;
-  //   display: string | null;
-  //   bio: string | null;
-  //   url: string | null;
-  //   fname: string | null;
-  // };
   casts: {
     id: GeneratedAlways<string>;
     createdAt: Generated<Date>;

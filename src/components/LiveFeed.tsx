@@ -93,8 +93,15 @@ export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
             </div>
             {request.isLoading ?
                 <LoadingTable />
-                : filter === 'list' ? <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts'][]} /> : <Grid casts={request?.data?.casts as KyselyDB['casts'][]} />}
-            {request?.data?.casts.length === 0 && <p className="text-center relative text-black/20 text-7xl pt-[10%]">no casts or replies</p>}
+                : filter === 'list' ? 
+                <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts'][]} /> 
+                : <Grid casts={request?.data?.casts as KyselyDB['casts'][]} />
+            }
+            {request?.data?.casts.length === 0 && 
+                <p className="text-center relative text-black/20 text-7xl pt-[10%]">
+                    no casts or replies
+                </p>
+            }
         </>
     )
 }

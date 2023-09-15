@@ -1,4 +1,5 @@
-import React, { createContext, useState, ReactNode } from 'react';
+/* eslint-disable @typescript-eslint/no-empty-function */
+import React, { createContext, useState, type ReactNode } from 'react';
 
 interface SearchContextValue {
   searchValue: string;

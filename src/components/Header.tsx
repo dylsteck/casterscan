@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     setIsPopupOpen(false);
   };
   
-  const handleKeyDown = async(e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       console.log(searchValue);
       setSearchValue(search)

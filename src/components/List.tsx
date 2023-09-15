@@ -126,7 +126,7 @@ const List = ({ expanded, casts }: ListProps) => {
               @
             </th>
             <th scope="col" className="px-6 py-3 font-normal">
-              <div className="max-w-full sm:max-w-xs">{/* Added max-width for "content" */}</div>
+              <div className="max-w-full sm:max-w-xs"></div>
             </th>
             <th scope="col" className="px-6 py-3 font-normal">
               img
