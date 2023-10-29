@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { warpcastChannels } from "~/utils/warpcast-channels"
+import { warpcastChannels } from "~/utils/warpcastChannels"
 
 
 export default function RenderChannelIcon({ parentUrl }: { parentUrl: string}){

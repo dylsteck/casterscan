@@ -6,7 +6,7 @@ import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
 import { motion } from 'framer-motion';
-import { warpcastChannels } from '~/utils/warpcast-channels';
+import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
 
 export interface ListRowProps {

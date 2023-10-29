@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getRelativeTime } from '~/lib/time';
 import type { KyselyDB } from '~/types/database.t';
-import { warpcastChannels } from '~/utils/warpcast-channels';
+import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
 import { renderText } from '~/lib/text';
 
