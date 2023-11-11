@@ -626,12 +626,6 @@ export const warpcastChannels = [
         "channel_id": "obsidian"
     },
     {
-        "name": "Base",
-        "parent_url": "https://onchainsummer.xyz",
-        "image": "https://warpcast.com/~/channel-images/base.png",
-        "channel_id": "base"
-    },
-    {
         "name": "Green Pill",
         "parent_url": "https://farcaster.group/green-pill",
         "image": "https://warpcast.com/~/channel-images/green-pill.png",
@@ -858,5 +852,47 @@ export const warpcastChannels = [
         "parent_url": "https://farcaster.group/daily-fantasy",
         "image": "https://warpcast.com/~/channel-images/daily-fantasy.png",
         "channel_id": "daily-fantasy"
+    },
+    {
+        "name": "Vietnamese",
+        "parent_url": "https://farcaster.group/vietnamese",
+        "image": "https://warpcast.com/~/channel-images/vietnamese.png",
+        "channel_id": "vietnamese"
+    },
+    {
+        "name": "SuperRare",
+        "parent_url": "https://superrare.com",
+        "image": "https://warpcast.com/~/channel-images/superrare.jpg",
+        "channel_id": "superrare"
+    },
+    {
+        "name": "Foundation",
+        "parent_url": "https://foundation.app",
+        "image": "https://warpcast.com/~/channel-images/foundation.jpg",
+        "channel_id": "foundation"
+    },
+    {
+        "name": "Tokyo",
+        "parent_url": "https://farcaster.group/tokyo",
+        "image": "https://warpcast.com/~/channel-images/tokyo.png",
+        "channel_id": "tokyo"
+    },
+    {
+        "name": "Rarible",
+        "parent_url": "https://rarible.com",
+        "image": "https://warpcast.com/~/channel-images/rarible.jpg",
+        "channel_id": "rarible"
+    },
+    {
+        "name": "CoCreated",
+        "parent_url": "https://app.cocreated.xyz",
+        "image": "https://app.cocreated.xyz/icon-512x512.png",
+        "channel_id": "cocreated"
+    },
+    {
+        "name": "Bounties",
+        "parent_url": "https://warpcast.com/~/channel/bounties",
+        "image": "https://warpcast.com/~/channel-images/bounties.png",
+        "channel_id": "bounties"
     }
 ];

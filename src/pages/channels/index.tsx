@@ -1,6 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import LiveFeed from '~/components/LiveFeed';
+import LiveFeed from '~/components/LiveFeed/LiveFeed';
+import ChannelLiveFeed from '~/components/LiveFeed/ChannelLiveFeed';
 
 const Channel = () => {
   const router = useRouter();
@@ -9,7 +10,7 @@ const Channel = () => {
 
   return (
     <>
-      <LiveFeed channel={channelUrl} />
+      <ChannelLiveFeed channel={channelUrl} />
     </>
   )
 }

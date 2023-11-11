@@ -1,48 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useRouter } from 'next/router'
-import { api } from '~/utils/api';
-import LiveFeed from '~/components/LiveFeed';
+import LiveFeed from '~/components/LiveFeed/LiveFeed';
 import { ExpandableImage } from '~/components/ExpandableImage';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
-
-interface LocalUser{
-  fid: bigint; created_at: string; custody_address: string; pfp: string | null; display: string | null; bio: string | null; url: string | null; fname: string | null;
-} // TODO: fix KyselyDB types, this interface is a temporary fix to some build errors
+import UserLiveFeed from '~/components/LiveFeed/UserLiveFeed';
+import { User, useUser } from 'farcasterkit';
 
 const UserPage = () => {
 
   const router = useRouter();
-  const t = api.useContext();
-  const [user, setUser] = useState<LocalUser>();
-
-  useEffect(() => {
-
-    if (!router.isReady) {
-      console.log("router not yet ready.");
-      return;
-    }
-    const { username } = router.query
-    if (!username) {
-      console.log("unable to get username");
-      return;
-    }
-
-    async function getUser() {
-      try {
-        const { user: profile } = await t.user.getUserPageData.fetch({ username: username as string });
-        setUser(profile);
-      } catch (error) {
-        if (typeof error === 'string') {
-          console.log(`Error fetching user data: ${error}`);
-        } else {
-          console.log('Error fetching user data');
-        }
-      }
-    }    
-    void getUser();
-
-  }, [router, t])
+  const { data: user, loading } = useUser({ fname: router.query.username as string}) as { data: User, loading: boolean };
 
   return(
     <>
@@ -70,7 +38,7 @@ const UserPage = () => {
           </div>
         </div>
       </div>
-      <LiveFeed user={user?.fname ?? ''} />
+      <UserLiveFeed user={user?.fname ?? ''} />
     </>
   )
 }

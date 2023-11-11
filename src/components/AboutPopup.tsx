@@ -50,7 +50,6 @@ const AboutPopup = ({ isOpen, handleClose }: AboutPopupProps) => {
             👇 Have any questions/comments or want to keep up with/contribute to Casterscan? <br />
             - <Link href="https://t.me/dylsteck">Message Dylan</Link> <br/>
             - <Link href="https://github.com/dylsteck/casterscan/issues">Create an issue</Link> <br />
-            - <Link href="https://github.com/users/dylsteck/projects/1">Check out the Roadmap</Link> <br />
             - <Link href="/users/casterscan">Follow on Farcaster</Link>
             <br /> <br />
             <p>Hope you enjoy exploring Casterscan! <br /> <Link href="https://dylansteck.com">- Dylan</Link> </p>

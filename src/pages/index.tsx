@@ -2,7 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Script from "next/script";
 import { useContext } from "react";
-import LiveFeed from "~/components/LiveFeed";
+import LiveFeed from "~/components/LiveFeed/LiveFeed";
 import Search from "~/components/Search";
 import { SearchContext } from "~/context/SearchContext";
 

@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import React from 'react';
 import { getRelativeTime } from '~/lib/time';
-import type { KyselyDB } from '~/types/database.t';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
 import { motion } from 'framer-motion';
 import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
+import { type Cast } from 'farcasterkit';
 
 export interface ListRowProps {
   username: string;
@@ -105,7 +105,8 @@ const ListRow = ({
         </Link>
       </td>
       <td className="px-6 py-4 w-[10%] max-w-[15%]">
-        {getRelativeTime(timestamp.getTime())}
+        {/* {getRelativeTime(timestamp.getTime())} */}
+        {getRelativeTime(new Date(timestamp).getTime())}
       </td>
     </tr>
   );
@@ -113,7 +114,7 @@ const ListRow = ({
 
 interface ListProps {
   expanded: boolean;
-  casts: KyselyDB['casts'][];
+  casts: Cast[];
 }
 
 const List = ({ expanded, casts }: ListProps) => {

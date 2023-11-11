@@ -7,7 +7,7 @@ You can [check it out here](https://casterscan.com)
 
 ### What is Casterscan?
 
-Casterscan is a block explorer for Farcaster. It lets you view and query all casts & profiles, view channels, and see raw metadata you would otherwise have to run code to get.
+Casterscan is a block explorer for Farcaster. It lets you view and query all casts & profiles, view channels, and see raw metadata you would otherwise have to run code to get. Casterscan is built using [Farcaster Kit](https://farcasterkit.com), free React hooks and an API to easily build Farcaster apps.
 
 There are two goals for Casterscan's utility:
 - make it easy to access/query Farcaster data
@@ -15,14 +15,11 @@ There are two goals for Casterscan's utility:
 
 
 ### How to run locally
-1. Run [Warpcast's Postgres replicator](https://github.com/farcasterxyz/hub-monorepo/tree/main/packages/hub-nodejs/examples/replicate-data-postgres)
-    - only modification needed: create the `users` materialized view using the SQL query in `create_users_materialized_view.md`, and make sure to(somewhat periodically) run `REFRESH MATERIALIZED VIEW USERS;` to grab the most recent users. I'm working on some updates to the backend that won't require any refreshes or materialized views for an easier developer experience going forward.
-2. Copy `.env.example` to `.env` and add your Postgres connection URL to `PG_CONNECTION_STRING`
-    - note: this should be the only key you need(leave every other value as `"example"`, will be removing deprecated .env values soon)
-3. Run `npm install` and `npm run dev` to start the app locally, then view it at `localhost:3000`
+1. `npm install`
+2. (optional) add your base URL to `<FarcasterKitProvider>` if you're running the [Farcaster Kit API](https://github.com/dylsteck/farcasterkit/tree/main/apps/api) locally
+3. `npm run dev` and you're good to go!
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 
 - [Message Dylan](https://t.me/dylsteck)
 - [Create an issue](https://github.com/dylsteck/casterscan/issues)
-- [Check out the Roadmap](https://github.com/users/dylsteck/projects/1)
 - [Follow on Warpcast](https://warpcast.com/casterscan)
