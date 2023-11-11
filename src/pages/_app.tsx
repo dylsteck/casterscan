@@ -9,7 +9,7 @@ import { FarcasterKitProvider } from "~/providers/FarcasterKitProvider";
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <div className="">
-      <FarcasterKitProvider baseURL="http://localhost:3001">
+      <FarcasterKitProvider>
         <SearchContextProvider>
           <Layout>
             <GoogleAnalytics trackPageViews/>

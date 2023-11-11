@@ -8,7 +8,6 @@ import LoadingTable from './LoadingTable';
 import { useSearch } from '~/providers/FarcasterKitProvider';
 import List from './List';
 import Grid from './Grid';
-import { KyselyDB } from '~/types/database.t';
 
 export interface SearchListRowProps {
   type: string;
@@ -161,8 +160,8 @@ const Search: React.FC = () => {
       {loading ?
           <LoadingTable />
           : filter === 'list' ? 
-          <List expanded={expanded} casts={casts as unknown as KyselyDB['casts'][]} /> 
-          : <Grid casts={casts as unknown as KyselyDB['casts'][]} />
+          <List expanded={expanded} casts={casts} /> 
+          : <Grid casts={casts} />
       }
       {casts && casts.length === 0 && 
           <p className="text-center relative text-black/20 text-7xl pt-[10%]">

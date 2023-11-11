@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '../Grid';
 import List from '../List';
-import type { KyselyDB } from '~/types/database.t';
 import dynamic from 'next/dynamic';
 import LiveIndicator from '../LiveIndicator';
 import RenderChannelIcon from '../RenderChannelIcon';

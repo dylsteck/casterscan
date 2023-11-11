@@ -5,16 +5,12 @@ import { ExpandableImage } from '~/components/ExpandableImage';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
 import UserLiveFeed from '~/components/LiveFeed/UserLiveFeed';
-import { useUser } from '~/providers/FarcasterKitProvider';
-
-interface LocalUser{
-  fid: bigint; created_at: string; custody_address: string; pfp: string | null; display: string | null; bio: string | null; url: string | null; fname: string | null;
-} // TODO: fix KyselyDB types, this interface is a temporary fix to some build errors
+import { User, useUser } from '~/providers/FarcasterKitProvider';
 
 const UserPage = () => {
 
   const router = useRouter();
-  const { data: user, loading } = useUser({ fname: router.query.username as string}) as { data: LocalUser, loading: boolean };
+  const { data: user, loading } = useUser({ fname: router.query.username as string}) as { data: User, loading: boolean };
 
   return(
     <>

@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import React from 'react';
 import { getRelativeTime } from '~/lib/time';
-import type { KyselyDB } from '~/types/database.t';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from './ExpandableImage';
 import CopyText from './CopyText';
 import { motion } from 'framer-motion';
 import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
+import { type Cast } from '~/providers/FarcasterKitProvider';
 
 export interface ListRowProps {
   username: string;
@@ -114,7 +114,7 @@ const ListRow = ({
 
 interface ListProps {
   expanded: boolean;
-  casts: KyselyDB['casts'][];
+  casts: Cast[];
 }
 
 const List = ({ expanded, casts }: ListProps) => {

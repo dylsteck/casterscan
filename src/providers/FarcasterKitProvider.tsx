@@ -66,6 +66,18 @@ export type CastResponse = {
   casts: Cast[]
 };
 
+export type User =  {
+  fid: string;
+  created_at: string;
+  custody_address: string;
+  pfp: string;
+  display: string;
+  bio: string;
+  url: string | null;
+  fname: string;
+}
+
+
 
 const FarcasterKitContext = createContext<FarcasterKitContextType | undefined>(undefined);
 
@@ -130,14 +142,14 @@ export const useCast = (queryParams?: CastParams) => {
   
     const { baseURL } = context;
     
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<Cast | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
   
     useEffect(() => {
       const getCast = async () => {
         try {
-          const response = await axios.get(`${baseURL}/casts/${queryParams?.hash}`, {params: params});
-          const responseData = response.data;
+          const response = await axios.get(`${baseURL}/casts/${queryParams?.hash ?? ''}`, {params: params});
+          const responseData = response.data as { cast: Cast };
           if (responseData && responseData.cast) {
             setData(responseData.cast);
             setLoading(false);
@@ -148,7 +160,9 @@ export const useCast = (queryParams?: CastParams) => {
         }
       };
   
-      getCast();
+      getCast().catch((err) => {
+        console.log('err', err);
+      });
     }, [baseURL, queryParams?.hash]);
   
     return { data, loading };
@@ -248,7 +262,7 @@ export const useReplies = (queryParams?: CastParams) => {
         cursor: queryParams?.cursor || 0,
         limit: queryParams?.limit || 100
     };
-    const fidOrFname = queryParams?.fid ? `fid=${queryParams?.fid}` : `fname=${queryParams?.fname}`
+    const fidOrFname = queryParams?.fid ? `fid=${queryParams?.fid}` : `fname=${queryParams?.fname ?? ''}`
   
     if (context === undefined) {
       throw new Error('useSearch must be used within a FarcasterKitProvider');
@@ -256,14 +270,14 @@ export const useReplies = (queryParams?: CastParams) => {
   
     const { baseURL } = context;
     
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
   
     useEffect(() => {
       const getUser = async () => {
         try {
           const response = await axios.get(`${baseURL}/users/user?${fidOrFname}`, {params: params});
-          const responseData = response.data;
+          const responseData = response.data as { user: User };
           if (responseData && responseData.user) {
             setData(responseData.user);
             setLoading(false);
@@ -274,7 +288,9 @@ export const useReplies = (queryParams?: CastParams) => {
         }
       };
   
-      getUser();
+      getUser().catch((err) => {
+        console.log('err', err);
+      });
     }, [baseURL, queryParams?.fid, queryParams?.fname]);
   
     return { data, loading };
