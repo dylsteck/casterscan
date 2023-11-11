@@ -105,7 +105,8 @@ const ListRow = ({
         </Link>
       </td>
       <td className="px-6 py-4 w-[10%] max-w-[15%]">
-        {getRelativeTime(timestamp.getTime())}
+        {/* {getRelativeTime(timestamp.getTime())} */}
+        {getRelativeTime(new Date(timestamp).getTime())}
       </td>
     </tr>
   );

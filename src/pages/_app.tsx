@@ -6,16 +6,19 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import Layout from "~/components/Layout";
 import { SearchContextProvider } from "~/context/SearchContext";
+import { FarcasterKitProvider } from "~/providers/FarcasterKitProvider";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <div className="">
-      <SearchContextProvider>
-        <Layout>
-          <GoogleAnalytics trackPageViews/>
-          <Component {...pageProps} />
-        </Layout>
-      </SearchContextProvider>
+      <FarcasterKitProvider baseURL="http://localhost:3001">
+        <SearchContextProvider>
+          <Layout>
+            <GoogleAnalytics trackPageViews/>
+            <Component {...pageProps} />
+          </Layout>
+        </SearchContextProvider>
+      </FarcasterKitProvider>
     </div>
   );
 };

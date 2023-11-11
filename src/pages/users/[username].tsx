@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { api } from '~/utils/api';
-import LiveFeed from '~/components/LiveFeed';
+import LiveFeed from '~/components/LiveFeed/LiveFeed';
 import { ExpandableImage } from '~/components/ExpandableImage';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
+import UserLiveFeed from '~/components/LiveFeed/UserLiveFeed';
 
 interface LocalUser{
   fid: bigint; created_at: string; custody_address: string; pfp: string | null; display: string | null; bio: string | null; url: string | null; fname: string | null;
@@ -70,7 +71,7 @@ const UserPage = () => {
           </div>
         </div>
       </div>
-      <LiveFeed user={user?.fname ?? ''} />
+      <UserLiveFeed user={user?.fname ?? ''} />
     </>
   )
 }

@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import Grid from './Grid';
-import List from './List';
+import Grid from '../Grid';
+import List from '../List';
 import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import dynamic from 'next/dynamic';
-import LiveIndicator from './LiveIndicator';
-import RenderChannelIcon from './RenderChannelIcon';
-const LoadingTable = dynamic(() => import('./LoadingTable'), {
+import LiveIndicator from '../LiveIndicator';
+import RenderChannelIcon from '../RenderChannelIcon';
+import { useLatestCasts } from '~/providers/FarcasterKitProvider';
+const LoadingTable = dynamic(() => import('../LoadingTable'), {
     ssr: false
 });
 
-interface LiveFeedProps {
-    channel?: string;
-    hash?: string;
-    user?: string;
+interface ChannelLiveFeedProps {
+    channel: string;
 }
 
-export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
+export default function ChannelLiveFeed({ channel }: ChannelLiveFeedProps) {
     const [filter, setFilter] = useState<string>('list');
     const [expanded, setExpanded] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
+    const { data: casts, loading } = useLatestCasts({ cursor: page, parent_url: channel });
 
     useEffect(() => {
         const isMobile = window.innerWidth < 768;
@@ -34,46 +34,20 @@ export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
         }
     }
 
-    const request = user ? api.casts.getCastsByUsername.useQuery(
-        { startRow: page, username: user },
-        { refetchOnWindowFocus: false }
-    ) 
-    : channel ? api.casts.getCastsByChannel.useQuery(
-        { startRow: page, channelUrl: channel },
-        { refetchOnWindowFocus: false }
-    ) : hash ? api.casts.getCastReplies.useQuery(
-        { startRow: page, hash: hash },
-        { refetchOnWindowFocus: false }
-    ) : api.casts.getLatestCasts.useQuery(
-        { startRow: page, limit: 50 },
-        { refetchOnWindowFocus: false }
-    );
-
     const handleSetPage = (back: boolean) => {
-        if (back) {
-            if (page > 0) {
-                setPage(page - 50)
-            }
+        const newPage = back ? Math.max(page - 50, 0) : page + 50;
+        if (newPage !== page) {
+          setPage(newPage);
         }
-        else {
-            if (request.data) {
-                const castsLength = request.data.casts.length;
-                if (castsLength === 50) {
-                    setPage(page + 50);
-                }
-            }
-        }
-    }
+      };
 
     return (
         <>
             <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
                 <div className="ml-4 flex flex-row gap-2 float-left items-center">
-                    {channel ? 
-                    <div className="mt-1">
+                    <div className="mt-0.5">
                         <RenderChannelIcon parentUrl={channel} />
                     </div>
-                    : <p>LIVE FEED</p>}
                     <LiveIndicator />
                 </div>
                 <div className="ml-4 flex flex-row gap-1 float-left">
@@ -91,13 +65,13 @@ export default function LiveFeed({ channel, hash, user }: LiveFeedProps) {
                     <p onClick={() => handleSetPage(false)}>{`=>`}</p>
                 </div>
             </div>
-            {request.isLoading ?
+            {loading ?
                 <LoadingTable />
                 : filter === 'list' ? 
-                <List expanded={expanded} casts={request?.data?.casts as KyselyDB['casts'][]} /> 
-                : <Grid casts={request?.data?.casts as KyselyDB['casts'][]} />
+                <List expanded={expanded} casts={casts} /> 
+                : <Grid casts={casts} />
             }
-            {request?.data?.casts.length === 0 && 
+            {casts && casts.length === 0 && 
                 <p className="text-center relative text-black/20 text-7xl pt-[10%]">
                     no casts or replies
                 </p>
