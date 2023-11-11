@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from '../Grid';
 import List from '../List';
-import { api } from '~/utils/api';
 import type { KyselyDB } from '~/types/database.t';
 import dynamic from 'next/dynamic';
 import LiveIndicator from '../LiveIndicator';
@@ -68,8 +67,8 @@ export default function ChannelLiveFeed({ channel }: ChannelLiveFeedProps) {
             {loading ?
                 <LoadingTable />
                 : filter === 'list' ? 
-                <List expanded={expanded} casts={casts} /> 
-                : <Grid casts={casts} />
+                <List expanded={expanded} casts={casts as unknown as KyselyDB['casts'][]} /> 
+                : <Grid casts={casts as unknown as KyselyDB['casts'][]} />
             }
             {casts && casts.length === 0 && 
                 <p className="text-center relative text-black/20 text-7xl pt-[10%]">

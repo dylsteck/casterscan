@@ -1,11 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { api } from '~/utils/api';
 import { getRelativeTime } from '~/lib/time';
 import { SearchContext } from '~/context/SearchContext';
 import { addHyperlinksToText } from '~/lib/text';
 import Link from 'next/link';
 import LiveIndicator from './LiveIndicator';
 import LoadingTable from './LoadingTable';
+import { useSearch } from '~/providers/FarcasterKitProvider';
+import List from './List';
+import Grid from './Grid';
+import { KyselyDB } from '~/types/database.t';
 
 export interface SearchListRowProps {
   type: string;
@@ -133,10 +136,7 @@ const Search: React.FC = () => {
       setFilter(input);
     }
   };
-
-  const listRequest = api.casts.getCastsByKeyword.useQuery({ keyword: searchValue });
-  // TODO: change so if the keyword is a username or hash, takes you there directly
-  // also, clear SearchContext value after the search request goes through
+  const { data: casts, loading } = useSearch({ query: searchValue });
 
   return (
     <>
@@ -158,15 +158,17 @@ const Search: React.FC = () => {
           {expanded ? <p>collapse [-]</p> : <p>expand [+]</p>}
         </div>
       </div>
-      {listRequest.isLoading ? (
-        <>
+      {loading ?
           <LoadingTable />
-        </>
-      ) : filter === 'list' ? (
-        <SearchList expanded={expanded} feed={listRequest?.data?.list.rows.flat() || ([] as SearchListRowProps[])} />
-      ) : (
-        <SearchGrid feed={listRequest?.data?.list.rows.flat() || ([] as SearchListRowProps[])} />
-      )}
+          : filter === 'list' ? 
+          <List expanded={expanded} casts={casts as unknown as KyselyDB['casts'][]} /> 
+          : <Grid casts={casts as unknown as KyselyDB['casts'][]} />
+      }
+      {casts && casts.length === 0 && 
+          <p className="text-center relative text-black/20 text-7xl pt-[10%]">
+              no casts or replies
+          </p>
+      }
     </>
   );
 };

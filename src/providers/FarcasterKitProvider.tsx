@@ -154,43 +154,6 @@ export const useCast = (queryParams?: CastParams) => {
     return { data, loading };
   };
 
-// export const useReplies = (queryParams?: CastParams) => {
-//     const context = useContext(FarcasterKitContext);
-//     const params = {
-//         cursor: queryParams?.cursor || 0,
-//         limit: queryParams?.limit || 100
-//     };
-  
-//     if (context === undefined) {
-//       throw new Error('useReplies must be used within a FarcasterKitProvider');
-//     }
-  
-//     const { baseURL } = context;
-    
-//     const [data, setData] = useState<any>(null);
-//     const [loading, setLoading] = useState<boolean>(true);
-  
-//     useEffect(() => {
-//       const getReplies = async () => {
-//         try {
-//           const response = await axios.get(`${baseURL}/casts/replies?parent_hash=${queryParams?.hash ?? ''}`, {params: params});
-//           const responseData = response.data;
-//           // TODO: change API response to .casts
-//           if (responseData && responseData.cast) {
-//             setData(responseData.cast);
-//             setLoading(false);
-//           }
-//         } catch (error) {
-//           console.error('Error fetching replies:', error);
-//           setLoading(false);
-//         }
-//       };
-  
-//       getReplies();
-//     }, [baseURL, queryParams?.hash]);
-  
-//     return { data, loading };
-//   };
 export const useReplies = (queryParams?: CastParams) => {
   const context = useContext(FarcasterKitContext);
 
@@ -237,38 +200,44 @@ export const useReplies = (queryParams?: CastParams) => {
 
   export const useSearch = (queryParams?: SearchCastParams) => {
     const context = useContext(FarcasterKitContext);
-    const params = {
-        cursor: queryParams?.cursor || 0,
-        limit: queryParams?.limit || 100
-    };
   
     if (context === undefined) {
       throw new Error('useSearch must be used within a FarcasterKitProvider');
     }
   
     const { baseURL } = context;
-    
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<Cast[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
   
     useEffect(() => {
-      const getSearch = async () => {
+      let isMounted = true;
+  
+      const fetchData = async () => {
+        if (isMounted) setLoading(true);
+  
         try {
-          const response = await axios.get(`${baseURL}/casts/search?query=${queryParams?.query}`, {params: params});
-          const responseData = response.data;
-          // TODO: change API response to .casts
-          if (responseData && responseData.cast) {
-            setData(responseData.cast);
+          const response = await axios.get(`${baseURL}/casts/search`, { params: queryParams });
+          const responseData = response.data as CastResponse;
+          if (isMounted) {
+            setData(responseData.casts || []);
             setLoading(false);
           }
         } catch (error) {
-          console.error('Error fetching search results:', error);
-          setLoading(false);
+          if (isMounted) {
+            console.error('Error fetching search request:', error);
+            setLoading(false);
+          }
         }
       };
   
-      getSearch();
-    }, [baseURL, queryParams?.query]);
+      fetchData().catch((err) => {
+        console.log('error', err);
+      });
+  
+      return () => {
+        isMounted = false;
+      };
+    }, [baseURL, JSON.stringify(queryParams)]);
   
     return { data, loading };
   };

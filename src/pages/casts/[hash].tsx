@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { api } from '~/utils/api';
 import CopyText from '~/components/CopyText';
 import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from '~/components/ExpandableImage';
