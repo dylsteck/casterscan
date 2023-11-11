@@ -5,8 +5,8 @@ import { addHyperlinksToText } from '~/lib/text';
 import { ExpandableImage } from '~/components/ExpandableImage';
 import { useRouter } from 'next/router';
 import { getRelativeTime } from '~/lib/time';
-import { Cast, useCast } from '~/providers/FarcasterKitProvider';
 import CastRepliesLiveFeed from '~/components/LiveFeed/CastRepliesLiveFeed';
+import { useCast, Cast } from 'farcasterkit';
 
 interface CastByHashProps {
   hash: string;
@@ -17,11 +17,7 @@ const CastByHash: React.FC<CastByHashProps> = ({ hash }) => {
   const router = useRouter();
   const routerHash = router.query.hash ?? hash;
   const { data: cast, loading } = useCast({ hash: (router.query.hash ?? hash) as string}) as { data: Cast, loading: boolean}
-  
-  // const queryResult = api.casts.getCastByHash.useQuery(
-  //   { hash: routerHash as string },
-  //   { refetchOnWindowFocus: false }
-  // );
+
 
   return (
     <>

@@ -7,7 +7,7 @@ import CopyText from './CopyText';
 import { motion } from 'framer-motion';
 import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
-import { type Cast } from '~/providers/FarcasterKitProvider';
+import { type Cast } from 'farcasterkit';
 
 export interface ListRowProps {
   username: string;

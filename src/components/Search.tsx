@@ -5,7 +5,7 @@ import { addHyperlinksToText } from '~/lib/text';
 import Link from 'next/link';
 import LiveIndicator from './LiveIndicator';
 import LoadingTable from './LoadingTable';
-import { useSearch } from '~/providers/FarcasterKitProvider';
+import { useSearch } from 'farcasterkit';
 import List from './List';
 import Grid from './Grid';
 

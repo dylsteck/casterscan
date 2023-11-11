@@ -4,7 +4,7 @@ import { GoogleAnalytics } from "nextjs-google-analytics";
 import "~/styles/globals.css";
 import Layout from "~/components/Layout";
 import { SearchContextProvider } from "~/context/SearchContext";
-import { FarcasterKitProvider } from "~/providers/FarcasterKitProvider";
+import { FarcasterKitProvider } from "farcasterkit";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (

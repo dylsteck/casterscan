@@ -4,7 +4,7 @@ import List from '../List';
 import dynamic from 'next/dynamic';
 import LiveIndicator from '../LiveIndicator';
 import RenderChannelIcon from '../RenderChannelIcon';
-import { useReplies } from '~/providers/FarcasterKitProvider';
+import { useReplies } from 'farcasterkit';
 const LoadingTable = dynamic(() => import('../LoadingTable'), {
     ssr: false
 });

@@ -5,7 +5,7 @@ import { ExpandableImage } from '~/components/ExpandableImage';
 import { renderText } from '~/lib/text';
 import CopyText from '~/components/CopyText';
 import UserLiveFeed from '~/components/LiveFeed/UserLiveFeed';
-import { User, useUser } from '~/providers/FarcasterKitProvider';
+import { User, useUser } from 'farcasterkit';
 
 const UserPage = () => {
 

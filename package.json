@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.17",
-    "axios": "^1.6.1",
+    "farcasterkit": "^1.0.1",
     "framer-motion": "^10.8.5",
     "heroicons": "^2.0.16",
     "next": "^13.2.1",

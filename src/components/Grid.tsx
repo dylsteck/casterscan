@@ -5,7 +5,7 @@ import { getRelativeTime } from '~/lib/time';
 import { warpcastChannels } from '~/utils/warpcastChannels';
 import RenderChannelIcon from './RenderChannelIcon';
 import { renderText } from '~/lib/text';
-import { type Cast } from '~/providers/FarcasterKitProvider';
+import { type Cast } from 'farcasterkit';
 
 interface GridProps {
   casts: Cast[];
