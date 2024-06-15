@@ -45,6 +45,7 @@ export default function Hash() {
             </>
           )}
         </div>
+        {/* TODO: add embeds table here to see relevant links / stats */}
         <div className="flex flex-row gap-2 items-center">
           <button 
             className="p-2 text-black border border-black" 

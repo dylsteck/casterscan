@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
 import Header from "./components/header";
+import Script from "next/script";
 
 const PAGE = {
   title: "Casterscan",
@@ -50,6 +51,16 @@ export default function RootLayout({
       <body className={GeistSans.className}>
         <Header />
         {children}
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
+        <Script id="google-analytics">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}');
+          `}
+        </Script>
       </body>
     </html>
   );
