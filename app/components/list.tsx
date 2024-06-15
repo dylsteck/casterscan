@@ -137,7 +137,7 @@ const ListRow = ({ cast }: ListRowProps) => {
         )}
       </td>
       <td className="px-2 py-2 w-1/6">
-        <Link href={`/${cast.hash}`}>
+        <Link href={`/casts/${cast.hash}`}>
             <p className="underline text-[#71579E]">{`link =>`}</p>
         </Link>
       </td>

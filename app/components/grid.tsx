@@ -102,12 +102,12 @@ const ListRow = ({ cast, isFirst }: ListRowProps) => {
       <div>
         <div className="flex items-center mb-2">
           <img src={cast.author.pfp.url} alt={`${cast.author.username}'s PFP`} className="w-6 h-6 rounded-full mr-2" />
-          <Link href={`/users/${cast.author.username}`} className="text-[#71579E] font-medium">{cast.author.username}</Link>
+          <Link href={`/users/${cast.author.username}`} className="text-black font-medium">{cast.author.username}</Link>
         </div>
         <p className="text-gray-800 break-words">{cast.text}</p>
       </div>
       <div className="mt-2 flex justify-between items-end">
-        <Link href={`/${cast.hash}`} className="text-[#71579E] underline">link =&gt;</Link>
+        <Link href={`/casts/${cast.hash}`} className="text-[#71579E] underline">link =&gt;</Link>
         <p className="text-gray-500 text-sm">{getRelativeTime(cast.timestamp)}</p>
       </div>
     </div>
