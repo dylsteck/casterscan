@@ -139,9 +139,9 @@ export default function Feed() {
           <LiveIndicator />
         </div>
         <div className="ml-4 flex flex-row gap-1 float-left">
-          <p className={`${filter === 'list' ? 'font-bold' : 'font-normal'}`} onClick={() => handleFilterChange('list')}>list</p>
+          <p className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`} onClick={() => handleFilterChange('list')}>list</p>
           <p>|</p>
-          <p className={`${filter === 'grid' ? 'font-bold' : 'font-normal'}`} onClick={() => handleFilterChange('grid')}>grid</p>
+          <p className={`${filter === 'grid' ? 'font-bold' : 'font-normal'} cursor-pointer`} onClick={() => handleFilterChange('grid')}>grid</p>
         </div>
         <div className="mr-6 float-right flex flex-row gap-3">
           <p className="cursor-pointer" onClick={() => handleSetPage(true)}>{`<=`}</p>
