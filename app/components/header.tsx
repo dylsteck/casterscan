@@ -13,9 +13,9 @@ export default function Header(){
           <p className="p-5 pl-4">CASTERSCAN</p>
         </Link>
         <div className="float-right flex flex-row">
-          {/* <p className="p-5 pl-4">
-            ABOUT
-          </p> */}
+          <Link href="https://warpcast.com/~/add-cast-action?url=https://casterscan.com/frames/actions/inspect-cast" target="_blank">
+            <p className="p-5 pl-4 mr-2">CAST ACTION</p>
+          </Link>
           <Link href="https://github.com/dylsteck/casterscan" target="_blank">
             <p className="p-5 pl-4 mr-2">GITHUB</p>
           </Link>
