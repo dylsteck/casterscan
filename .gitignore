@@ -4,18 +4,14 @@
 /node_modules
 /.pnp
 .pnp.js
+.yarn/install-state.gz
 
 # testing
 /coverage
 
-# database
-/prisma/db.sqlite
-/prisma/db.sqlite-journal
-
 # next.js
-/.next/
+.next
 /out/
-next-env.d.ts
 
 # production
 /build
@@ -28,11 +24,8 @@ next-env.d.ts
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
 # local env files
-# do not commit any .env files to git, except for the .env.example file.
-.env
 .env*.local
 
 # vercel
@@ -40,7 +33,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-
-
-# SSL certs
-*.crt
+next-env.d.ts
