@@ -86,13 +86,7 @@ const useNeynarCast = (hash: string) => {
     const fetchCast = async () => {
       try {
         const response = await fetch(
-          `https://api.neynar.com/v2/farcaster/cast?identifier=${hash}&type=hash`,
-          {
-            method: 'GET',
-            headers: {
-              'api_key': `${process.env.NEXT_PUBLIC_NEYNAR_API_KEY ?? ""}`
-            }
-          }
+          `/api/casts/neynar?hash=${hash}`
         );
         const json = await response.json();
         setCast(json.cast);
