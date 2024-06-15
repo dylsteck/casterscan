@@ -1,22 +1,25 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React from 'react';
 
 function LoadingTableRow() {
-  const rowAnimation = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
+  const [style, setStyle] = React.useState({
+    opacity: 0,
+    transform: "translateY(20px)",
+  });
+
+  React.useEffect(() => {
+    const animation: Keyframe[] = [
+      { opacity: 0, transform: "translateY(20px)" },
+      { opacity: 1, transform: "translateY(0)" },
+    ];
+    const timing: KeyframeAnimationOptions = {
+      duration: 300,
+      easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      fill: "forwards" as FillMode,
+    };
+    const row = document.getElementById(`row-${Date.now()}`);
+    if (row) row.animate(animation, timing);
+    setStyle({ opacity: 1, transform: "translateY(0)" });
+  }, []);
 
   const secondsAgo = (timestamp: number) => {
     const now = new Date().getTime();
@@ -28,11 +31,10 @@ function LoadingTableRow() {
   const timestamp = Date.parse(isoTimestamp);
 
   return (
-    <motion.tr
+    <tr
+      id={`row-${Date.now()}`}
       className="bg-white font-normal"
-      variants={rowAnimation}
-      initial="hidden"
-      animate="visible"
+      style={style}
     >
       <th scope="row" className="px-6 py-4 whitespace-nowrap">
         {secondsAgo(timestamp)}
@@ -40,14 +42,14 @@ function LoadingTableRow() {
       <td className="px-6 py-4 text-[#71579E]">
         Awaiting request from Farcaster protocol hubs...
       </td>
-    </motion.tr>
+    </tr>
   );
 }
 
 export default function LoadingTable() {
-  const [rows, setRows] = useState<React.ReactNode[]>([]);
+  const [rows, setRows] = React.useState<React.ReactNode[]>([]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const addRow = () => {
       setRows((prevRows) => [
         ...prevRows,
