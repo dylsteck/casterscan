@@ -102,11 +102,16 @@ const useWarpcastCast = (hash: string) => {
     const fetchCast = async () => {
       try {
         const response = await fetch(
-          `https://api.warpcast.com/v2/thread-casts?castHash=${hash}`, {
+          `/api/casts/warpcast?hash=${hash}`, {
             method: 'GET'
         });
         const json = await response.json();
-        setCast(json.result.casts[0]);
+        if (Array.isArray(json.result.casts)) {
+            const newCast = json.result.casts.find((cast: { hash: string }) => cast.hash === hash);
+            setCast(newCast);
+        } else {
+            // no cast found
+        }
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch cast');

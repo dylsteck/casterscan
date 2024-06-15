@@ -122,7 +122,7 @@ const ListRow = ({ cast }: ListRowProps) => {
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-1/6"
       >
-        <Link href={`/users/${cast.author.username}`}>{cast.author.username}</Link>
+        <Link href={`https://warpcast.com/${cast.author.username}`}>{cast.author.username}</Link>
       </th>
       <td className="px-2 py-2 max-w-20">
         <p className="overflow-x-scroll">
