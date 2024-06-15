@@ -1,9 +1,10 @@
 "use client";
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import useNeynarCast from '@/app/hooks/neynar/use-neynar-cast';
 import useWarpcastCast from '@/app/hooks/warpcast/use-warpcast-cast';
+import useHubCast, { WARPCAST_HUB_URLS } from '@/app/hooks/hub/use-hub-cast';
 import WarpcastIcon from '@/app/components/warpcast-icon';
 import CopyClipboardIcon from '@/app/components/copy-clipboard-icon';
 import { XCircleIcon } from '@heroicons/react/20/solid';
@@ -13,8 +14,67 @@ export default function Hash() {
   const hash = pathname.split('/')[2];
   const { cast: neynarCast, loading: neynarLoading, error: neynarError } = useNeynarCast(hash);
   const { cast: warpcastCast, loading: warpcastLoading, error: warpcastError } = useWarpcastCast(hash);
+  
+  const [fid, setFid] = useState<number | null>(null);
+  const [neynarHubCast, setNeynarHubCast] = useState<any>(null);
+  const [neynarHubLoading, setNeynarHubLoading] = useState<boolean>(false);
+  const [neynarHubError, setNeynarHubError] = useState<string | null>(null);
 
-  const [showModal, setShowModal] = React.useState<{ show: boolean, type: 'neynar' | 'warpcast' }>({ show: false, type: 'neynar' });
+  const [warpcastHubCast, setWarpcastHubCast] = useState<any>(null);
+  const [warpcastHubLoading, setWarpcastHubLoading] = useState<boolean>(false);
+  const [warpcastHubError, setWarpcastHubError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (neynarCast) {
+      setFid(neynarCast.author.fid);
+    }
+  }, [neynarCast]);
+
+  useEffect(() => {
+    const fetchHubCast = async (hubType: 'neynar' | 'warpcast') => {
+      if (fid && hash) {
+        if (hubType === 'neynar') {
+          setNeynarHubLoading(true);
+          try {
+            const response = await fetch(`https://hub-api.neynar.com/v1/castById?fid=${fid}&hash=${hash}`);
+            const json = await response.json();
+            setNeynarHubCast(json);
+            setNeynarHubLoading(false);
+          } catch (err) {
+            setNeynarHubError('Failed to fetch neynar hub cast');
+            setNeynarHubLoading(false);
+          }
+        } else {
+          setWarpcastHubLoading(true);
+          try {
+            const url = WARPCAST_HUB_URLS[Math.floor(Math.random() * WARPCAST_HUB_URLS.length)];
+            const response = await fetch(`${url}/v1/castById?fid=${fid}&hash=${hash}`);
+            if (!response.ok) {
+              const fallbackUrl = WARPCAST_HUB_URLS.find(u => u !== url);
+              const fallbackResponse = await fetch(`${fallbackUrl}/v1/castById?fid=${fid}&hash=${hash}`);
+              if (!fallbackResponse.ok) throw new Error('Failed to fetch cast from both Warpcast Hub URLs');
+              const json = await fallbackResponse.json();
+              setWarpcastHubCast(json);
+            } else {
+              const json = await response.json();
+              setWarpcastHubCast(json);
+            }
+            setWarpcastHubLoading(false);
+          } catch (err) {
+            setWarpcastHubError('Failed to fetch warpcast hub cast');
+            setWarpcastHubLoading(false);
+          }
+        }
+      }
+    };
+
+    if (fid && hash) {
+      fetchHubCast('neynar');
+      fetchHubCast('warpcast');
+    }
+  }, [fid, hash]);
+
+  const [showModal, setShowModal] = useState<{ show: boolean, type: 'neynar' | 'warpcast' | 'neynarHub' | 'warpcastHub' }>({ show: false, type: 'neynar' });
 
   return (
     <div className="w-screen h-screen flex justify-center items-start">
@@ -96,6 +156,9 @@ export default function Hash() {
             </>
           )}
         </div>
+        <p className="font-medium text-lg">
+          response data
+        </p>
         <div className="flex flex-row gap-2 items-center">
           <button 
             className="p-2 text-black border border-black" 
@@ -109,21 +172,34 @@ export default function Hash() {
           >
             warpcast api
           </button>
+          <button 
+            className="p-2 text-black border border-black" 
+            onClick={() => setShowModal({ show: true, type: 'neynarHub' })}
+          >
+            neynar hub
+          </button>
+          <button 
+            className="p-2 text-black border border-black" 
+            onClick={() => setShowModal({ show: true, type: 'warpcastHub' })}
+          >
+            warpcast hub
+          </button>
         </div>
       </div>
-
       {showModal.show && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-4 rounded shadow-lg max-w-md w-full">
-            <h2 className="text-lg font-medium mb-2">{showModal.type === 'neynar' ? 'neynar' : 'warpcast'} api response</h2>
+            <h2 className="text-lg font-medium mb-2">
+              {showModal.type === 'neynar' ? 'neynar' : showModal.type === 'warpcast' ? 'warpcast' : showModal.type === 'neynarHub' ? 'neynar hub' : 'warpcast hub'} api response
+            </h2>
             <pre className="bg-gray-100 p-2 rounded overflow-auto text-xs h-64">
-              {JSON.stringify(showModal.type === 'neynar' ? neynarCast : warpcastCast, null, 2)}
+              {JSON.stringify(showModal.type === 'neynar' ? neynarCast : showModal.type === 'warpcast' ? warpcastCast : showModal.type === 'neynarHub' ? neynarHubCast : warpcastHubCast, null, 2)}
             </pre>
             <div className="mt-2 flex justify-end gap-0.5">
               <div className="pr-1 pt-0.5">
-                <CopyClipboardIcon value={JSON.stringify(showModal.type === 'neynar' ? neynarCast : warpcastCast)} />
+                <CopyClipboardIcon value={JSON.stringify(showModal.type === 'neynar' ? neynarCast : showModal.type === 'warpcast' ? warpcastCast : showModal.type === 'neynarHub' ? neynarHubCast : warpcastHubCast)} />
               </div>
-              <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" onClick={() => setShowModal({ show: false, type: 'neynar' })} />
+              <XCircleIcon className="w-5 h-5 text-red-500 cursor-pointer" onClick={() => setShowModal({ show: false, type: showModal.type })} />
             </div>
           </div>
         </div>

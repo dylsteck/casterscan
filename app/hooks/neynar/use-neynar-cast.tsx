@@ -86,7 +86,7 @@ const useNeynarCast = (hash: string) => {
     const fetchCast = async () => {
       try {
         const response = await fetch(
-          `/api/casts/neynar?hash=${hash}`
+          `/api/neynar/cast?hash=${hash}`
         );
         const json = await response.json();
         setCast(json.cast);

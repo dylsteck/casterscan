@@ -8,7 +8,7 @@ import Grid from './grid';
 import LoadingTable from './loading-table';
 import LiveIndicator from './live-indicator';
 
-interface Cast {
+export interface NeynarCastV2 {
   hash: string;
   parentHash: string | null;
   parentUrl: string | null;
@@ -71,7 +71,7 @@ const fetcher = async (url: string) => {
 };
 
 export default function Feed() {
-  const [casts, setCasts] = useState<Cast[]>([]);
+  const [casts, setCasts] = useState<NeynarCastV2[]>([]);
   const [currentCursor, setCurrentCursor] = useState<string | null>(null);
   const [previousCursors, setPreviousCursors] = useState<string[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -85,7 +85,7 @@ export default function Feed() {
 
   useEffect(() => {
     if (data && Array.isArray(data.casts)) {
-      const parsedCasts = data.casts.map((item: Cast) => ({
+      const parsedCasts = data.casts.map((item: NeynarCastV2) => ({
         ...item,
         author: {
           ...item.author,
@@ -144,8 +144,8 @@ export default function Feed() {
           <p className={`${filter === 'grid' ? 'font-bold' : 'font-normal'}`} onClick={() => handleFilterChange('grid')}>grid</p>
         </div>
         <div className="mr-6 float-right flex flex-row gap-3">
-          <p onClick={() => handleSetPage(true)}>{`<=`}</p>
-          <p onClick={() => handleSetPage(false)}>{`=>`}</p>
+          <p className="cursor-pointer" onClick={() => handleSetPage(true)}>{`<=`}</p>
+          <p className="cursor-pointer" onClick={() => handleSetPage(false)}>{`=>`}</p>
         </div>
       </div>
       {data ? (

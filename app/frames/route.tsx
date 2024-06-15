@@ -24,7 +24,7 @@ export const GET = frames(async (ctx) => {
         View website
       </Button>,
       <Button action="link" target={installFrameActionUrl}>
-        Install Inspect Cast
+        Install Cast Action
       </Button>,
     ],
   };

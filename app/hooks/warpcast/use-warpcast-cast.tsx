@@ -102,7 +102,7 @@ const useWarpcastCast = (hash: string) => {
     const fetchCast = async () => {
       try {
         const response = await fetch(
-          `/api/casts/warpcast?hash=${hash}`, {
+          `/api/warpcast/cast?hash=${hash}`, {
             method: 'GET'
         });
         const json = await response.json();
