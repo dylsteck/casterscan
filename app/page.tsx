@@ -2,27 +2,22 @@ import Image from "next/image";
 import Feed from "./components/feed";
 import { fetchMetadata } from 'frames.js/next'
 import { Metadata } from "next";
-
-const PAGE = {
-  title: "Casterscan",
-  description: "A block explorer for Farcaster",
-  url: "https://casterscan.com",
-};
+import { SEO } from "./consts";
 
 export async function generateMetadata(){
   return{
-    metadataBase: new URL(PAGE.url),
+    metadataBase: new URL(SEO.url),
     title: {
-      default: PAGE.title,
-      template: '%s | Casterscan',
+      default: SEO.title,
+      template: `%s | ${SEO.title}`,
     },
-    description: PAGE.description,
+    description: SEO.description,
     openGraph: {
-      title: PAGE.title,
-      description: PAGE.description,
-      images: ['https://i.imgur.com/KJ7qfro.png'],
-      url: PAGE.url,
-      siteName: PAGE.title,
+      title: SEO.title,
+      description: SEO.description,
+      images: [SEO.ogImage],
+      url: SEO.url,
+      siteName: SEO.title,
       locale: 'en_US',
       type: 'website',
     },

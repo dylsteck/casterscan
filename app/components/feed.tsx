@@ -2,7 +2,7 @@
 'use client';
 import useSWR from 'swr';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import List from './list';
 import Grid from './grid';
 import LoadingTable from './loading-table';
@@ -62,29 +62,25 @@ export interface NeynarCastV2 {
 }
 
 const fetcher = async (url: string) => {
-  const response = await axios.get(url, {
-    headers: {
-      'api_key': process.env.NEXT_PUBLIC_NEYNAR_API_KEY,
-    },
-  });
+  const response = await axios.get(url);
   return response.data.result;
 };
 
 export default function Feed() {
-  const [casts, setCasts] = useState<NeynarCastV2[]>([]);
-  const [currentCursor, setCurrentCursor] = useState<string | null>(null);
-  const [previousCursors, setPreviousCursors] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>('list');
+  const [casts, setCasts] = React.useState<NeynarCastV2[]>([]);
+  const [currentCursor, setCurrentCursor] = React.useState<string | null>(null);
+  const [previousCursors, setPreviousCursors] = React.useState<string[]>([]);
+  const [nextCursor, setNextCursor] = React.useState<string | null>(null);
+  const [filter, setFilter] = React.useState<string>('list');
 
   const { data, error } = useSWR(
-    `https://api.neynar.com/v1/farcaster/recent-casts?limit=75${currentCursor ? `&cursor=${currentCursor}` : ''}`,
+    `/api/neynar/recent-casts?limit=75${currentCursor ? `&cursor=${currentCursor}` : ''}`,
     fetcher,
     { revalidateOnFocus: false }
   );
 
-  useEffect(() => {
-    if (data && Array.isArray(data.casts)) {
+  React.useEffect(() => {
+    if (data && data.casts && Array.isArray(data.casts)) {
       const parsedCasts = data.casts.map((item: NeynarCastV2) => ({
         ...item,
         author: {
@@ -102,7 +98,7 @@ export default function Feed() {
     }
   }, [data]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
       setFilter('grid');

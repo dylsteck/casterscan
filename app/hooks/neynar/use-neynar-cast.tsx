@@ -77,7 +77,7 @@ interface NeynarCastResponse {
   }[];
 }
 
-const useNeynarCast = (hash: string) => {
+const useNeynarCast = (identifier: string, type: 'url' | 'hash') => {
   const [cast, setCast] = React.useState<NeynarCastResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -86,7 +86,7 @@ const useNeynarCast = (hash: string) => {
     const fetchCast = async () => {
       try {
         const response = await fetch(
-          `/api/neynar/cast?hash=${hash}`
+          `/api/neynar/cast?identifier=${identifier}&type=${type}`
         );
         const json = await response.json();
         setCast(json.cast);
@@ -98,7 +98,7 @@ const useNeynarCast = (hash: string) => {
     };
 
     fetchCast();
-  }, [hash]);
+  }, [identifier, type]);
 
   return { cast, loading, error };
 };

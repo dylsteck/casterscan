@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 interface Cast {
   hash: string;
@@ -59,9 +59,9 @@ interface ListRowProps {
 }
 
 const ListRow = ({ cast }: ListRowProps) => {
-  const rowRef = useRef<HTMLTableRowElement>(null);
+  const rowRef = React.useRef<HTMLTableRowElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (rowRef.current) {
       rowRef.current.animate(
         [

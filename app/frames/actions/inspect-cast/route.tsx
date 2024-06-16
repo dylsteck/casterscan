@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { frames } from "../../frames";
 import { ActionMetadata } from "frames.js";
-const appURL = 'https://casterscan.com';
+import { SEO } from "@/app/consts";
 
 export const GET = async (req: NextRequest) => {
   const actionMetadata: ActionMetadata = {
@@ -10,7 +10,7 @@ export const GET = async (req: NextRequest) => {
     },
     icon: "link-external",
     name: "Inspect Cast",
-    aboutUrl: `${appURL}`,
+    aboutUrl: `${SEO.url}`,
     description: "Inspect the raw details of a cast on Casterscan",
   };
 
@@ -21,7 +21,7 @@ export const POST = frames(async (ctx) => {
   const hash = ctx.message?.castId?.hash;
   return Response.json({
     message: `Click to Inspect Cast`,
-    link: `${appURL}/casts/${hash}`,
+    link: `${SEO.url}/casts/${hash}`,
     type: 'message'
   });
 });
