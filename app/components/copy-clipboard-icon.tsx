@@ -18,7 +18,7 @@ export default function CopyClipboardIcon({ value, className }: { value: string,
 
     return (
         copied ? (
-            <CheckCircleIcon className={`w-4 h-4 text-green-500 ml-2 cursor-pointer ${className ? className : ''}`} />
+            <CheckCircleIcon className={`w-5 h-5 text-green-500 ml-2 cursor-pointer ${className ? className : ''}`} />
         ) : (
             <ClipboardIcon className={`w-4 h-4 text-gray-500 ml-2 cursor-pointer ${className ? className : ''}`} onClick={() => handleCopy(value)} />
         )

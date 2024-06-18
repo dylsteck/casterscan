@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LiveIndicator() {
+export default function LiveIndicatorIcon() {
   const indicatorRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {

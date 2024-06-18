@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import CasterscanIcon from './casterscan-icon';
+import CasterscanIcon from './icons/casterscan-icon';
 import Search from './search';
 
 export default function Header() {

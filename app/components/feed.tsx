@@ -6,7 +6,7 @@ import React from 'react';
 import List from './list';
 import Grid from './grid';
 import LoadingTable from './loading-table';
-import LiveIndicator from './live-indicator';
+import LiveIndicatorIcon from './icons/live-indicator-icon';
 
 export interface NeynarCastV2 {
   hash: string;
@@ -132,7 +132,7 @@ export default function Feed() {
       <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
         <div className="ml-4 flex flex-row gap-2 float-left items-center">
           <p>LIVE FEED</p>
-          <LiveIndicator />
+          <LiveIndicatorIcon />
         </div>
         <div className="ml-4 flex flex-row gap-1 float-left">
           <p className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`} onClick={() => handleFilterChange('list')}>list</p>
