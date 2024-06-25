@@ -38,7 +38,7 @@ interface HubCastResponse {
   signer: string;
 }
 
-const useHubCast = (fid: number | null, hash: string, type: 'neynar' | 'warpcast') => {
+const useHubCast = (fid: number | null, hash: string, type: 'neynar' | 'warpcast' | 'pinata') => {
   const [cast, setCast] = React.useState<HubCastResponse | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);

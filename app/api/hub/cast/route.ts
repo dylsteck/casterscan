@@ -1,4 +1,4 @@
-import { WARPCAST_HUB_URLS } from "@/app/consts";
+import { PINATA_HUB_URL, WARPCAST_HUB_URLS } from "@/app/consts";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -24,9 +24,11 @@ export async function GET(request: NextRequest) {
             }
             apiUrl = `https://hub-api.neynar.com/v1/castById?fid=${fid}&hash=${hash}`;
             headers['api_key'] = apiKey;
-        } else {
+        } else if(type === 'warpcast') {
             const randomUrl = WARPCAST_HUB_URLS[Math.floor(Math.random() * WARPCAST_HUB_URLS.length)];
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
+        } else if(type === 'pinata') {
+            apiUrl = `${PINATA_HUB_URL}/v1/castById?fid=${fid}&hash=${hash}`
         }
 
         const response = await fetch(apiUrl, {
