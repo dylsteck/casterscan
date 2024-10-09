@@ -1,4 +1,4 @@
-import { PINATA_HUB_URL, WARPCAST_HUB_URLS } from "@/app/lib/consts";
+import { WARPCAST_HUB_URLS } from "@/app/lib/consts";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
