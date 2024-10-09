@@ -1,4 +1,4 @@
-import { SEO } from '@/app/consts';
+import { SEO } from '@/app/lib/consts';
 import { fetchMetadata } from 'frames.js/next';
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';

@@ -19,7 +19,7 @@ There are two goals for Casterscan's utility:
 
 ### How to run locally
 1. `npm install`
-2. Copy `.env.example` to a new `.env.local` file and add your Neynar API key under `NEXT_PUBLIC_NEYNAR_API_KEY`
+2. Copy `.env.example` to a new `.env.local` file and add your Neynar API key under `NEYNAR_API_KEY`
 3. `npm run dev`
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 

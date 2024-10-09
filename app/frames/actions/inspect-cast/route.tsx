@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { frames } from "../../frames";
 import { ActionMetadata } from "frames.js";
-import { SEO } from "@/app/consts";
+import { SEO } from "@/app/lib/consts";
 
 export const GET = async (req: NextRequest) => {
   const actionMetadata: ActionMetadata = {

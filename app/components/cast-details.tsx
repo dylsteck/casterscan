@@ -15,7 +15,6 @@ export default function CastDetails({ hash }: { hash: string }) {
   const [fid, setFid] = React.useState<number | null>(null);
   const { cast: neynarHubCast, loading: neynarHubLoading, error: neynarHubError } = useHubCast(fid, hash, 'neynar');
   const { cast: warpcastHubCast, loading: warpcastHubLoading, error: warpcastHubError } = useHubCast(fid, hash, 'warpcast');
-  const { cast: pinataHubCast, loading: pinataHubLoading, error: pinataHubError } = useHubCast(fid, hash, 'pinata');
 
   React.useEffect(() => {
     if (neynarCast) {
@@ -23,7 +22,7 @@ export default function CastDetails({ hash }: { hash: string }) {
     }
   }, [neynarCast]);
 
-  const [showModal, setShowModal] = React.useState<{ show: boolean, type: 'neynar' | 'warpcast' | 'neynarHub' | 'warpcastHub' | 'pinataHub' }>({ show: false, type: 'neynar' });
+  const [showModal, setShowModal] = React.useState<{ show: boolean, type: 'neynar' | 'warpcast' | 'neynarHub' | 'warpcastHub' }>({ show: false, type: 'neynar' });
 
   const [selectedOption, setSelectedOption] = React.useState("view on warpcast");
 
@@ -139,12 +138,6 @@ export default function CastDetails({ hash }: { hash: string }) {
           >
             warpcast hub
           </button>
-          <button 
-            className="p-2 text-black border border-black" 
-            onClick={() => setShowModal({ show: true, type: 'pinataHub' })}
-          >
-            pinata hub
-          </button>
         </div>
       </div>
       {showModal.show && (
@@ -152,10 +145,10 @@ export default function CastDetails({ hash }: { hash: string }) {
           <div className="bg-white p-4 rounded shadow-lg max-w-3xl w-full h-[80vh] flex flex-col justify-between">
             <div>
               <h2 className="text-lg font-medium mb-2">
-                {showModal.type === 'neynar' ? 'neynar api' : showModal.type === 'warpcast' ? 'warpcast api' : showModal.type === 'neynarHub' ? 'neynar hub' : showModal.type === 'pinataHub' ? 'pinata hub' : 'warpcast hub'} response
+                {showModal.type === 'neynar' ? 'neynar api' : showModal.type === 'warpcast' ? 'warpcast api' : showModal.type === 'neynarHub' ? 'neynar hub' : 'warpcast hub'} response
               </h2>
               <pre className="bg-gray-100 p-2 rounded overflow-auto text-xs h-[65vh]">
-                {JSON.stringify(showModal.type === 'neynar' ? neynarCast : showModal.type === 'warpcast' ? warpcastCast : showModal.type === 'neynarHub' ? neynarHubCast : showModal.type === 'pinataHub' ? pinataHubCast : warpcastHubCast, null, 2)}
+                {JSON.stringify(showModal.type === 'neynar' ? neynarCast : showModal.type === 'warpcast' ? warpcastCast : showModal.type === 'neynarHub' ? neynarHubCast : warpcastHubCast, null, 2)}
               </pre>
             </div>
             <div className="flex flex-row justify-end items-center gap-0.5">

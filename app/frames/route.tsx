@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
 import { frames } from "./frames";
-import { SEO } from "../consts";
+import { SEO } from "../lib/consts";
 
 function constructCastActionUrl(params: { url: string }): string {
   const baseUrl = "https://warpcast.com/~/add-cast-action";
@@ -16,7 +16,6 @@ export const GET = frames(async (ctx) => {
   const installFrameActionUrl = constructCastActionUrl({
     url: `${SEO.url}/frames/actions/inspect-cast`,
   });
-  console.log(ctx.message);
   return {
     image: 'https://i.imgur.com/KJ7qfro.png',
     buttons: [

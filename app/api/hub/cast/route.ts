@@ -1,4 +1,4 @@
-import { PINATA_HUB_URL, WARPCAST_HUB_URLS } from "@/app/consts";
+import { PINATA_HUB_URL, WARPCAST_HUB_URLS } from "@/app/lib/consts";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         };
 
         if (type === 'neynar') {
-            const apiKey = process.env.NEXT_PUBLIC_NEYNAR_API_KEY;
+            const apiKey = process.env.NEYNAR_API_KEY;
             if (!apiKey) {
                 return NextResponse.json({ error: "Neynar API key is missing" }, { status: 400 });
             }
@@ -27,8 +27,6 @@ export async function GET(request: NextRequest) {
         } else if(type === 'warpcast') {
             const randomUrl = WARPCAST_HUB_URLS[Math.floor(Math.random() * WARPCAST_HUB_URLS.length)];
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
-        } else if(type === 'pinata') {
-            apiUrl = `${PINATA_HUB_URL}/v1/castById?fid=${fid}&hash=${hash}`
         }
 
         const response = await fetch(apiUrl, {
