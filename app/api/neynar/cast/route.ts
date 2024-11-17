@@ -1,3 +1,4 @@
+import { NEYNAR_API_URL } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     try {
         const apiKey = process.env.NEYNAR_API_KEY ?? "";
         const response = await fetch(
-            `https://api.neynar.com/v2/farcaster/cast?identifier=${identifier}&type=${type}`, {
+            `${NEYNAR_API_URL}/v2/farcaster/cast?identifier=${identifier}&type=${type}`, {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',

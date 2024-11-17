@@ -1,13 +1,13 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import WarpcastIcon from '@/app/components/icons/warpcast-icon';
-import SupercastIcon from './icons/supercast-icon';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import { CLIENTS } from '../lib/utils';
+import { type Client } from '../lib/types';
 
-interface ShareCastProps {
-  selectedOption: string;
-  setSelectedOption: React.Dispatch<React.SetStateAction<string>>;
+type ShareCastProps = {
+  selectedOption: Client;
+  setSelectedOption: React.Dispatch<React.SetStateAction<Client>>;
   neynarCast: {
     author: {
       username: string;
@@ -19,33 +19,16 @@ interface ShareCastProps {
 
 export default function ShareCast({ selectedOption, setSelectedOption, neynarCast }: ShareCastProps) {
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const options = CLIENTS.map(client => client.name.toLowerCase());
 
-  const options = ["view on warpcast", "view on supercast"];
-
-  const getIcon = (option: string) => {
-    switch(option) {
-      case "view on warpcast":
-        return (
-          <WarpcastIcon className="ml-2 w-5 h-5" />
-        );
-      case "view on supercast":
-        return (
-          <SupercastIcon className="ml-2 w-5 h-5" />
-        );
-      default:
-        return null;
-    }
+  const getIcon = (option: Client) => {
+    const client = CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
+    return client ? client.icon : null;
   };
 
-  const getLink = (option: string) => {
-    switch(option) {
-      case "view on warpcast":
-        return `https://warpcast.com/${neynarCast?.author.username}/${neynarCast?.hash.slice(0, 10)}`;
-      case "view on supercast":
-        return `https://supercast.xyz/c/${neynarCast?.hash}`;
-      default:
-        return "#";
-    }
+  const getLink = (option: Client) => {
+    const client = CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
+    return client ? client.castLink + (neynarCast?.hash || '') : "#";
   };
 
   return (
@@ -64,11 +47,11 @@ export default function ShareCast({ selectedOption, setSelectedOption, neynarCas
               key={index} 
               className="px-4 py-2 cursor-pointer hover:bg-gray-200" 
               onClick={() => {
-                setSelectedOption(option);
+                setSelectedOption(CLIENTS.find((client) => client.name.toLowerCase() === option) ?? CLIENTS[0]);
                 setIsDropdownOpen(false);
               }}
             >
-              {option}
+              view on {option}
             </div>
           ))}
         </div>

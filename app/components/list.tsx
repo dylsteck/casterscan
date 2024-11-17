@@ -1,64 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
+import { type NeynarV1Cast, type User } from '../lib/types';
+import { renderCastText } from '../lib/utils';
 
-interface Cast {
-  hash: string;
-  parentHash: string | null;
-  parentUrl: string | null;
-  rootParentUrl: string | null;
-  threadHash: string;
-  parentAuthor: {
-    fid: number | null;
-  };
-  author: {
-    fid: number;
-    custodyAddress: string;
-    username: string;
-    displayName: string;
-    pfp: {
-      url: string;
-    };
-    profile: {
-      bio: {
-        text: string;
-        mentionedProfiles: any[];
-      };
-    };
-    followerCount: number;
-    followingCount: number;
-    verifications: string[];
-    verifiedAddresses: {
-      eth_addresses: string[];
-      sol_addresses: string[];
-    };
-    activeStatus: string;
-    powerBadge: boolean;
-  };
-  text: string;
-  timestamp: string;
-  embeds: {
-    url: string;
-  }[];
-  mentionedProfiles: any[];
-  reactions: {
-    count: number;
-    fids: number[];
-  };
-  recasts: {
-    count: number;
-    fids: number[];
-  };
-  recasters: any[];
-  replies: {
-    count: number;
-  };
-}
-
-interface ListRowProps {
-  cast: Cast;
-}
-
-const ListRow = ({ cast }: ListRowProps) => {
+const ListRow = ({ cast }: { cast: NeynarV1Cast }) => {
   const rowRef = React.useRef<HTMLTableRowElement>(null);
 
   React.useEffect(() => {
@@ -124,11 +69,11 @@ const ListRow = ({ cast }: ListRowProps) => {
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-1/6"
       >
-        <Link href={`https://warpcast.com/${cast.author.username}`}>{cast.author.username}</Link>
+        <Link href={`https://warpcast.com/${(cast.author as any).fname ?? ""}`}>{(cast.author as any).fname ?? ""}</Link>
       </th>
       <td className="px-2 py-2 max-w-20">
         <p className="overflow-x-scroll">
-          {cast.text}
+          {renderCastText(cast.text)}
         </p>
       </td>
       <td className="px-2 py-2 w-1/6">
@@ -150,11 +95,7 @@ const ListRow = ({ cast }: ListRowProps) => {
   );
 };
 
-interface ListProps {
-  casts: Cast[];
-}
-
-const List = ({ casts }: ListProps) => {
+const List = ({ casts }: { casts: NeynarV1Cast[] }) => {
   return (
     <div className="overflow-x-auto w-full pl-2">
       <table className="min-w-full text-sm text-left table-fixed">

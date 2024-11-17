@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import { Button } from "frames.js/next";
 import { frames } from "./frames";
-import { SEO } from "../lib/consts";
+import { SEO } from "../lib/utils";
 
 function constructCastActionUrl(params: { url: string }): string {
   const baseUrl = "https://warpcast.com/~/add-cast-action";

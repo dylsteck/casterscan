@@ -1,11 +1,10 @@
-import { SEO } from '@/app/lib/consts';
+import CastDetails from '@/app/components/cast-details';
+import { SEO } from '@/app/lib/utils';
 import { fetchMetadata } from 'frames.js/next';
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
 
-const CastDetails = dynamic(() => import('@/app/components/cast-details'), { ssr: false });
-
-export async function generateMetadata({ params }: { params: { hash: string } }) {
+export async function generateMetadata(props: { params: Promise<{ hash: string }> }) {
+  const params = await props.params;
   const { hash } = params;
   const metadata = await fetchMetadata(
     new URL(
@@ -46,7 +45,8 @@ export async function generateMetadata({ params }: { params: { hash: string } })
   } as Metadata;
 }
 
-export default function Hash({ params }: { params: { hash: string } }) {
+export default async function Hash(props: { params: Promise<{ hash: string }> }) {
+  const params = await props.params;
   const { hash } = params;
   return <CastDetails hash={hash} />;
 }

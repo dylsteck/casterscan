@@ -7,59 +7,7 @@ import List from './list';
 import Grid from './grid';
 import LoadingTable from './loading-table';
 import LiveIndicatorIcon from './icons/live-indicator-icon';
-
-export interface NeynarCastV2 {
-  hash: string;
-  parentHash: string | null;
-  parentUrl: string | null;
-  rootParentUrl: string | null;
-  threadHash: string;
-  parentAuthor: {
-    fid: number | null;
-  };
-  author: {
-    fid: number;
-    custodyAddress: string;
-    username: string;
-    displayName: string;
-    pfp: {
-      url: string;
-    };
-    profile: {
-      bio: {
-        text: string;
-        mentionedProfiles: any[];
-      };
-    };
-    followerCount: number;
-    followingCount: number;
-    verifications: string[];
-    verifiedAddresses: {
-      eth_addresses: string[];
-      sol_addresses: string[];
-    };
-    activeStatus: string;
-    powerBadge: boolean;
-  };
-  text: string;
-  timestamp: string;
-  embeds: {
-    url: string;
-  }[];
-  mentionedProfiles: any[];
-  reactions: {
-    count: number;
-    fids: number[];
-  };
-  recasts: {
-    count: number;
-    fids: number[];
-  };
-  recasters: any[];
-  replies: {
-    count: number;
-  };
-}
+import { type NeynarV1Cast, type User } from '../lib/types';
 
 const fetcher = async (url: string) => {
   const response = await axios.get(url);
@@ -67,7 +15,7 @@ const fetcher = async (url: string) => {
 };
 
 export default function Feed() {
-  const [casts, setCasts] = React.useState<NeynarCastV2[]>([]);
+  const [casts, setCasts] = React.useState<NeynarV1Cast[]>([]);
   const [currentCursor, setCurrentCursor] = React.useState<string | null>(null);
   const [previousCursors, setPreviousCursors] = React.useState<string[]>([]);
   const [nextCursor, setNextCursor] = React.useState<string | null>(null);
@@ -81,16 +29,12 @@ export default function Feed() {
 
   React.useEffect(() => {
     if (data && data.casts && Array.isArray(data.casts)) {
-      const parsedCasts = data.casts.map((item: NeynarCastV2) => ({
-        ...item,
-        author: {
-          ...item.author,
-          profile: {
-            ...item.author.profile,
-          },
-        },
-      }));
-
+      const parsedCasts: NeynarV1Cast[] = data.casts.map((cast: NeynarV1Cast) => {
+        return {
+          ...cast, 
+          author: cast.author as User
+        };
+      });
       setCasts(parsedCasts);
       if (data.next && data.next.cursor) {
         setNextCursor(data.next.cursor);
