@@ -3,6 +3,12 @@ import SupercastIcon from "../components/icons/supercast-icon";
 import RecasterIcon from "../components/icons/recaster-icon";
 import React from "react";
 import { Client } from "./types";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export const SEO = {
     title: 'Casterscan',
