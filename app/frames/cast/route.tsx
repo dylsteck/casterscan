@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { frames } from "../frames";
 import { ActionMetadata } from "frames.js";
 import { Button } from "frames.js/next";
-import { SEO } from "@/app/lib/consts";
+import { SEO } from "@/app/lib/utils";
 
 export const GET = frames(async (ctx) => {
     const hash = ctx.searchParams.hash;

@@ -2,6 +2,8 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import useNeynarCast from '../hooks/neynar/use-neynar-cast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { InfoIcon } from 'lucide-react';
 
 const Search = () => {
   const [search, setSearch] = React.useState('');
@@ -53,10 +55,24 @@ const Search = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-7 focus:outline-none w-full"
+        className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-0 focus:outline-none w-full"
         placeholder="search"
         ref={inputRef}
       />
+      <div className="ml-4 mb-2 w-auto h-auto">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <span className="cursor-pointer text-gray-500 ml-2">
+                <InfoIcon className="size-5" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={10}>
+              Enter a cast hash or warpcast URL
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       {error && (
         <div className="text-red-500 p-2 ml-2 mb-2">
         <button className="font-medium mr-2.5 p-0.5" onClick={clearLocalState}>Dismiss</button> {error}

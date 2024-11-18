@@ -7,6 +7,8 @@ import useHubCast from '@/app/hooks/hub/use-hub-cast';
 import CopyClipboardIcon from '@/app/components/copy-clipboard-icon';
 import { XCircleIcon } from '@heroicons/react/20/solid';
 import ShareCast from './share-cast';
+import { type Client } from '../lib/types';
+import { CLIENTS } from '../lib/utils';
 
 export default function CastDetails({ hash }: { hash: string }) {
   const { cast: neynarCast, loading: neynarLoading, error: neynarError } = useNeynarCast(hash, 'hash');
@@ -23,8 +25,7 @@ export default function CastDetails({ hash }: { hash: string }) {
   }, [neynarCast]);
 
   const [showModal, setShowModal] = React.useState<{ show: boolean, type: 'neynar' | 'warpcast' | 'neynarHub' | 'warpcastHub' }>({ show: false, type: 'neynar' });
-
-  const [selectedOption, setSelectedOption] = React.useState("view on warpcast");
+  const [selectedOption, setSelectedOption] = React.useState<Client>(CLIENTS.find((client) => client.name === "Warpcast") ?? CLIENTS[0]);
 
   return (
     <div className="w-screen h-screen flex justify-center items-start">

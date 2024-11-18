@@ -1,4 +1,4 @@
-import { WARPCAST_HUB_URLS } from "@/app/lib/consts";
+import { NEYNAR_HUB_API_URL, WARPCAST_HUB_URLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
             if (!apiKey) {
                 return NextResponse.json({ error: "Neynar API key is missing" }, { status: 400 });
             }
-            apiUrl = `https://hub-api.neynar.com/v1/castById?fid=${fid}&hash=${hash}`;
+            apiUrl = `${NEYNAR_HUB_API_URL}/v1/castById?fid=${fid}&hash=${hash}`;
             headers['api_key'] = apiKey;
         } else if(type === 'warpcast') {
             const randomUrl = WARPCAST_HUB_URLS[Math.floor(Math.random() * WARPCAST_HUB_URLS.length)];

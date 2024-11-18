@@ -1,3 +1,4 @@
+import { NEYNAR_API_URL } from '@/app/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -5,7 +6,7 @@ export async function GET(request: NextRequest) {
   const cursor = searchParams.get('cursor');
   const limit = searchParams.get('limit') || '75';
 
-  const apiUrl = `https://api.neynar.com/v1/farcaster/recent-casts?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}`;
+  const apiUrl = `${NEYNAR_API_URL}/v1/farcaster/recent-casts?limit=${limit}${cursor ? `&cursor=${cursor}` : ''}`;
 
   const headers = new Headers({
     'Content-Type': 'application/json',

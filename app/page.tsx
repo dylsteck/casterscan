@@ -2,7 +2,7 @@ import Image from "next/image";
 import Feed from "./components/feed";
 import { fetchMetadata } from 'frames.js/next'
 import { Metadata } from "next";
-import { SEO } from "./lib/consts";
+import { SEO } from "./lib/utils";
 
 export async function generateMetadata(){
   return{
