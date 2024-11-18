@@ -6,9 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "prepare": "husky",
-    "test": "echo \"No tests specified\" && exit 0"
+    "lint": "next lint"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
