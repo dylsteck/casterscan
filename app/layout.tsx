@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/header";
 import Script from "next/script";
 import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
+import FrameProvider from "./components/frame-provider";
 
 const PAGE = {
   title: "Casterscan",
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     images: [BANNER_IMG_URL],
   },
   other: {
-    "fc:frame": JSON.stringify(frame)
+    "fc:frame": JSON.stringify(frame())
   }
 }
 
@@ -54,7 +55,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <Header />
-        {children}
+        <FrameProvider>
+          {children}
+        </FrameProvider>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
         <Script id="google-analytics">
           {`

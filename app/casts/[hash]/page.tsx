@@ -1,19 +1,10 @@
 import CastDetails from '@/app/components/cast-details';
-import { SEO } from '@/app/lib/utils';
-import { fetchMetadata } from 'frames.js/next';
+import { BASE_URL, frame, SEO } from '@/app/lib/utils';
 import { Metadata } from 'next';
 
 export async function generateMetadata(props: { params: Promise<{ hash: string }> }) {
   const params = await props.params;
   const { hash } = params;
-  const metadata = await fetchMetadata(
-    new URL(
-      `/frames/cast?hash=${hash}`,
-      process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000'
-    )
-  );
   return {
     metadataBase: new URL(SEO.url),
     title: {
@@ -41,7 +32,9 @@ export async function generateMetadata(props: { params: Promise<{ hash: string }
         'max-snippet': -1,
       },
     },
-    other: metadata,
+    other: {
+      "fc:frame": JSON.stringify(frame('Inspect Cast', `${BASE_URL}/casts/${hash}`)),
+    }
   } as Metadata;
 }
 

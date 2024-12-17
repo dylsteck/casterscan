@@ -45,20 +45,22 @@ export const CLIENTS: Client[] = [
   },
 ];
 
-export const frame = {
-  version: "next",
-  imageUrl: BANNER_IMG_URL,
-  button: {
-    title: "Open Casterscan",
-    action: {
-      type: "launch_frame",
-      name: "Casterscan",
-      url: `${BASE_URL}`,
-      splashImageUrl: ICON_IMG_URL,
-      splashBackgroundColor: "#FFFFFF",
+export const frame = (title = 'Open Casterscan', url = BASE_URL) => {
+  return {
+    version: "next",
+    imageUrl: BANNER_IMG_URL,
+    button: {
+      title: title,
+      action: {
+        type: "launch_frame",
+        name: "Casterscan",
+        url: url,
+        splashImageUrl: ICON_IMG_URL,
+        splashBackgroundColor: "#FFFFFF",
+      },
     },
-  },
-};
+  };
+}
 
 export const MAX_CAST_PREVIEW_CHARS = 280;
 

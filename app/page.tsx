@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Feed from "./components/feed";
-import { fetchMetadata } from 'frames.js/next'
 import { Metadata } from "next";
-import { SEO } from "./lib/utils";
+import { frame, SEO } from "./lib/utils";
 
 export async function generateMetadata(){
   return{
@@ -33,15 +32,8 @@ export async function generateMetadata(){
       },
     },
     other: {
-      ...(await fetchMetadata(
-        new URL(
-          "/frames",
-          process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : "http://localhost:3000"
-        )
-      )),
-    },
+      "fc:frame": JSON.stringify(frame())
+    }
   } as Metadata
 }
 
