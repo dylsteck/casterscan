@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
 import Header from "./components/header";
 import Script from "next/script";
+import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
 
 const PAGE = {
   title: "Casterscan",
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     siteName: PAGE.title,
     images: [
       {
-        url: 'https://i.imgur.com/KJ7qfro.png',
+        url: BANNER_IMG_URL,
         width: 1200,
         height: 634,
         alt: 'og:image',
@@ -30,15 +31,18 @@ export const metadata: Metadata = {
     type: 'website',
   },
   icons: {
-    icon: 'https://i.imgur.com/PD1XTs5.jpeg'
+    icon: ICON_IMG_URL,
   },
   twitter: {
     card: 'summary_large_image',
     title: PAGE.title,
     description: PAGE.description,
     creator: '@Dylan_Steck',
-    images: ['https://i.imgur.com/KJ7qfro.png'],
+    images: [BANNER_IMG_URL],
   },
+  other: {
+    "fc:frame": JSON.stringify(frame)
+  }
 }
 
 export default function RootLayout({

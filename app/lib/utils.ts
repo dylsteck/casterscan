@@ -10,17 +10,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const BANNER_IMG_URL = 'https://i.imgur.com/KJ7qfro.png';
+export const ICON_IMG_URL = 'https://i.imgur.com/PD1XTs5.jpeg';
+
 export const SEO = {
     title: 'Casterscan',
     description: 'A block explorer for Farcaster',
-    ogImage: 'https://i.imgur.com/KJ7qfro.png',
+    ogImage: BANNER_IMG_URL,
     url: 'https://casterscan.com',
 };
 
 const isDev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT || 3000;
 const localUrl = `http://localhost:${port}`;
-
 export const BASE_URL = isDev 
   ? localUrl 
   : 'https://casterscan.com';
@@ -42,6 +44,21 @@ export const CLIENTS: Client[] = [
     castLink: "https://recaster.org/cast/",
   },
 ];
+
+export const frame = {
+  version: "next",
+  imageUrl: BANNER_IMG_URL,
+  button: {
+    title: "Open Casterscan",
+    action: {
+      type: "launch_frame",
+      name: "Casterscan",
+      url: `${BASE_URL}`,
+      splashImageUrl: ICON_IMG_URL,
+      splashBackgroundColor: "#FFFFFF",
+    },
+  },
+};
 
 export const MAX_CAST_PREVIEW_CHARS = 280;
 
