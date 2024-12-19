@@ -3,21 +3,14 @@ import React from 'react';
 import Link from 'next/link';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { CLIENTS } from '../lib/utils';
-import { type Client } from '../lib/types';
+import { NeynarV2Cast, type Client } from '../lib/types';
 
 type ShareCastProps = {
-  selectedOption: Client;
-  setSelectedOption: React.Dispatch<React.SetStateAction<Client>>;
-  neynarCast: {
-    author: {
-      username: string;
-      fid: number;
-    };
-    hash: string;
-  } | null;
+  neynarCast: NeynarV2Cast
 }
 
-export default function ShareCast({ selectedOption, setSelectedOption, neynarCast }: ShareCastProps) {
+export default function ShareCast({ neynarCast }: ShareCastProps) {
+  const [selectedOption, setSelectedOption] = React.useState<Client>(CLIENTS.find((client) => client.name === "Warpcast") ?? CLIENTS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const options = CLIENTS.map(client => client.name.toLowerCase());
 
@@ -28,6 +21,9 @@ export default function ShareCast({ selectedOption, setSelectedOption, neynarCas
 
   const getLink = (option: Client) => {
     const client = CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
+    if(client?.name.toLowerCase() === "warpcast") {
+      return `${client.castLink}${neynarCast.author.username}/${neynarCast?.hash.slice(0, 10)}`
+    }
     return client ? client.castLink + (neynarCast?.hash || '') : "#";
   };
 

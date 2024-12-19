@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',
-                'api_key': `${apiKey}`
+                'x-api-key': `${apiKey}`
                 }
             }
         );
