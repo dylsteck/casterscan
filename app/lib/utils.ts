@@ -27,6 +27,22 @@ export const BASE_URL = isDev
   ? localUrl 
   : 'https://casterscan.com';
 
+export const cachedRequest = async (url: string, revalidate: number, method = 'GET', headers?: Record<string, string>) => {
+    const response = await fetch(url, {
+        method: method,
+        headers: headers,
+        next: {
+            revalidate: revalidate
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch cast from the selected hub');
+    }
+
+    return response.json();
+};
+
 export const CLIENTS: Client[] = [
   {
     name: "Warpcast",

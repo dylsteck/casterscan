@@ -1,4 +1,4 @@
-import { WARPCAST_API_URL } from "@/app/lib/utils";
+import { cachedRequest, WARPCAST_API_URL } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -6,14 +6,8 @@ export async function GET(request: NextRequest) {
     const hash = url.searchParams.get('hash');
 
     try {
-        const response = await fetch(
-            `${WARPCAST_API_URL}/v2/thread-casts?castHash=${hash}`, {
-                method: 'GET'
-            }
-        );
-
-        const data = await response.json();
-        return NextResponse.json(data);
+        const responseData = await cachedRequest(`${WARPCAST_API_URL}/v2/thread-casts?castHash=${hash}`, 3600, 'GET');
+        return NextResponse.json(responseData);
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });
     }

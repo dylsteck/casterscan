@@ -1,4 +1,4 @@
-import { NEYNAR_HUB_API_URL, WARPCAST_HUB_URLS } from "@/app/lib/utils";
+import { cachedRequest, NEYNAR_HUB_API_URL, WARPCAST_HUB_URLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -29,17 +29,8 @@ export async function GET(request: NextRequest) {
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
         }
 
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: headers,
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch cast from the selected hub');
-        }
-
-        const data = await response.json();
-        return NextResponse.json(data);
+        const responseData = await cachedRequest(apiUrl, 86400, 'GET', headers);
+        return NextResponse.json(responseData);
     } catch (err) {
         console.error('Error fetching cast from API:', err);
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });

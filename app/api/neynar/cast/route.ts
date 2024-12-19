@@ -1,4 +1,4 @@
-import { NEYNAR_API_URL } from "@/app/lib/utils";
+import { cachedRequest, NEYNAR_API_URL } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -8,18 +8,14 @@ export async function GET(request: NextRequest) {
 
     try {
         const apiKey = process.env.NEYNAR_API_KEY ?? "";
-        const response = await fetch(
-            `${NEYNAR_API_URL}/v2/farcaster/cast?identifier=${identifier}&type=${type}`, {
-                method: 'GET',
-                headers: {
+        const responseData = await cachedRequest(
+            `${NEYNAR_API_URL}/v2/farcaster/cast?identifier=${identifier}&type=${type}`, 3600, 'GET', 
+            {
                 'Content-Type': 'application/json',
                 'x-api-key': `${apiKey}`
-                }
             }
         );
-
-        const data = await response.json();
-        return NextResponse.json(data);
+        return NextResponse.json(responseData);
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });
     }
