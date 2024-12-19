@@ -58,6 +58,7 @@ export default function RootLayout({
         <Header />
         <FrameProvider>
           {children}
+          <SpeedInsights />
         </FrameProvider>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
         <Script id="google-analytics">
