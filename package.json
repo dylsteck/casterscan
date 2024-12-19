@@ -12,6 +12,7 @@
     "@farcaster/frame-sdk": "^0.0.20",
     "@heroicons/react": "^2.1.5",
     "@radix-ui/react-tooltip": "^1.1.4",
+    "@vercel/speed-insights": "^1.1.0",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

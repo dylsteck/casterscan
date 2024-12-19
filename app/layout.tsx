@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
 import Header from "./components/header";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
 import FrameProvider from "./components/frame-provider";
 
