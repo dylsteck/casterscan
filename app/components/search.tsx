@@ -62,7 +62,7 @@ const Search = () => {
         <button className="font-medium mr-2.5 p-0.5" onClick={clearLocalState}>Dismiss</button> {error}
         </div>
       )}
-      {loading && <p>Loading...</p>}
+      {/* {loading && <p>Loading...</p>} */}
       {fetchError && <p>{fetchError}</p>}
     </div>
   );

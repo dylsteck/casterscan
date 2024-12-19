@@ -66,6 +66,7 @@ export const MAX_CAST_PREVIEW_CHARS = 280;
 
 export const NEYNAR_API_URL = 'https://api.neynar.com';
 export const NEYNAR_HUB_API_URL = 'https://hub-api.neynar.com';
+export const WARPCAST_API_URL = 'https://api.warpcast.com';
 
 export const renderCastText = (text: string) => {
   if(text.length > MAX_CAST_PREVIEW_CHARS){

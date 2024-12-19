@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
                 return NextResponse.json({ error: "Neynar API key is missing" }, { status: 400 });
             }
             apiUrl = `${NEYNAR_HUB_API_URL}/v1/castById?fid=${fid}&hash=${hash}`;
-            headers['api_key'] = apiKey;
+            headers['x-api-key'] = apiKey;
         } else if(type === 'warpcast') {
             const randomUrl = WARPCAST_HUB_URLS[Math.floor(Math.random() * WARPCAST_HUB_URLS.length)];
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;

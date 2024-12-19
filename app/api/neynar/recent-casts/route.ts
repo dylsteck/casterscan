@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   const headers = new Headers({
     'Content-Type': 'application/json',
-    'api_key': process.env.NEYNAR_API_KEY || '',
+    'x-api-key': process.env.NEYNAR_API_KEY || '',
   });
 
   try {
