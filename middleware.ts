@@ -3,15 +3,19 @@ import type { NextRequest } from 'next/server';
 import { BASE_URL } from './app/lib/utils';
 
 export function middleware(request: NextRequest) {
-  const origin = request.nextUrl.origin || request.headers.get('origin') || request.headers.get('referer');
+  const origin = request.nextUrl.origin;
   const referer = request.headers.get('referer');
+  const host = request.headers.get('host');
 
-  if (origin && origin !== BASE_URL) {
-    return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 });
-  }
+  const isValidOrigin = origin === BASE_URL;
+  const isValidReferer = referer ? referer.startsWith(BASE_URL) : true;
+  const isValidHost = host === new URL(BASE_URL).host;
 
-  if (!referer || !referer.startsWith(BASE_URL)) {
-    return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 });
+  if (!isValidOrigin && !isValidReferer && !isValidHost) {
+    return NextResponse.json({ 
+      error: 'Unauthorized access', 
+      details: 'Request does not match the expected base URL' 
+    }, { status: 403 });
   }
 
   return NextResponse.next();

@@ -1,3 +1,4 @@
+import { WARPCAST_API_URL } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -5,9 +6,8 @@ export async function GET(request: NextRequest) {
     const hash = url.searchParams.get('hash');
 
     try {
-        const regularBase = 'https://api.warpcast.com';
         const response = await fetch(
-            `${regularBase}/v2/thread-casts?castHash=${hash}`, {
+            `${WARPCAST_API_URL}/v2/thread-casts?castHash=${hash}`, {
                 method: 'GET'
             }
         );

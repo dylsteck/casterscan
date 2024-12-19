@@ -1,10 +1,10 @@
 'use client'
 
 import { sdk } from "@farcaster/frame-sdk";
-import { useEffect } from "react";
+import React from "react";
 
 export default function FrameProvider({ children }: { children: React.ReactNode }){
-    useEffect(() => {
+    React.useEffect(() => {
         const init = async () => {
           const context = await sdk.context;
           setTimeout(() => {

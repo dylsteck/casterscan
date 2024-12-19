@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@farcaster/frame-sdk": "^0.0.18",
+    "@farcaster/frame-sdk": "^0.0.20",
     "@heroicons/react": "^2.1.5",
     "@radix-ui/react-tooltip": "^1.1.4",
     "axios": "^1.7.7",

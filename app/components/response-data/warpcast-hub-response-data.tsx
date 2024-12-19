@@ -1,9 +1,11 @@
+import { getHubCast } from "@/app/lib/server";
 import ResponseData from ".";
 
-export default function WarpcastHubResponseData() {
+export default async function WarpcastHubResponseData({ fid, hash }: { fid: number, hash: string }) {
+    const neynarHubCast = await getHubCast(fid, hash, 'warpcast');
     return(
         <>
-            {/* <ResponseData data={warpcastHubResponseData} title="warpcast hub response" /> */}
+            <ResponseData data={neynarHubCast} title="warpcast hub" />
         </>
     )
 }

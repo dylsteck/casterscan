@@ -1,71 +1,72 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import useNeynarCast from '../hooks/neynar/use-neynar-cast';
+import { getNeynarCast } from '@/app/lib/server';
 
-const Search = () => {
+export default function Search(){
   const [search, setSearch] = React.useState('');
-  const [error, setError] = React.useState('');
-  const [identifier, setIdentifier] = React.useState<string | null>(null);
-  const inputRef = React.useRef(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
-  
-  const { cast, loading, error: fetchError } = useNeynarCast(identifier ?? '', 'url');
 
   const clearLocalState = () => {
-    setIdentifier(null);
     setSearch('');
-    setError('');
+    setLoading(false);
+    setError(null);
   }
 
-  React.useEffect(() => {
-    if (identifier && cast) {
-      clearLocalState();
-      router.push(`/casts/${cast.hash}`);
-    }
-  }, [cast, identifier, router]);
+  const handleSearch = async () => {
+    if (!search) return;
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      const warpcastPattern = /^https:\/\/warpcast\.com\/[^\/]+\/0x[a-fA-F0-9]{8,10}$/;
-      if (search.startsWith('0x')) {
-        clearLocalState();
-        router.push(`/casts/${search}`);
-      } else if (warpcastPattern.test(search)) {
-        const extractedIdentifier = search.split('/').pop();
-        if (extractedIdentifier) {
-          setIdentifier(search);
-        } else {
-          setError('Invalid Warpcast URL');
-          setSearch('');
-        }
+    setError(null);
+
+    try {
+      const isHash = /^0x[a-fA-F0-9]{40}$/.test(search);
+      const isWarpcastUrl = search.includes('warpcast.com/');
+      let cast;
+      if (isHash) {
+        cast = await getNeynarCast(search, 'hash');
+      } else if (isWarpcastUrl) {
+        cast = await getNeynarCast(search, 'url');
       } else {
-        setError('Input must start with a 0x hash or be a valid Warpcast cast URL');
-        setSearch('');
+        throw new Error('Invalid cast identifier');
       }
+
+      if (cast && cast.hash) {
+        clearLocalState();
+        router.push(`/casts/${cast.hash}`);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
     }
-  };
-  
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  }
+
   return (
     <div className="border-b-2 border-[#C1C1C1] justify-center">
       <input
+        ref={inputRef}
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-5 focus:outline-none w-full"
         placeholder="search"
-        ref={inputRef}
+        disabled={loading}
+        className="text-black/20 text-7xl p-5 pl-4 pt-5 pb-5 focus:outline-none w-full"
       />
       {error && (
         <div className="text-red-500 p-2 ml-2 mb-2">
-        <button className="font-medium mr-2.5 p-0.5" onClick={clearLocalState}>Dismiss</button> {error}
+          <button className="font-medium mr-2.5 p-0.5" onClick={clearLocalState}>Dismiss</button> {error}
         </div>
       )}
-      {/* {loading && <p>Loading...</p>} */}
-      {fetchError && <p>{fetchError}</p>}
     </div>
   );
-};
-
-export default Search;
+}

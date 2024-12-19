@@ -1,14 +1,14 @@
-"use client";
 import Link from 'next/link';
 import React from 'react';
-import useHubCast from '@/app/hooks/hub/use-hub-cast';
 import CopyClipboardIcon from '@/app/components/copy-clipboard-icon';
-import { XCircleIcon } from '@heroicons/react/20/solid';
 import ShareCast from './share-cast';
 import { NeynarV2Cast, type Client } from '../lib/types';
 import { CLIENTS } from '../lib/utils';
 import ResponseData from './response-data';
 import NeynarApiResponseData from './response-data/neynar-api-response-data';
+import WarpcastApiResponseData from './response-data/warpcast-api-response-data';
+import NeynarHubResponseData from './response-data/neynar-hub-response-data';
+import WarpcastHubResponseData from './response-data/warpcast-hub-response-data';
 
 export default function CastDetails({ hash, neynarCast }: { hash: string, neynarCast: NeynarV2Cast }) {
   return (
@@ -90,24 +90,9 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
         </p>
         <div className="flex flex-row gap-2 items-center">
           <NeynarApiResponseData neynarCast={neynarCast} />
-          {/* <button 
-            className="p-2 text-black border border-black" 
-            onClick={() => setShowModal({ show: true, type: 'warpcast' })}
-          >
-            warpcast api
-          </button>
-          <button 
-            className="p-2 text-black border border-black" 
-            onClick={() => setShowModal({ show: true, type: 'neynarHub' })}
-          >
-            neynar hub
-          </button>
-          <button 
-            className="p-2 text-black border border-black" 
-            onClick={() => setShowModal({ show: true, type: 'warpcastHub' })}
-          >
-            warpcast hub
-          </button> */}
+          <WarpcastApiResponseData hash={hash} />
+          <NeynarHubResponseData fid={neynarCast.author.fid} hash={hash} />
+          <WarpcastHubResponseData fid={neynarCast.author.fid} hash={hash} />
         </div>
       </div>
     </div>

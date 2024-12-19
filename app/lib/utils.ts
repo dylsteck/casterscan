@@ -31,7 +31,7 @@ export const CLIENTS: Client[] = [
   {
     name: "Warpcast",
     icon: React.createElement(WarpcastIcon, { className: "ml-2 w-7 h-7" }),
-    castLink: "https://warpcast.com/~/conversations/",
+    castLink: "https://warpcast.com/",
   },
   {
     name: "Supercast",

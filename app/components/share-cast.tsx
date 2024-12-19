@@ -21,6 +21,9 @@ export default function ShareCast({ neynarCast }: ShareCastProps) {
 
   const getLink = (option: Client) => {
     const client = CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
+    if(client?.name.toLowerCase() === "warpcast") {
+      return `${client.castLink}${neynarCast.author.username}/${neynarCast?.hash.slice(0, 10)}`
+    }
     return client ? client.castLink + (neynarCast?.hash || '') : "#";
   };
 
