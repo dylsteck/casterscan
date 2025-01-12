@@ -5,13 +5,14 @@ import List from './list';
 import Grid from './grid';
 import LiveIndicatorIcon from './icons/live-indicator-icon';
 import { HubStreamCast, type NeynarV1Cast, type User } from '../lib/types';
+import { BASE_URL } from '../lib/utils';
 
 export default function Feed() {
   const [casts, setCasts] = React.useState<HubStreamCast[]>([]);
   const [filter, setFilter] = React.useState('list');
 
   React.useEffect(() => {
-    const eventSource = new EventSource('/api/hub/stream');
+    const eventSource = new EventSource(`${BASE_URL}/api/hub/stream`);
     eventSource.onmessage = (e) => {
       const data = JSON.parse(e.data) as Omit<HubStreamCast, 'timestamp'>;
       const incoming = { ...data, timestamp: new Date().toISOString() };

@@ -1,4 +1,4 @@
-import { PINATA_HUB_GRPC_URL } from "@/app/lib/utils";
+import { BASE_URL, PINATA_HUB_GRPC_URL } from "@/app/lib/utils";
 import { getSSLHubRpcClient, HubEventType } from "@farcaster/hub-nodejs";
 
 export async function GET() {
@@ -38,7 +38,7 @@ export async function GET() {
             if (event.mergeMessageBody.message.data.type === 1) {
               const authorFid = event.mergeMessageBody.message.data.fid;
               const userResponse = await fetch(
-                `http://localhost:3000/api/warpcast/user?fid=${authorFid}`
+                `${BASE_URL}/api/warpcast/user?fid=${authorFid}`
               );
               const userData = await userResponse.json();
               const data = {
