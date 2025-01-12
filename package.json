@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@farcaster/frame-sdk": "^0.0.25",
+    "@farcaster/hub-nodejs": "^0.12.7",
     "@heroicons/react": "^2.1.5",
     "@radix-ui/react-tooltip": "^1.1.4",
     "axios": "^1.7.7",
