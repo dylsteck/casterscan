@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
-import { type NeynarV1Cast, type User } from '../lib/types';
+import { type HubStreamCast, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
 
-const ListRow = ({ cast, isFirst }: { cast: NeynarV1Cast, isFirst: boolean }) => {
+const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) => {
   const rowRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -47,8 +47,8 @@ const ListRow = ({ cast, isFirst }: { cast: NeynarV1Cast, isFirst: boolean }) =>
     <div ref={rowRef} className={`border border-gray-300 p-4 flex flex-col justify-between h-full ${isFirst ? '' : 'border-t-0'}`}>
       <div>
         <div className="flex items-center mb-2">
-          <img src={(cast.author as any).avatar_url ?? ""} alt={`${(cast.author as any).fname ?? ""}'s PFP`} className="w-6 h-6 rounded-full mr-2" />
-          <Link href={`https://warpcast.com/${(cast.author as any).fname ?? ""}`} className="text-black font-medium">{(cast.author as any).fname ?? ""}</Link>
+          <img src={cast.author.user.pfp.url ?? ""} alt={`${cast.author.user.username}'s PFP`} className="w-6 h-6 rounded-full mr-2" />
+          <Link href={`https://warpcast.com/${cast.author.user.username}`} className="text-black font-medium">{cast.author.user.username}</Link>
         </div>
         <p className="text-gray-800 break-words">{renderCastText(cast.text)}</p>
       </div>
@@ -60,7 +60,7 @@ const ListRow = ({ cast, isFirst }: { cast: NeynarV1Cast, isFirst: boolean }) =>
   );
 };
 
-const Grid = ({ casts }: { casts: NeynarV1Cast[]}) => {
+const Grid = ({ casts }: { casts: HubStreamCast[]}) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-l border-r border-gray-300">
       {casts.map((cast, index) => (

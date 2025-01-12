@@ -1,75 +1,43 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import useSWR from 'swr';
-import axios from 'axios';
 import React from 'react';
 import List from './list';
 import Grid from './grid';
-import LoadingTable from './loading-table';
 import LiveIndicatorIcon from './icons/live-indicator-icon';
-import { type NeynarV1Cast, type User } from '../lib/types';
-
-const fetcher = async (url: string) => {
-  const response = await axios.get(url);
-  return response.data.result;
-};
+import { HubStreamCast, type NeynarV1Cast, type User } from '../lib/types';
+import { BASE_URL } from '../lib/utils';
 
 export default function Feed() {
-  const [casts, setCasts] = React.useState<NeynarV1Cast[]>([]);
-  const [currentCursor, setCurrentCursor] = React.useState<string | null>(null);
-  const [previousCursors, setPreviousCursors] = React.useState<string[]>([]);
-  const [nextCursor, setNextCursor] = React.useState<string | null>(null);
-  const [filter, setFilter] = React.useState<string>('list');
-
-  const { data, error } = useSWR(
-    `/api/neynar/recent-casts?limit=75${currentCursor ? `&cursor=${currentCursor}` : ''}`,
-    fetcher,
-    { revalidateOnFocus: false }
-  );
+  const [casts, setCasts] = React.useState<HubStreamCast[]>([]);
+  const [filter, setFilter] = React.useState('list');
 
   React.useEffect(() => {
-    if (data && data.casts && Array.isArray(data.casts)) {
-      const parsedCasts: NeynarV1Cast[] = data.casts.map((cast: NeynarV1Cast) => {
-        return {
-          ...cast, 
-          author: cast.author as User
-        };
-      });
-      setCasts(parsedCasts);
-      if (data.next && data.next.cursor) {
-        setNextCursor(data.next.cursor);
-      }
-    }
-  }, [data]);
+    const eventSource = new EventSource(`${BASE_URL}/api/hub/stream`);
+    eventSource.onmessage = (e) => {
+      const data = JSON.parse(e.data) as Omit<HubStreamCast, 'timestamp'>;
+      const incoming = { ...data, timestamp: new Date().toISOString() };
+      setCasts((prev) => [incoming, ...prev]);
+    };
+    eventSource.onerror = (err) => {
+      console.error(err);
+      eventSource.close();
+    };
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   React.useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
+    if (window.innerWidth < 768) {
       setFilter('grid');
     }
   }, []);
 
-  const handleFilterChange = (input: string) => {
-    if (filter !== input) {
-      setFilter(input);
+  function handleFilterChange(layout: string) {
+    if (filter !== layout) {
+      setFilter(layout);
     }
-  };
-
-  const handleSetPage = (back: boolean) => {
-    if (back) {
-      const prevCursor = previousCursors.pop();
-      setPreviousCursors([...previousCursors]);
-      setCurrentCursor(prevCursor || null);
-    } else {
-      if (nextCursor) {
-        setPreviousCursors([...previousCursors, currentCursor!]);
-        setCurrentCursor(nextCursor);
-      }
-    }
-  };
-
-  if (error) return <div>Failed to load casts</div>;
-  if (!data && casts.length === 0) return <LoadingTable />;
+  }
 
   return (
     <div className="w-screen h-screen">
@@ -79,28 +47,26 @@ export default function Feed() {
           <LiveIndicatorIcon />
         </div>
         <div className="ml-4 flex flex-row gap-1 float-left">
-          <p className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`} onClick={() => handleFilterChange('list')}>list</p>
+          <p
+            className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`}
+            onClick={() => handleFilterChange('list')}
+          >
+            list
+          </p>
           <p>|</p>
-          <p className={`${filter === 'grid' ? 'font-bold' : 'font-normal'} cursor-pointer`} onClick={() => handleFilterChange('grid')}>grid</p>
-        </div>
-        <div className="mr-6 float-right flex flex-row gap-3">
-          <p className="cursor-pointer" onClick={() => handleSetPage(true)}>{`<=`}</p>
-          <p className="cursor-pointer" onClick={() => handleSetPage(false)}>{`=>`}</p>
+          <p
+            className={`${filter === 'grid' ? 'font-bold' : 'font-normal'} cursor-pointer`}
+            onClick={() => handleFilterChange('grid')}
+          >
+            grid
+          </p>
         </div>
       </div>
-      {data ? (
-        filter === 'list' ? (
-          <List casts={casts} />
-        ) : (
-          <Grid casts={casts} />
-        )
-      ) : (
-        <LoadingTable />
+      {!casts.length && (
+        <p className="text-center relative text-black/20 text-7xl pt-[10%]">no casts</p>
       )}
-      {casts && casts.length === 0 && (
-        <p className="text-center relative text-black/20 text-7xl pt-[10%]">
-          no casts or replies
-        </p>
+      {casts.length > 0 && (
+        filter === 'list' ? <List casts={casts} /> : <Grid casts={casts} />
       )}
     </div>
   );

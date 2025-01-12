@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
-import { type NeynarV1Cast, type User } from '../lib/types';
+import { type HubStreamCast, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
 
-const ListRow = ({ cast }: { cast: NeynarV1Cast }) => {
+const ListRow = ({ cast }: { cast: HubStreamCast }) => {
   const rowRef = React.useRef<HTMLTableRowElement>(null);
 
   React.useEffect(() => {
@@ -69,7 +69,7 @@ const ListRow = ({ cast }: { cast: NeynarV1Cast }) => {
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-1/6"
       >
-        <Link href={`https://warpcast.com/${(cast.author as any).fname ?? ""}`}>{(cast.author as any).fname ?? ""}</Link>
+        <Link href={`https://warpcast.com/${cast.author.user.username}`}>{cast.author.user.username}</Link>
       </th>
       <td className="px-2 py-2 max-w-20">
         <p className="overflow-x-scroll">
@@ -95,7 +95,7 @@ const ListRow = ({ cast }: { cast: NeynarV1Cast }) => {
   );
 };
 
-const List = ({ casts }: { casts: NeynarV1Cast[] }) => {
+const List = ({ casts }: { casts: HubStreamCast[] }) => {
   return (
     <div className="overflow-x-auto w-full pl-2">
       <table className="min-w-full text-sm text-left table-fixed">
