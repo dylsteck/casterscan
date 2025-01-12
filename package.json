@@ -13,7 +13,6 @@
     "@farcaster/frame-sdk": "^0.0.26",
     "@farcaster/hub-nodejs": "^0.12.7",
     "@heroicons/react": "^2.2.0",
-    "@radix-ui/react-tooltip": "^1.1.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "frames.js": "^0.17.0",
