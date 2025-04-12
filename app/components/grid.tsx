@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { type HubStreamCast, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
+import { FrameLink } from './frame-link';
 
 const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) => {
   const rowRef = React.useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
       <div>
         <div className="flex items-center mb-2">
           <img src={cast.author.user.pfp.url ?? ""} alt={`${cast.author.user.username}'s PFP`} className="w-6 h-6 rounded-full mr-2" />
-          <Link href={`https://warpcast.com/${cast.author.user.username}`} className="text-black font-medium">{cast.author.user.username}</Link>
+          <FrameLink href={`https://warpcast.com/${cast.author.user.username}`} className="text-black font-medium">{cast.author.user.username}</FrameLink>
         </div>
         <p className="text-gray-800 break-words">{renderCastText(cast.text)}</p>
       </div>

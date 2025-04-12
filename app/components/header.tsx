@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import CasterscanIcon from './icons/casterscan-icon';
 import Search from './search';
+import { FrameLink } from './frame-link';
 
 export default function Header() {
   return (
@@ -15,9 +16,9 @@ export default function Header() {
           </Link>
         </div>
         <div className="float-right flex flex-row gap-3 p-5">
-          <Link href="https://warpcast.com/~/add-cast-action?url=https://casterscan.com/frames/actions/inspect-cast" target="_blank">
+          <FrameLink href="https://warpcast.com/~/add-cast-action?url=https://casterscan.com/frames/actions/inspect-cast">
             <p>CAST ACTION</p>
-          </Link>
+          </FrameLink>
           <Link href="https://github.com/dylsteck/casterscan" target="_blank">
             <p>GITHUB</p>
           </Link>

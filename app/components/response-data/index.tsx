@@ -12,8 +12,8 @@ export default function ResponseData({ data, title }: { data: any, title: string
                 {title}
             </button>
             {showModal && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-                <div className="bg-white p-4 rounded shadow-lg max-w-3xl w-full h-[80vh] flex flex-col justify-between">
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center" onClick={() => setShowModal(false)}>
+                <div className="bg-white p-4 rounded shadow-lg max-w-3xl w-full h-[80vh] flex flex-col justify-between" onClick={(e) => e.stopPropagation()}>
                     <div>
                     <h2 className="text-lg font-medium mb-2">
                        {title} response

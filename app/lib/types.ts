@@ -1,7 +1,9 @@
 export type Client = {
-  castLink: string;
-  icon: React.FunctionComponentElement<{ className?: string }>;
   name: string;
+  username: string;
+  fid: number;
+  icon: React.FunctionComponentElement<{ className?: string }>;
+  castLink: string;
 };
 
 export type HubCast = {
@@ -65,83 +67,127 @@ export type NeynarV1Cast = {
 };
 
 export type NeynarV2Cast = {
-  author: {
-      active_status: string;
-      display_name: string;
+    object: "cast";
+    hash: string;
+    author: {
+      object: "user";
       fid: number;
-      object: string;
+      username: string;
+      display_name: string;
       pfp_url: string;
-      power_badge: boolean;
-      profile: {
-          bio: {
-              text: string;
-          };
-      };
       custody_address: string;
+      profile: {
+        bio: {
+          text: string;
+          mentioned_profiles: {
+            object: "user_dehydrated";
+            fid: number;
+            username: string;
+            display_name: string;
+            pfp_url: string;
+            custody_address: string;
+          }[];
+          mentioned_profiles_ranges: {
+            start: number;
+            end: number;
+          }[];
+          mentioned_channels: {
+            object: "channel_dehydrated";
+            id: string;
+            name: string;
+            image_url: string;
+          }[];
+          mentioned_channels_ranges: {
+            start: number;
+            end: number;
+          }[];
+        };
+        location: {
+          latitude: number;
+          longitude: number;
+          address: {
+            city: string;
+            state: string;
+            state_code: string;
+            country: string;
+            country_code: string;
+          };
+        };
+      };
       follower_count: number;
       following_count: number;
-      username: string;
       verifications: string[];
       verified_addresses: {
-          eth_addresses: string[];
-          sol_addresses: string[];
+        eth_addresses: string[];
+        sol_addresses: string[];
+        primary: {
+          eth_address: string;
+          sol_address: string | null;
+        };
       };
-  };
-  ancestors: {
-      cast: any[];
-      count: number;
-  };
-  embeds: {
+      verified_accounts: {
+        platform: string;
+        username: string;
+      }[];
+      power_badge: boolean;
+    };
+    app: {
+      object: "user_dehydrated";
+      fid: number;
+      username: string;
+      display_name: string;
+      pfp_url: string;
+      custody_address: string;
+    };
+    thread_hash: string;
+    parent_hash: string | null;
+    parent_url: string | null;
+    root_parent_url: string | null;
+    parent_author: {
+      fid: number | null;
+    };
+    text: string;
+    timestamp: string;
+    embeds: {
       url: string;
-  }[];
-  hash: string;
-  mentioned_profiles: {
-      active_status: string;
-      custody_address: string;
-      display_name: string;
-      fid: number;
-      object: string;
-      pfp_url: string;
-      power_badge: boolean;
-      profile: {
-          bio: {
-              mentioned_profiles: any[];
-              text: string;
-          };
+      metadata: {
+        content_type: string;
+        content_length: number;
+        _status: string;
+        image: {
+          width_px: number;
+          height_px: number;
+        };
       };
-      follower_count: number;
-      following_count: number;
-      username: string;
-      verifications: string[];
-      verified_addresses: {
-          eth_addresses: string[];
-          sol_addresses: string[];
-      };
-  }[];
-  parent_hash: string | null;
-  parent_url: string | null;
-  reactions: {
-      count?: never;
-      likes: {
-          fid: number;
-          fname: string;
-      }[];
+    }[];
+    channel: {
+      object: "channel_dehydrated";
+      id: string;
+      name: string;
+      image_url: string;
+    };
+    reactions: {
       likes_count: number;
-      recasts: {
-          fid: number;
-          fname: string;
-      }[];
       recasts_count: number;
-  };
-  root_parent_url: string | null;
-  replies: {
-      cast: any[];
+      likes: {
+        fid: number;
+        fname: string;
+      }[];
+      recasts: {
+        fid: number;
+        fname: string;
+      }[];
+    };
+    replies: {
       count: number;
-  };
-  text: string;
-  thread_hash: string;
-  timestamp: string;
-  type?: never;
+    };
+    mentioned_profiles: any[];
+    mentioned_profiles_ranges: any[];
+    mentioned_channels: any[];
+    mentioned_channels_ranges: any[];
+    author_channel_context: {
+      following: boolean;
+    };
 };
 
 export type User = {
@@ -165,96 +211,185 @@ export type User = {
 };
 
 export type WarpcastCast = {
-  activeOnFcNetwork: boolean;
-  ancestors: {
-      cast: any[];
-      count: number;
-  };
-  author: {
-      activeOnFcNetwork: boolean;
-      displayName: string;
+    hash: string;
+    threadHash: string;
+    parentSource?: {
+      type: string;
+      url: string;
+    };
+    author: {
       fid: number;
-      followerCount: number;
-      followingCount: number;
+      username: string;
+      displayName: string;
       pfp: {
-          url: string;
-          verified: boolean;
+        url: string;
+        verified: boolean;
       };
       profile: {
-          bio: {
-              mentions: any[];
-              text: string;
-          };
-          location: {
-              description: string;
-              placeId: string;
-          };
-      };
-      username: string;
-      viewerContext: WarpcastCastViewerContext;
-  };
-  bookmarks?: never;
-  combinedRecastCount: number;
-  displayName: string;
-  embeds: {
-      collection: {
+        bio: {
+          text: string;
+          mentions: string[];
+          channelMentions: string[];
+        };
+        location: {
+          placeId: string;
           description: string;
-          id: string;
-          imageUrl: string;
-          itemCount: number;
-          mintUrl: string;
-          name: string;
-          openSeaUrl: string;
-          schemaName: string;
-          volumeTraded: string;
-          ownerCount: number;
-          farcasterOwnerCount: number;
+        };
+        earlyWalletAdopter?: boolean;
       };
-      images: any[];
-      processedCastText: string;
-      urls: {
-          domain: string;
-          openGraph: {
-              domain: string;
-              image: string;
-              sourceUrl: string;
-              title: string;
-              type: string;
-              url: string;
-              useLargeImage: boolean;
-          };
-          type: string;
-          url: string;
+      followerCount: number;
+      followingCount: number;
+      viewerContext: {
+        following: boolean;
+        blockedBy: boolean;
+      };
+    };
+    text: string;
+    timestamp: number;
+    mentions: any[];
+    embeds: {
+      images: {
+        type: string;
+        url: string;
+        sourceUrl: string;
+        media: {
+          version: string;
+          width: number;
+          height: number;
+          staticRaster: string;
+          mimeType: string;
+        };
+        alt: string;
       }[];
+      urls: any[];
+      videos: any[];
       unknowns: any[];
-  };
-  fid: number;
-  hash: string;
-  mentions: any[];
-  parentHash: string;
-  parentUrl: string;
-  quoteCount: number;
-  recasts: {
+      processedCastText: string;
+      groupInvites: any[];
+    };
+    ancestors: {
       count: number;
-  };
-  reactions: {
+      casts: {
+        hash: string;
+        threadHash: string;
+        author: {
+          fid: number;
+          displayName: string;
+          pfp: {
+            url: string;
+            verified: boolean;
+          };
+          profile: {
+            bio: {
+              text: string;
+              mentions: string[];
+            };
+            location: {
+              placeId: string;
+              description: string;
+            };
+          };
+          followerCount: number;
+          followingCount: number;
+          viewerContext: {
+            following: boolean;
+            blockedBy: boolean;
+          };
+        };
+        castType: string;
+        text: string;
+        timestamp: number;
+        mentions: any[];
+        ancestors: {
+          count: number;
+        };
+        replies: {
+          count: number;
+        };
+        reactions: {
+          count: number;
+        };
+        recasts: {
+          count: number;
+        };
+        watches: {
+          count: number;
+        };
+        tags: {
+          type: string;
+          id: string;
+          name: string;
+          imageUrl: string;
+        }[];
+        quoteCount: number;
+        combinedRecastCount: number;
+        warpsTipped: number;
+        channel: {
+          key: string;
+          name: string;
+          imageUrl: string;
+          authorContext: {
+            role: string;
+            restricted: boolean;
+            banned: boolean;
+          };
+          authorRole: string;
+        };
+        viewerContext: {
+          reacted: boolean;
+          recast: boolean;
+          bookmarked: boolean;
+        };
+      }[];
+    };
+    replies: {
       count: number;
-  };
-  replies: {
-      cast: any[];
+    };
+    reactions: {
       count: number;
-  };
-  tags: any[];
-  threadHash: string;
-  text: string;
-  timestamp: number;
-  watches: {
+    };
+    recasts: {
       count: number;
-  };
-  warpsTipped: number;
-  viewerContext: WarpcastCastViewerContext;
+    };
+    watches: {
+      count: number;
+    };
+    tags: {
+      type: string;
+      id: string;
+      name: string;
+      imageUrl: string;
+    }[];
+    quoteCount: number;
+    combinedRecastCount: number;
+    warpsTipped: number;
+    channel: {
+      key: string;
+      name: string;
+      imageUrl: string;
+      authorContext: {
+        role: string;
+        restricted: boolean;
+        banned: boolean;
+      };
+      authorRole: string;
+    };
+    client: {
+      fid: number;
+      username: string;
+      displayName: string;
+      pfp: {
+        url: string;
+        verified: boolean;
+      };
+    };
+    viewerContext: {
+      reacted: boolean;
+      recast: boolean;
+      bookmarked: boolean;
+    };
 };
-
+  
 export type WarpcastUser = {
   collectionsOwned: any[];
   extras: {

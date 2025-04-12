@@ -1,11 +1,11 @@
-import recasterIcon from '@/public/recasterIcon.png';
+import recasterIcon from '@/public/apps/recaster-icon.png';
 
 export default function RecasterIcon({ className }: { className?: string }) {
   return (
     <img
       src={recasterIcon.src}
       alt="Recaster Icon"
-      className={`w-7 h-7 ${className ? className : ''} rounded-md`}
+      className={`size-7 ${className ? className : ''} rounded-md`}
     />
   );
 };

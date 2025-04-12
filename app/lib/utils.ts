@@ -1,10 +1,13 @@
-import WarpcastIcon from "../components/icons/warpcast-icon";
-import SupercastIcon from "../components/icons/supercast-icon";
-import RecasterIcon from "../components/icons/recaster-icon";
+import WarpcastIcon from "../components/icons/apps/warpcast-icon";
+import SuperIcon from "../components/icons/apps/super-icon";
+import RecasterIcon from "../components/icons/apps/recaster-icon";
 import React from "react";
 import { Client } from "./types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import UnofficialIcon from "../components/icons/apps/unofficial-icon";
+import ZapperIcon from "../components/icons/apps/zapper-icon";
+import CoinbaseWalletIcon from "../components/icons/apps/coinbase-wallet-icon";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -46,18 +49,45 @@ export const cachedRequest = async (url: string, revalidate: number, method = 'G
 export const CLIENTS: Client[] = [
   {
     name: "Warpcast",
-    icon: React.createElement(WarpcastIcon, { className: "ml-2 w-7 h-7" }),
+    username: "warpcast",
+    fid: 9152,
+    icon: React.createElement(WarpcastIcon, { className: "ml-2 size-7" }),
     castLink: "https://warpcast.com/",
   },
   {
-    name: "Supercast",
-    icon: React.createElement(SupercastIcon, { className: "ml-2 w-5 h-5" }),
-    castLink: "https://supercast.xyz/c/",
+    name: "Super",
+    username: "super",
+    fid: 193137,
+    icon: React.createElement(SuperIcon, { className: "ml-2 w-5 h-5" }),
+    castLink: "https://super.sc/c/",
   },
   {
     name: "Recaster",
+    username: "recaster-fc",
+    fid: 356900,
     icon: React.createElement(RecasterIcon, { className: "ml-2 w-5 h-5" }),
     castLink: "https://recaster.org/cast/",
+  },
+  {
+    name: "Unofficial",
+    username: "unofficial", 
+    fid: 16999,
+    icon: React.createElement(UnofficialIcon, { className: "ml-2 w-5 h-5" }),
+    castLink: "",
+  },
+  {
+    name: "Zapper",
+    username: "zapper",
+    fid: 827605,
+    icon: React.createElement(ZapperIcon, { className: "ml-2 w-5 h-5" }),
+    castLink: "",
+  },
+  {
+    name: "Coinbase Wallet",
+    username: "coinbasewallet",
+    fid: 309857,
+    icon: React.createElement(CoinbaseWalletIcon, { className: "ml-2 w-5 h-5" }),
+    castLink: "",
   },
 ];
 

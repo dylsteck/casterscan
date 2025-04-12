@@ -76,6 +76,25 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
               </span>
             </li>
             <li className="flex justify-between items-center mb-1">
+              <span className="font-semibold mr-1">app name</span>
+              <span className="flex items-center text-right">
+                <div className="flex flex-row gap-1.5 items-center">
+                  <img src={neynarCast.app.pfp_url} className="size-4 rounded-full" alt={`PFP for ${neynarCast.app.display_name}`} />
+                  <span>
+                    {neynarCast.app.display_name}
+                  </span>
+                </div>
+                <CopyClipboardIcon value={neynarCast.app.display_name} className="ml-1 flex-shrink-0" />
+              </span>
+            </li>
+            <li className="flex justify-between items-center mb-1">
+              <span className="font-semibold mr-1">app fid</span>
+              <span className="flex items-center text-right">
+                {neynarCast.app.fid}
+                <CopyClipboardIcon value={neynarCast.app.fid.toString()} className="ml-1 flex-shrink-0" />
+              </span>
+            </li>
+            <li className="flex justify-between items-center mb-1">
               <span className="font-semibold mr-1">timestamp</span>
               <span className="flex items-center text-right">
                 {new Date(neynarCast.timestamp).toLocaleString()}

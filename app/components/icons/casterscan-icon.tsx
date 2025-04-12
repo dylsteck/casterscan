@@ -5,7 +5,7 @@ export default function CasterscanIcon() {
     <img
       src={casterscanIcon.src}
       alt="Casterscan Icon"
-      className="w-7 h-7"
+      className="size-7"
     />
   );
 };

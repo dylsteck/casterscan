@@ -2,6 +2,7 @@ import Link from 'next/link';
 import React from 'react';
 import { type HubStreamCast, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
+import { FrameLink } from './frame-link';
 
 const ListRow = ({ cast }: { cast: HubStreamCast }) => {
   const rowRef = React.useRef<HTMLTableRowElement>(null);
@@ -69,7 +70,7 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-1/6"
       >
-        <Link href={`https://warpcast.com/${cast.author.user.username}`}>{cast.author.user.username}</Link>
+        <FrameLink href={`https://warpcast.com/${cast.author.user.username}`}>{cast.author.user.username}</FrameLink>
       </th>
       <td className="px-2 py-2 max-w-20">
         <p className="overflow-x-scroll">

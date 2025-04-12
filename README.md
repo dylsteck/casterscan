@@ -1,11 +1,11 @@
 # Casterscan
 
-### A block explorer for Farcaster
+## A block explorer for Farcaster
 You can [check it out here](https://casterscan.com)
 
-![Casterscan homepage as of 6/15/24](https://i.imgur.com/kiNHLHN.png)
+![Casterscan as of 4/12/25](https://i.imgur.com/rqKPvAR.png)
 
-### What is Casterscan?
+## What is Casterscan?
 
 Casterscan is a block explorer for Farcaster. It currently lets you view:
 - a firehose of the latest casts, either as a list or grid
@@ -17,7 +17,7 @@ There are two goals for Casterscan's utility:
 - give each atomic unit of data available on [hubs](https://www.thehubble.xyz/) its own URL, starting with casts
 
 
-### How to run locally
+## How to run locally
 1. `npm install`
 2. Copy `.env.example` to a new `.env.local` file and add your Neynar API key under `NEYNAR_API_KEY`
 3. `npm run dev`

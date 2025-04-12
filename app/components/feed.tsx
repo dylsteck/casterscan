@@ -68,13 +68,13 @@ export default function Feed() {
   }
 
   return (
-    <div className="w-screen h-screen">
-      <div className="mt-2 border-b-2 border-[#C1C1C1] min-h-[5vh] max-h-[10vh]">
-        <div className="ml-4 flex flex-row gap-2 float-left items-center">
+    <div className="w-screen h-screen overflow-x-hidden">
+      <div className="py-2 border-b-2 border-[#C1C1C1] flex items-center">
+        <div className="ml-4 flex flex-row gap-2 items-center">
           <p>LIVE FEED</p>
           <LiveIndicatorIcon />
         </div>
-        <div className="ml-4 flex flex-row gap-1 float-left">
+        <div className="ml-4 flex flex-row gap-1">
           <p
             className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`}
             onClick={() => handleFilterChange('list')}
