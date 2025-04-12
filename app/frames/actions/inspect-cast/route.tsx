@@ -19,10 +19,9 @@ export const GET = async (req: NextRequest) => {
 
 export const POST = frames(async (ctx) => {
   const hash = ctx.message?.castId?.hash;
-  const miniAppUrl = `https://warpcast.com/~/frames/launch?domain=${encodeURIComponent(`${SEO.url}/casts/${hash}`)}`;
   return Response.json({
     message: `Click to Inspect Cast`,
-    link: miniAppUrl,
+    link: `${SEO.url}/casts/${hash}`,
     type: 'message'
   });
 });
