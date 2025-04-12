@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
+
 import React from 'react';
 import List from './list';
 import Grid from './grid';
@@ -12,18 +12,46 @@ export default function Feed() {
   const [filter, setFilter] = React.useState('list');
 
   React.useEffect(() => {
-    const eventSource = new EventSource(`${BASE_URL}/api/hub/stream`);
-    eventSource.onmessage = (e) => {
-      const data = JSON.parse(e.data) as Omit<HubStreamCast, 'timestamp'>;
-      const incoming = { ...data, timestamp: new Date().toISOString() };
-      setCasts((prev) => [incoming, ...prev]);
+    let eventSource: EventSource | null = null;
+    let retryCount = 0;
+    let timeoutId: number;
+    
+    const connectEventSource = () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+      
+      eventSource = new EventSource(`${BASE_URL}/api/hub/stream`);
+      
+      eventSource.onmessage = (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.ping) return;
+          
+          const incoming = { ...data, timestamp: new Date().toISOString() };
+          setCasts((prev) => [incoming, ...prev]);
+          retryCount = 0;
+        } catch (err) {
+        }
+      };
+      
+      eventSource.onerror = () => {
+        eventSource?.close();
+        
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+        retryCount++;
+        
+        timeoutId = setTimeout(() => {
+          connectEventSource();
+        }, delay) as unknown as number;
+      };
     };
-    eventSource.onerror = (err) => {
-      console.error(err);
-      eventSource.close();
-    };
+    
+    connectEventSource();
+    
     return () => {
-      eventSource.close();
+      eventSource?.close();
+      clearTimeout(timeoutId);
     };
   }, []);
 

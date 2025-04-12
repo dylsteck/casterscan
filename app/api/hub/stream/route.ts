@@ -2,7 +2,7 @@ import { BASE_URL, PINATA_HUB_GRPC_URL } from "@/app/lib/utils";
 import { getSSLHubRpcClient, HubEventType } from "@farcaster/hub-nodejs";
 
 export async function GET() {
-  const hubRpcEndpoint = PINATA_HUB_GRPC_URL
+  const hubRpcEndpoint = PINATA_HUB_GRPC_URL;
   const client = getSSLHubRpcClient(hubRpcEndpoint);
 
   try {
@@ -16,8 +16,6 @@ export async function GET() {
       });
     });
 
-    console.log(`Connected to ${hubRpcEndpoint}`);
-
     const subscribeResult = await client.subscribe({
       eventTypes: [HubEventType.MERGE_MESSAGE],
     });
@@ -27,12 +25,21 @@ export async function GET() {
     }
 
     const stream = subscribeResult.value;
-
     let isClosed = false;
 
     const readableStream = new ReadableStream({
       async start(controller) {
+        let keepAliveInterval: number | undefined;
+
         try {
+          controller.enqueue(`data: {"ping": true}\n\n`);
+          
+          keepAliveInterval = setInterval(() => {
+            if (!isClosed) {
+              controller.enqueue(`data: {"ping": true}\n\n`);
+            }
+          }, 20000) as unknown as number;
+
           for await (const event of stream) {
             if (isClosed) break;
             if (event.mergeMessageBody.message.data.type === 1) {
@@ -40,6 +47,11 @@ export async function GET() {
               const userResponse = await fetch(
                 `${BASE_URL}/api/warpcast/user?fid=${authorFid}`
               );
+              
+              if (!userResponse.ok) {
+                continue;
+              }
+              
               const userData = await userResponse.json();
               const data = {
                 author: userData.result,
@@ -54,11 +66,13 @@ export async function GET() {
           }
         } catch (err) {
           if (!isClosed) {
-            console.error("Error during streaming:", err);
-            controller.error(err);
+            if (keepAliveInterval) clearInterval(keepAliveInterval);
+            client.close();
+            controller.close();
           }
         } finally {
           if (!isClosed) {
+            if (keepAliveInterval) clearInterval(keepAliveInterval);
             controller.close();
           }
         }
@@ -72,12 +86,12 @@ export async function GET() {
     return new Response(readableStream, {
       headers: {
         "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
+        "Cache-Control": "no-cache, no-transform",
         "Connection": "keep-alive",
+        "X-Accel-Buffering": "no"
       },
     });
   } catch (error) {
-    console.error(error);
     client.close();
     return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
