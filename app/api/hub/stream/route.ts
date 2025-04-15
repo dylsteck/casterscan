@@ -1,20 +1,14 @@
-import { BASE_URL, NEYNAR_HUB_GRPC_URL } from "@/app/lib/utils";
-import { createDefaultMetadataKeyInterceptor, getSSLHubRpcClient, HubEventType } from "@farcaster/hub-nodejs";
+import { BASE_URL, HUB_GRPC_URL } from "@/app/lib/utils";
+import { getSSLHubRpcClient, HubEventType } from "@farcaster/hub-nodejs";
 
 export async function GET() {
-  const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY ?? "";
-  const client = getSSLHubRpcClient(NEYNAR_HUB_GRPC_URL, {
-    interceptors: [
-        createDefaultMetadataKeyInterceptor('x-api-key', NEYNAR_API_KEY),
-    ],
-    'grpc.max_receive_message_length': 20 * 1024 * 1024, 
-});
+  const client = getSSLHubRpcClient(HUB_GRPC_URL);
 
   try {
     await new Promise<void>((resolve, reject) => {
       client.$.waitForReady(Date.now() + 5000, (error) => {
         if (error) {
-          reject(new Error(`Failed to connect to ${NEYNAR_HUB_GRPC_URL}: ${error.message}`));
+          reject(new Error(`Failed to connect to ${HUB_GRPC_URL}: ${error.message}`));
         } else {
           resolve();
         }
