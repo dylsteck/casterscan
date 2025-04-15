@@ -48,8 +48,23 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
     <div ref={rowRef} className={`border border-gray-300 p-4 flex flex-col justify-between h-full ${isFirst ? '' : 'border-t-0'}`}>
       <div>
         <div className="flex items-center mb-2">
-          <img src={cast.author.user.pfp.url ?? ""} alt={`${cast.author.user.username}'s PFP`} className="w-6 h-6 rounded-full mr-2" />
-          <FrameLink href={`https://warpcast.com/${cast.author.user.username}`} className="text-black font-medium">{cast.author.user.username}</FrameLink>
+          {cast.author && cast.author.user ? (
+            <>
+              <img 
+                src={cast.author.user.pfp?.url || ""} 
+                alt={`${cast.author.user.username}'s PFP`} 
+                className="w-6 h-6 rounded-full mr-2" 
+              />
+              <FrameLink 
+                href={`https://warpcast.com/${cast.author.user.username}`} 
+                className="text-black font-medium"
+              >
+                {cast.author.user.username}
+              </FrameLink>
+            </>
+          ) : (
+            <span className="text-black font-medium">Unknown user</span>
+          )}
         </div>
         <p className="text-gray-800 break-words">{renderCastText(cast.text)}</p>
       </div>

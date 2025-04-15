@@ -70,7 +70,13 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-1/6"
       >
-        <FrameLink href={`https://warpcast.com/${cast.author.user.username}`}>{cast.author.user.username}</FrameLink>
+        {cast.author && cast.author.user ? (
+          <FrameLink href={`https://warpcast.com/${cast.author.user.username}`}>
+            {cast.author.user.username}
+          </FrameLink>
+        ) : (
+          <span>user</span>
+        )}
       </th>
       <td className="px-2 py-2 max-w-20">
         <p className="overflow-x-scroll">
