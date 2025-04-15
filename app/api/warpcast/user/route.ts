@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: "Missing fid" }, { status: 400 });
     }
     try {
-        const responseData = await cachedRequest(`${WARPCAST_API_URL}/v2/user?fid=${fid}`, 3600, 'GET');
+        const responseData = await cachedRequest(`${WARPCAST_API_URL}/v2/user?fid=${fid}`, 3600, 'GET', undefined, `warpcast:user:${fid}`);
         return NextResponse.json(responseData);
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });

@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
             {
                 'Content-Type': 'application/json',
                 'x-api-key': `${apiKey}`
-            }
+            },
+            `neynar:cast:${type}:${identifier}`
         );
         return NextResponse.json(responseData);
     } catch (err) {

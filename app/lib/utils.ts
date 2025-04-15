@@ -8,6 +8,7 @@ import { twMerge } from "tailwind-merge"
 import UnofficialIcon from "../components/icons/apps/unofficial-icon";
 import ZapperIcon from "../components/icons/apps/zapper-icon";
 import CoinbaseWalletIcon from "../components/icons/apps/coinbase-wallet-icon";
+import { getCachedData, cacheData } from "./cloudflare-kv";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,20 +31,30 @@ export const BASE_URL = isDev
   ? localUrl 
   : 'https://casterscan.com';
 
-export const cachedRequest = async (url: string, revalidate: number, method = 'GET', headers?: Record<string, string>) => {
+export const cachedRequest = async (url: string, revalidate: number, method = 'GET', headers?: Record<string, string>, cacheTag?: string) => {
+    if (cacheTag) {
+        const cachedData = await getCachedData(cacheTag);
+        if (cachedData) {
+            return cachedData;
+        }
+    }
+
     const response = await fetch(url, {
         method: method,
-        headers: headers,
-        next: {
-            revalidate: revalidate
-        }
+        headers: headers
     });
 
     if (!response.ok) {
         throw new Error('Failed to fetch cast from the selected hub');
     }
 
-    return response.json();
+    const data = await response.json();
+    
+    if (cacheTag) {
+        await cacheData(cacheTag, data, revalidate);
+    }
+
+    return data;
 };
 
 export const CLIENTS: Client[] = [

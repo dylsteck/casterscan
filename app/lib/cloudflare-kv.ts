@@ -6,6 +6,8 @@ const client = new Cloudflare({
 
 const ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '';
 const KV_NAMESPACE_ID = process.env.CF_KV_NAMESPACE_ID || '';
+// Cloudflare KV minimum TTL is 60 seconds
+const MIN_TTL = 60;
 
 const memoryCache = new Map<string, { data: any; expiry: number }>();
 
@@ -13,13 +15,20 @@ export async function cacheData(key: string, data: any, expirySeconds = 3600, us
   try {
     const cacheKey = userId ? `${key}:${userId}` : key;
     
+    // Ensure TTL is at least 60 seconds
+    const ttl = Math.max(expirySeconds, MIN_TTL);
+    
+    const valueToStore = {
+      value: data
+    };
+    
     if (KV_NAMESPACE_ID && ACCOUNT_ID && process.env.CF_API_TOKEN) {
-      const expiration = Math.floor(Date.now() / 1000) + expirySeconds;
+      const expiration = Math.floor(Date.now() / 1000) + ttl;
       
       await client.kv.namespaces.values.update(KV_NAMESPACE_ID, cacheKey, {
         account_id: ACCOUNT_ID,
-        value: JSON.stringify(data),
-        expiration_ttl: expirySeconds,
+        value: JSON.stringify(valueToStore),
+        expiration_ttl: ttl,
         metadata: JSON.stringify({ timestamp: Date.now() })
       });
     } else {
@@ -60,15 +69,15 @@ export async function getCachedData<T>(key: string, userId?: string | number): P
       return null;
     }
     
-    const response = await client.kv.namespaces.values.get(KV_NAMESPACE_ID, cacheKey, {
-      account_id: ACCOUNT_ID
-    });
-    
-    if (!response) {
-      return null;
-    }
-    
     try {
+      const response = await client.kv.namespaces.values.get(KV_NAMESPACE_ID, cacheKey, {
+        account_id: ACCOUNT_ID
+      });
+      
+      if (!response) {
+        return null;
+      }
+      
       let responseText = '';
       
       if (typeof response === 'string') {
@@ -82,20 +91,33 @@ export async function getCachedData<T>(key: string, userId?: string | number): P
         return null;
       }
       
-      const parsedData = JSON.parse(responseText) as T;
-      
-      memoryCache.set(cacheKey, {
-        data: parsedData,
-        expiry: Date.now() + 3600 * 1000
-      });
-      
-      return parsedData;
-    } catch (parseError) {
-      console.error('KV Parse Error:', parseError);
+      try {
+        const parsedData = JSON.parse(responseText);
+        
+        const actualData = parsedData.value !== undefined ? parsedData.value : parsedData;
+        
+        memoryCache.set(cacheKey, {
+          data: actualData,
+          expiry: Date.now() + 3600 * 1000
+        });
+        
+        return actualData as T;
+      } catch (parseError) {
+        console.error('KV Parse Error:', parseError);
+        return null;
+      }
+    } catch (error: any) {
+ 
+      if (!(error?.errors?.[0]?.message?.includes('key not found'))) {
+        console.error('KV Cache Error (getCachedData):', error);
+      }
       return null;
     }
   } catch (error) {
-    console.error('KV Cache Error (getCachedData):', error);
+    if (error instanceof Error && 
+        !(error.message?.includes('key not found'))) {
+      console.error('KV Cache Error (getCachedData):', error);
+    }
     
     const cacheKey = userId ? `${key}:${userId}` : key;
     if (memoryCache.has(cacheKey)) {

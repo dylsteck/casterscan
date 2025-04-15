@@ -28,9 +28,17 @@ export async function getWarpcastCast(hash: string) {
 
   if (!response.ok) throw new Error('Failed to fetch Warpcast cast');
   const data = await response.json();
-  return Array.isArray(data.result.casts) 
-    ? data.result.casts.find((cast: { hash: string }) => cast.hash === hash)
-    : null;
+  
+  if (data?.result?.casts && Array.isArray(data.result.casts)) {
+    return data.result.casts.find((cast: { hash: string }) => cast.hash === hash);
+  } else if (data?.casts && Array.isArray(data.casts)) {
+    return data.casts.find((cast: { hash: string }) => cast.hash === hash);
+  } else if (data?.result && Array.isArray(data.result)) {
+    return data.result.find((cast: { hash: string }) => cast.hash === hash);
+  } else {
+    console.error('Unexpected Warpcast cast data structure:', JSON.stringify(data).substring(0, 200));
+    return null;
+  }
 }
 
 export async function getHubCast(fid: number, hash: string, type: 'neynar' | 'warpcast') {

@@ -1,4 +1,4 @@
-import { BASE_URL, HUB_GRPC_URL } from "@/app/lib/utils";
+import { BASE_URL, HUB_GRPC_URL, cachedRequest } from "@/app/lib/utils";
 import { getSSLHubRpcClient, HubEventType } from "@farcaster/hub-nodejs";
 
 export async function GET() {
@@ -43,24 +43,27 @@ export async function GET() {
             if (isClosed) break;
             if (event.mergeMessageBody.message.data.type === 1) {
               const authorFid = event.mergeMessageBody.message.data.fid;
-              const userResponse = await fetch(
-                `${BASE_URL}/api/warpcast/user?fid=${authorFid}`
-              );
-              
-              if (!userResponse.ok) {
+              try {
+                const userData = await cachedRequest(
+                  `${BASE_URL}/api/warpcast/user?fid=${authorFid}`,
+                  60,
+                  'GET',
+                  undefined,
+                  `warpcast:user:${authorFid}`
+                );
+                
+                const data = {
+                  author: userData.result,
+                  hash: `0x${event.mergeMessageBody.message.hash.toString('hex')}`,
+                  text: event.mergeMessageBody.message.data.castAddBody.text,
+                  timestamp: `${event.mergeMessageBody.message.data.timestamp}`,
+                  parentUrl: event.mergeMessageBody.message.data.castAddBody.parentUrl,
+                  embeds: event.mergeMessageBody.message.data.castAddBody.embeds
+                };
+                controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
+              } catch (err) {
                 continue;
               }
-              
-              const userData = await userResponse.json();
-              const data = {
-                author: userData.result,
-                hash: `0x${event.mergeMessageBody.message.hash.toString('hex')}`,
-                text: event.mergeMessageBody.message.data.castAddBody.text,
-                timestamp: `${event.mergeMessageBody.message.data.timestamp}`,
-                parentUrl: event.mergeMessageBody.message.data.castAddBody.parentUrl,
-                embeds: event.mergeMessageBody.message.data.castAddBody.embeds
-              };
-              controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
             }
           }
         } catch (err) {

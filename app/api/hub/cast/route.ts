@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
         }
 
-        const responseData = await cachedRequest(apiUrl, 86400, 'GET', headers);
+        const responseData = await cachedRequest(apiUrl, 86400, 'GET', headers, `hub:${type}:cast:${fid}:${hash}`);
         return NextResponse.json(responseData);
     } catch (err) {
         console.error('Error fetching cast from API:', err);
