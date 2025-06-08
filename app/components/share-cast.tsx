@@ -20,7 +20,7 @@ export default function ShareCast({ neynarCast }: ShareCastProps) {
   
   const [selectedOption, setSelectedOption] = React.useState<Client>(
     matchedClient || 
-    AVAILABLE_CLIENTS.find((client) => client.name === "Warpcast") || 
+    AVAILABLE_CLIENTS.find((client) => client.name === "Farcaster") || 
     AVAILABLE_CLIENTS[0]
   );
   
@@ -36,7 +36,7 @@ export default function ShareCast({ neynarCast }: ShareCastProps) {
 
   const getLink = (option: Client) => {
     const client = AVAILABLE_CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
-    if (client?.name.toLowerCase() === "warpcast") {
+    if (client?.name.toLowerCase() === "farcaster") {
       return `${client.castLink}${neynarCast.author.username}/${neynarCast?.hash.slice(0, 10)}`;
     }
     return client ? client.castLink + (neynarCast?.hash || '') : "#";

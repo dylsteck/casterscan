@@ -1,28 +1,11 @@
 import Link from 'next/link';
 import React from 'react';
-import { type HubStreamCast, type User } from '../lib/types';
+import { motion } from 'framer-motion';
+import { type SnapchainEvent, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
 import { FrameLink } from './frame-link';
 
-const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) => {
-  const rowRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    if (rowRef.current) {
-      rowRef.current.animate(
-        [
-          { opacity: 0 },
-          { opacity: 1 },
-        ],
-        {
-          duration: 300,
-          easing: 'ease-in-out',
-          fill: 'forwards',
-        }
-      );
-    }
-  }, []);
-
+const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: boolean; isNew?: boolean }) => {
   const getRelativeTime = (timestamp: string) => {
     const now = new Date();
     const past = new Date(timestamp);
@@ -44,43 +27,97 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
     }
   };
 
+  const getEventContent = () => {
+    switch (event.type) {
+      case 'CAST_ADD':
+        return event.text || '';
+      case 'REACTION_ADD':
+        return `${event.reactionType === 'REACTION_TYPE_LIKE' ? '❤️' : '🔄'} reaction`;
+      case 'LINK_ADD':
+        return `🔗 ${event.linkType} link`;
+      case 'VERIFICATION_ADD':
+        return `✅ verified ${event.address?.slice(0, 8)}...`;
+      case 'ON_CHAIN_EVENT':
+        return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
+      default:
+        return `🔧 ${event.eventType || 'unknown event'}`;
+    }
+  };
+
+  const getEventTypeDisplay = () => {
+    switch (event.type) {
+      case 'CAST_ADD':
+        return 'cast';
+      case 'REACTION_ADD':
+        return event.reactionType === 'REACTION_TYPE_LIKE' ? 'like' : 'recast';
+      case 'LINK_ADD':
+        return 'follow';
+      case 'VERIFICATION_ADD':
+        return 'verify';
+      case 'ON_CHAIN_EVENT':
+        return 'onchain';
+      default:
+        return 'other';
+    }
+  };
+
   return (
-    <div ref={rowRef} className={`border border-gray-300 p-4 flex flex-col justify-between h-full ${isFirst ? '' : 'border-t-0'}`}>
-      <div>
-        <div className="flex items-center mb-2">
-          {cast.author && cast.author.user ? (
-            <>
-              <img 
-                src={cast.author.user.pfp?.url || ""} 
-                alt={`${cast.author.user.username}'s PFP`} 
-                className="w-6 h-6 rounded-full mr-2" 
-              />
-              <FrameLink 
-                href={`https://warpcast.com/${cast.author.user.username}`} 
-                className="text-black font-medium"
-              >
-                {cast.author.user.username}
-              </FrameLink>
-            </>
-          ) : (
-            <span className="text-black font-medium">Unknown user</span>
-          )}
+    <motion.div
+      initial={isNew ? { opacity: 0, scale: 0.95, backgroundColor: '#dcfce7' } : { opacity: 1 }}
+      animate={{ opacity: 1, scale: 1, backgroundColor: isNew ? '#dcfce7' : '#ffffff' }}
+      transition={{ 
+        duration: 0.5,
+        backgroundColor: { delay: 2, duration: 1 }
+      }}
+      className={`border-b border-r border-gray-300 p-4 ${isFirst ? 'border-t-2 border-t-[#71579E]' : ''}`}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex flex-col gap-1">
+          <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+            {getEventTypeDisplay()}
+          </span>
+          <span className="text-xs text-gray-600">fid: {event.fid}</span>
         </div>
-        <p className="text-gray-800 break-words">{renderCastText(cast.text)}</p>
+        <span className="text-xs text-gray-500">
+          {getRelativeTime(event.timestamp)}
+        </span>
       </div>
-      <div className="mt-2 flex justify-between items-end">
-        <Link href={`/casts/${cast.hash}`} className="text-[#71579E] underline">link =&gt;</Link>
-        <p className="text-gray-500 text-sm">{getRelativeTime(cast.timestamp)}</p>
+      
+      <div className="mb-3 max-h-20 overflow-y-auto">
+        <p className="text-sm">
+          {event.type === 'CAST_ADD' ? renderCastText(event.text || '') : getEventContent()}
+        </p>
       </div>
-    </div>
+      
+      {event.embeds && event.embeds.length > 0 && (
+        <div className="mb-2">
+          <div className="flex items-center justify-center bg-gray-400 w-8 h-8 rounded">
+            <p className="text-xs text-center">{`+${event.embeds.length}`}</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex justify-end">
+        <Link href={event.link} target={event.link.startsWith('/') ? undefined : '_blank'}>
+          <p className="text-xs underline text-[#71579E]">link =&gt;</p>
+        </Link>
+      </div>
+    </motion.div>
   );
 };
 
-const Grid = ({ casts }: { casts: HubStreamCast[]}) => {
+const Grid = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?: SnapchainEvent[] }) => {
+  const newEventIds = new Set(newEvents.map(e => e.id));
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-l border-r border-gray-300">
-      {casts.map((cast, index) => (
-        <ListRow cast={cast} isFirst={index === 0} key={index} />
+      {events.map((event, index) => (
+        <GridRow 
+          event={event} 
+          isFirst={index === 0} 
+          key={`${event.id}-${index}`}
+          isNew={newEventIds.has(event.id)}
+        />
       ))}
     </div>
   );

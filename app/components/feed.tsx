@@ -1,71 +1,18 @@
 'use client';
 
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import List from './list';
 import Grid from './grid';
 import LiveIndicatorIcon from './icons/live-indicator-icon';
-import { HubStreamCast, type NeynarV1Cast, type User } from '../lib/types';
-import { BASE_URL } from '../lib/utils';
+import { useEvents } from '../hooks/useEvents';
 
 export default function Feed() {
-  const [casts, setCasts] = React.useState<HubStreamCast[]>([]);
   const [filter, setFilter] = React.useState('list');
-  const [isConnected, setIsConnected] = React.useState(false);
-  const eventSourceRef = React.useRef<EventSource | null>(null);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const itemsPerPage = 50;
 
-  React.useEffect(() => {
-    let retryCount = 0;
-    let timeoutId: number;
-    
-    const connectEventSource = () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-      
-      eventSourceRef.current = new EventSource(`${BASE_URL}/api/hub/stream`);
-      
-      eventSourceRef.current.onopen = () => {
-        setIsConnected(true);
-        retryCount = 0;
-      };
-      
-      eventSourceRef.current.onmessage = (e) => {
-        try {
-          const data = JSON.parse(e.data);
-          if (data.ping) return;
-          
-          const incoming = { ...data, timestamp: new Date().toISOString() };
-          setCasts((prev) => [incoming, ...prev.slice(0, 99)]);
-        } catch (err) {
-          console.error("Failed to parse message", err);
-        }
-      };
-      
-      eventSourceRef.current.onerror = (err) => {
-        console.log("EventSource error:", err);
-        setIsConnected(false);
-        
-        if (eventSourceRef.current?.readyState === EventSource.CLOSED) {
-          eventSourceRef.current?.close();
-          
-          const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
-          retryCount++;
-          
-          console.log(`Reconnecting in ${delay}ms...`);
-          timeoutId = setTimeout(() => {
-            connectEventSource();
-          }, delay) as unknown as number;
-        }
-      };
-    };
-    
-    connectEventSource();
-    
-    return () => {
-      eventSourceRef.current?.close();
-      clearTimeout(timeoutId);
-    };
-  }, []);
+  const { data, isLoading, error, newEvents, refresh } = useEvents(currentPage, itemsPerPage);
 
   React.useEffect(() => {
     if (window.innerWidth < 768) {
@@ -79,35 +26,142 @@ export default function Feed() {
     }
   }
 
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (data?.pagination.hasNextPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handleRefresh = () => {
+    refresh();
+  };
+
+  const events = data?.events || [];
+  const pagination = data?.pagination;
+
   return (
     <div className="w-screen h-screen overflow-x-hidden">
-      <div className="py-2 border-b-2 border-[#C1C1C1] flex items-center">
-        <div className="ml-4 flex flex-row gap-2 items-center">
-          <p>LIVE FEED</p>
-          <LiveIndicatorIcon status={isConnected ? 'connected' : 'disconnected'} />
+      <div className="py-2 border-b-2 border-[#C1C1C1] flex items-center justify-between">
+        <div className="flex items-center">
+          <div className="ml-4 flex flex-row gap-2 items-center">
+            <p>LIVE FEED</p>
+            <LiveIndicatorIcon status={error ? 'disconnected' : 'connected'} />
+            {newEvents.length > 0 && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"
+              >
+                +{newEvents.length} new
+              </motion.div>
+            )}
+          </div>
+          <div className="ml-4 flex flex-row gap-1">
+            <p
+              className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`}
+              onClick={() => handleFilterChange('list')}
+            >
+              list
+            </p>
+            <p>|</p>
+            <p
+              className={`${filter === 'grid' ? 'font-bold' : 'font-normal'} cursor-pointer`}
+              onClick={() => handleFilterChange('grid')}
+            >
+              grid
+            </p>
+          </div>
         </div>
-        <div className="ml-4 flex flex-row gap-1">
-          <p
-            className={`${filter === 'list' ? 'font-bold' : 'font-normal'} cursor-pointer`}
-            onClick={() => handleFilterChange('list')}
+        
+        <div className="mr-4 flex flex-row gap-2 items-center">
+          <button
+            onClick={handleRefresh}
+            className="px-3 py-1 text-[#71579E] cursor-pointer hover:underline"
           >
-            list
-          </p>
-          <p>|</p>
-          <p
-            className={`${filter === 'grid' ? 'font-bold' : 'font-normal'} cursor-pointer`}
-            onClick={() => handleFilterChange('grid')}
+            refresh
+          </button>
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 0 || isLoading}
+            className={`px-3 py-1 ${currentPage === 0 || isLoading ? 'text-gray-400 cursor-not-allowed' : 'text-[#71579E] cursor-pointer hover:underline'}`}
           >
-            grid
-          </p>
+            &lt;=
+          </button>
+          <span className="text-sm text-gray-600">
+            page {currentPage + 1} {pagination && `of ${pagination.totalPages}`}
+          </span>
+          <button
+            onClick={handleNextPage}
+            disabled={isLoading || !pagination?.hasNextPage}
+            className={`px-3 py-1 ${isLoading || !pagination?.hasNextPage ? 'text-gray-400 cursor-not-allowed' : 'text-[#71579E] cursor-pointer hover:underline'}`}
+          >
+            =&gt;
+          </button>
         </div>
       </div>
-      {!casts.length && (
-        <p className="text-center relative text-black/20 text-7xl pt-[10%]">no casts</p>
-      )}
-      {casts.length > 0 && (
-        filter === 'list' ? <List casts={casts} /> : <Grid casts={casts} />
-      )}
+      
+      <AnimatePresence mode="wait">
+        {isLoading && (
+          <motion.p 
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center relative text-black/20 text-2xl pt-[10%]"
+          >
+            loading...
+          </motion.p>
+        )}
+        
+        {error && (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center relative text-red-500 text-xl pt-[10%]"
+          >
+            <p>Failed to load events</p>
+            <button 
+              onClick={handleRefresh}
+              className="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Retry
+            </button>
+          </motion.div>
+        )}
+        
+        {!isLoading && !error && !events.length && (
+          <motion.p 
+            key="no-events"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center relative text-black/20 text-7xl pt-[10%]"
+          >
+            no events
+          </motion.p>
+        )}
+        
+        {!isLoading && !error && events.length > 0 && (
+          <motion.div
+            key="events"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {filter === 'list' ? <List events={events} newEvents={newEvents} /> : <Grid events={events} newEvents={newEvents} />}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

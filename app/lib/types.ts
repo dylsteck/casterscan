@@ -45,12 +45,42 @@ export type HubCast = {
 };
 
 export type HubStreamCast = {
-  author: WarpcastUser;
+  author: FarcasterUser;
   castAddBody?: never;
   embeds: any[];
   hash: string;
   text: string;
   timestamp: string;
+};
+
+export type SnapchainEvent = {
+  type: 'CAST_ADD' | 'REACTION_ADD' | 'LINK_ADD' | 'VERIFICATION_ADD' | 'ON_CHAIN_EVENT' | 'OTHER';
+  id: number;
+  hash: string;
+  timestamp: string;
+  fid: number;
+  author: any;
+  link: string;
+  // Cast-specific fields
+  text?: string;
+  embeds?: any[];
+  mentions?: any[];
+  parentCastId?: any;
+  parentUrl?: string;
+  // Reaction-specific fields
+  reactionType?: string;
+  targetCastId?: any;
+  // Link-specific fields
+  linkType?: string;
+  targetFid?: number;
+  // Verification-specific fields
+  address?: string;
+  // On-chain event fields
+  chainEventType?: string;
+  chainId?: number;
+  blockNumber?: number;
+  // Other event fields
+  eventType?: string;
 };
 
 export type NeynarV1Cast = {
@@ -210,7 +240,7 @@ export type User = {
   viewerContext?: UserViewerContext;
 };
 
-export type WarpcastCast = {
+export type FarcasterCast = {
     hash: string;
     threadHash: string;
     parentSource?: {
@@ -390,7 +420,7 @@ export type WarpcastCast = {
     };
 };
   
-export type WarpcastUser = {
+export type FarcasterUser = {
   collectionsOwned: any[];
   extras: {
       custodyAddress: string;
@@ -429,7 +459,7 @@ export type WarpcastUser = {
           };
       };
       username: string;
-      viewerContext: WarpcastUserViewerContext;
+      viewerContext: FarcasterUserViewerContext;
   };
 };
 
@@ -440,13 +470,13 @@ type UserViewerContext = {
   recasted?: boolean;
 };
 
-type WarpcastCastViewerContext = {
+type FarcasterCastViewerContext = {
   bookmarked: boolean;
   recast: boolean;
   reacted: boolean;
 };
 
-type WarpcastUserViewerContext = {
+type FarcasterUserViewerContext = {
   canSendDirectCasts: boolean;
   followedBy: boolean;
   following: boolean;

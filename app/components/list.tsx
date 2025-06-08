@@ -1,48 +1,11 @@
 import Link from 'next/link';
 import React from 'react';
-import { type HubStreamCast, type User } from '../lib/types';
+import { motion } from 'framer-motion';
+import { type SnapchainEvent, type User } from '../lib/types';
 import { renderCastText } from '../lib/utils';
 import { FrameLink } from './frame-link';
 
-const ListRow = ({ cast }: { cast: HubStreamCast }) => {
-  const rowRef = React.useRef<HTMLTableRowElement>(null);
-
-  React.useEffect(() => {
-    if (rowRef.current) {
-      rowRef.current.animate(
-        [
-          { opacity: 0 },
-          { opacity: 1 },
-        ],
-        {
-          duration: 300,
-          easing: 'ease-in-out',
-          fill: 'forwards',
-        }
-      );
-    }
-  }, []);
-
-  const checkImages = (): string[] => {
-    const pattern = /(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif))/g;
-    const imageLinks: string[] = [];
-
-    let match;
-    while ((match = pattern.exec(cast.text)) !== null) {
-      imageLinks.push(match[0]);
-    }
-    if (cast.embeds) {
-      cast.embeds.forEach((embed) => {
-        while ((match = pattern.exec(embed.url ?? '')) !== null) {
-          imageLinks.push(match[0]);
-        }
-      });
-    }
-    return imageLinks;
-  };
-
-  const images = checkImages();
-
+const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) => {
   const getRelativeTime = (timestamp: string) => {
     const now = new Date();
     const past = new Date(timestamp);
@@ -64,60 +27,108 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
     } 
   };
 
+  const getEventContent = () => {
+    switch (event.type) {
+      case 'CAST_ADD':
+        return event.text || '';
+      case 'REACTION_ADD':
+        return `${event.reactionType === 'REACTION_TYPE_LIKE' ? '❤️' : '🔄'} reaction`;
+      case 'LINK_ADD':
+        return `🔗 ${event.linkType} link`;
+      case 'VERIFICATION_ADD':
+        return `✅ verified ${event.address?.slice(0, 8)}...`;
+      case 'ON_CHAIN_EVENT':
+        return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
+      default:
+        return `🔧 ${event.eventType || 'unknown event'}`;
+    }
+  };
+
+  const getEventTypeDisplay = () => {
+    switch (event.type) {
+      case 'CAST_ADD':
+        return 'cast';
+      case 'REACTION_ADD':
+        return event.reactionType === 'REACTION_TYPE_LIKE' ? 'like' : 'recast';
+      case 'LINK_ADD':
+        return 'follow';
+      case 'VERIFICATION_ADD':
+        return 'verify';
+      case 'ON_CHAIN_EVENT':
+        return 'onchain';
+      default:
+        return 'other';
+    }
+  };
+
   return (
-    <tr ref={rowRef} className="bg-white">
+    <motion.tr 
+      initial={isNew ? { opacity: 0, y: -20, backgroundColor: '#dcfce7' } : { opacity: 1 }}
+      animate={{ opacity: 1, y: 0, backgroundColor: isNew ? '#dcfce7' : '#ffffff' }}
+      transition={{ 
+        duration: 0.5,
+        backgroundColor: { delay: 2, duration: 1 }
+      }}
+      className="bg-white"
+    >
       <th
         scope="row"
-        className="px-2 py-2 text-[#71579E] font-normal w-1/6"
+        className="px-2 py-2 text-[#71579E] font-normal w-20"
       >
-        {cast.author && cast.author.user ? (
-          <FrameLink href={`https://warpcast.com/${cast.author.user.username}`}>
-            {cast.author.user.username}
-          </FrameLink>
-        ) : (
-          <span>user</span>
-        )}
+        <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+          {getEventTypeDisplay()}
+        </span>
       </th>
-      <td className="px-2 py-2 max-w-20">
+      <td className="px-2 py-2 w-16 text-center">
+        {event.fid}
+      </td>
+      <td className="px-2 py-2 flex-1">
         <p className="overflow-x-scroll">
-          {renderCastText(cast.text)}
+          {event.type === 'CAST_ADD' ? renderCastText(event.text || '') : getEventContent()}
         </p>
       </td>
-      <td className="px-2 py-2 w-1/6">
-        {cast.embeds && cast.embeds.length > 0 && (
+      <td className="px-2 py-2 w-20">
+        {event.embeds && event.embeds.length > 0 && (
           <div className="flex items-center justify-center bg-gray-400 w-10 h-10 ml-2">
-            <p className="text-center">{`+${cast.embeds.length}`}</p>
+            <p className="text-center">{`+${event.embeds.length}`}</p>
           </div>
         )}
       </td>
-      <td className="px-2 py-2 w-1/6">
-        <Link href={`/casts/${cast.hash}`}>
+      <td className="px-2 py-2 w-16">
+        <Link href={event.link} target={event.link.startsWith('/') ? undefined : '_blank'}>
             <p className="underline text-[#71579E]">{`link =>`}</p>
         </Link>
       </td>
-      <td className="px-2 py-2 w-1/6">
-        {getRelativeTime(cast.timestamp)}
+      <td className="px-2 py-2 w-20">
+        {getRelativeTime(event.timestamp)}
       </td>
-    </tr>
+    </motion.tr>
   );
 };
 
-const List = ({ casts }: { casts: HubStreamCast[] }) => {
+const List = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?: SnapchainEvent[] }) => {
+  const newEventIds = new Set(newEvents.map(e => e.id));
+
   return (
     <div className="overflow-x-auto w-full pl-2">
       <table className="min-w-full text-sm text-left table-fixed">
         <thead className="text-md text-[#494949] font-normal">
           <tr>
-            <th scope="col" className="px-2 py-2 w-1/6">username</th>
-            <th scope="col" className="px-2 py-2 w-2/6">content</th>
-            <th scope="col" className="px-2 py-2 w-1/6">embeds</th>
-            <th scope="col" className="px-2 py-2 w-1/6">link</th>
-            <th scope="col" className="px-2 py-2 w-1/6">time</th>
+            <th scope="col" className="px-2 py-2 w-20">type</th>
+            <th scope="col" className="px-2 py-2 w-16">fid</th>
+            <th scope="col" className="px-2 py-2 flex-1">content</th>
+            <th scope="col" className="px-2 py-2 w-20">embeds</th>
+            <th scope="col" className="px-2 py-2 w-16">link</th>
+            <th scope="col" className="px-2 py-2 w-20">time</th>
           </tr>
         </thead>
         <tbody>
-          {casts.map((cast, index) => (
-            <ListRow cast={cast} key={index} />
+          {events.map((event, index) => (
+            <ListRow 
+              event={event} 
+              key={`${event.id}-${index}`}
+              isNew={newEventIds.has(event.id)}
+            />
           ))}
         </tbody>
       </table>
