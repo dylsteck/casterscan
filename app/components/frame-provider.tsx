@@ -21,7 +21,7 @@ export function useFrameContext() {
 
 export default function FrameProvider({ children }: { children: React.ReactNode }){
     const [context, setContext] = useState<Context.FrameContext | undefined>(undefined);
-    const [ready, setReady] = useState(false);
+    const [ready, setReady] = useState<boolean>(false);
 
     React.useEffect(() => {
         const init = async () => {
