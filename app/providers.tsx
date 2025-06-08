@@ -1,7 +1,6 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -17,12 +16,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             refetchInterval: (query) => {
               // Events query gets more frequent updates
               if (query.queryKey[0] === 'events') {
-                return 15000; // 15 seconds for events
+                return 5000; // 5 seconds for events - faster loading
               }
               // Other queries less frequent
               return 60000; // 1 minute for cast data
             },
-            staleTime: 5000, // Consider data stale after 5 seconds for responsiveness
+            staleTime: 2000, // Consider data stale after 2 seconds for faster updates
             // Retry failed requests
             retry: (failureCount, error) => {
               // Don't retry if it's a 4xx error
@@ -44,11 +43,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <ReactQueryDevtools 
-        initialIsOpen={false} 
-        buttonPosition="bottom-left"
-        position="left"
-      />
     </QueryClientProvider>
   );
 } 

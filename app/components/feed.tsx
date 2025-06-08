@@ -47,21 +47,12 @@ export default function Feed() {
 
   return (
     <div className="w-screen h-screen overflow-x-hidden">
-      <div className="py-2 border-b-2 border-[#C1C1C1] flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white py-2 border-b-2 border-[#C1C1C1] flex items-center justify-between">
         <div className="flex items-center">
           <div className="ml-4 flex flex-row gap-2 items-center">
             <p>LIVE FEED</p>
             <LiveIndicatorIcon status={error ? 'disconnected' : 'connected'} />
-            {newEvents.length > 0 && (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"
-              >
-                +{newEvents.length} new
-              </motion.div>
-            )}
+
           </div>
           <div className="ml-4 flex flex-row gap-1">
             <p
@@ -81,29 +72,25 @@ export default function Feed() {
         </div>
         
         <div className="mr-4 flex flex-row gap-2 items-center">
-          <button
-            onClick={handleRefresh}
-            className="px-3 py-1 text-[#71579E] cursor-pointer hover:underline"
-          >
-            refresh
-          </button>
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 0 || isLoading}
-            className={`px-3 py-1 ${currentPage === 0 || isLoading ? 'text-gray-400 cursor-not-allowed' : 'text-[#71579E] cursor-pointer hover:underline'}`}
-          >
-            &lt;=
-          </button>
+          {currentPage > 0 && !isLoading && (
+            <button
+              onClick={handlePreviousPage}
+              className="text-black cursor-pointer"
+            >
+              &lt;=
+            </button>
+          )}
           <span className="text-sm text-gray-600">
             page {currentPage + 1} {pagination && `of ${pagination.totalPages}`}
           </span>
-          <button
-            onClick={handleNextPage}
-            disabled={isLoading || !pagination?.hasNextPage}
-            className={`px-3 py-1 ${isLoading || !pagination?.hasNextPage ? 'text-gray-400 cursor-not-allowed' : 'text-[#71579E] cursor-pointer hover:underline'}`}
-          >
-            =&gt;
-          </button>
+          {!isLoading && pagination?.hasNextPage && (
+            <button
+              onClick={handleNextPage}
+              className="text-black cursor-pointer"
+            >
+              =&gt;
+            </button>
+          )}
         </div>
       </div>
       

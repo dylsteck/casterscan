@@ -40,6 +40,13 @@ const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: bo
       case 'ON_CHAIN_EVENT':
         return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
       default:
+        if (event.eventType?.includes('PRUNE')) {
+          const pruneEvent = event as any;
+          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text || 
+                 pruneEvent.pruneMessageBody?.message?.data?.text || 
+                 pruneEvent.text || 
+                 'pruned content';
+        }
         return `🔧 ${event.eventType || 'unknown event'}`;
     }
   };
@@ -57,26 +64,34 @@ const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: bo
       case 'ON_CHAIN_EVENT':
         return 'onchain';
       default:
-        return 'other';
+        // Convert HUB_EVENT_TYPE_* to readable names
+        if (event.eventType) {
+          return event.eventType
+            .replace('HUB_EVENT_TYPE_', '')
+            .replace('_MESSAGE', '')
+            .toLowerCase()
+            .replace('_', ' ');
+        }
+        return 'unknown';
     }
   };
 
   return (
     <motion.div
-      initial={isNew ? { opacity: 0, scale: 0.95, backgroundColor: '#dcfce7' } : { opacity: 1 }}
-      animate={{ opacity: 1, scale: 1, backgroundColor: isNew ? '#dcfce7' : '#ffffff' }}
-      transition={{ 
-        duration: 0.5,
-        backgroundColor: { delay: 2, duration: 1 }
-      }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
       className={`border-b border-r border-gray-300 p-4 ${isFirst ? 'border-t-2 border-t-[#71579E]' : ''}`}
     >
       <div className="flex justify-between items-start mb-2">
         <div className="flex flex-col gap-1">
-          <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+          <span className="text-sm">
             {getEventTypeDisplay()}
           </span>
-          <span className="text-xs text-gray-600">fid: {event.fid}</span>
+          <span className="text-xs text-gray-600">fid: {
+            event.eventType?.includes('PRUNE') && (event as any).pruneMessageBody?.message?.data?.fid 
+              ? (event as any).pruneMessageBody.message.data.fid 
+              : event.fid
+          }</span>
         </div>
         <span className="text-xs text-gray-500">
           {getRelativeTime(event.timestamp)}

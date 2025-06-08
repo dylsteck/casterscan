@@ -40,6 +40,13 @@ const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) =
       case 'ON_CHAIN_EVENT':
         return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
       default:
+        if (event.eventType?.includes('PRUNE')) {
+          const pruneEvent = event as any;
+          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text || 
+                 pruneEvent.pruneMessageBody?.message?.data?.text || 
+                 pruneEvent.text || 
+                 'pruned content';
+        }
         return `🔧 ${event.eventType || 'unknown event'}`;
     }
   };
@@ -57,30 +64,36 @@ const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) =
       case 'ON_CHAIN_EVENT':
         return 'onchain';
       default:
-        return 'other';
+        // Convert HUB_EVENT_TYPE_* to readable names
+        if (event.eventType) {
+          return event.eventType
+            .replace('HUB_EVENT_TYPE_', '')
+            .replace('_MESSAGE', '')
+            .toLowerCase()
+            .replace('_', ' ');
+        }
+        return 'unknown';
     }
   };
 
   return (
     <motion.tr 
-      initial={isNew ? { opacity: 0, y: -20, backgroundColor: '#dcfce7' } : { opacity: 1 }}
-      animate={{ opacity: 1, y: 0, backgroundColor: isNew ? '#dcfce7' : '#ffffff' }}
-      transition={{ 
-        duration: 0.5,
-        backgroundColor: { delay: 2, duration: 1 }
-      }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 1 }}
       className="bg-white"
     >
       <th
         scope="row"
         className="px-2 py-2 text-[#71579E] font-normal w-20"
       >
-        <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+        <span className="text-sm">
           {getEventTypeDisplay()}
         </span>
       </th>
       <td className="px-2 py-2 w-16 text-center">
-        {event.fid}
+        {event.eventType?.includes('PRUNE') && (event as any).pruneMessageBody?.message?.data?.fid 
+          ? (event as any).pruneMessageBody.message.data.fid 
+          : event.fid}
       </td>
       <td className="px-2 py-2 flex-1">
         <p className="overflow-x-scroll">
