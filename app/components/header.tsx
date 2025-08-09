@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { sdk } from '@farcaster/frame-sdk';
+import { sdk } from '@farcaster/miniapp-sdk';
 import CasterscanIcon from './icons/casterscan-icon';
 import Search from './search';
 import { FrameLink } from './frame-link';

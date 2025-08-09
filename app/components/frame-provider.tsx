@@ -1,11 +1,11 @@
 'use client'
 
-import { sdk } from "@farcaster/frame-sdk";
-import type { Context } from "@farcaster/frame-sdk";
+import { sdk } from "@farcaster/miniapp-sdk";
+import type { Context } from "@farcaster/miniapp-sdk";
 import React, { createContext, useState, useContext, useMemo } from "react";
 
 interface FrameContextType {
-  context: Context.FrameContext | undefined;
+  context: Context.MiniAppContext | undefined;
   ready: boolean;
 }
 
@@ -20,7 +20,7 @@ export function useFrameContext() {
 }
 
 export default function FrameProvider({ children }: { children: React.ReactNode }){
-    const [context, setContext] = useState<Context.FrameContext | undefined>(undefined);
+    const [context, setContext] = useState<Context.MiniAppContext | undefined>(undefined);
     const [ready, setReady] = useState<boolean>(false);
 
     React.useEffect(() => {
