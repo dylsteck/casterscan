@@ -25,6 +25,9 @@ export async function GET() {
       ogDescription: SEO.description,
       ogImageUrl: SEO.ogImage,
       noindex: false,
+    },
+    "baseBuilder": {
+        "allowedAddresses": ["0x8342A48694A74044116F330db5050a267b28dD85"],
     }
   };
 
