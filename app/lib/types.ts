@@ -220,6 +220,69 @@ export type NeynarV2Cast = {
     };
 };
 
+export type NeynarV2User = {
+  object: "user";
+  fid: number;
+  username: string;
+  display_name: string;
+  pfp_url: string;
+  custody_address: string;
+  profile: {
+    bio: {
+      text: string;
+      mentioned_profiles: {
+        object: "user_dehydrated";
+        fid: number;
+        username: string;
+        display_name: string;
+        pfp_url: string;
+        custody_address: string;
+      }[];
+      mentioned_profiles_ranges: {
+        start: number;
+        end: number;
+      }[];
+      mentioned_channels: {
+        object: "channel_dehydrated";
+        id: string;
+        name: string;
+        image_url: string;
+      }[];
+      mentioned_channels_ranges: {
+        start: number;
+        end: number;
+      }[];
+    };
+    location: {
+      latitude: number;
+      longitude: number;
+      address: {
+        city: string;
+        state: string;
+        state_code: string;
+        country: string;
+        country_code: string;
+      };
+    };
+  };
+  follower_count: number;
+  following_count: number;
+  verifications: string[];
+  verified_addresses: {
+    eth_addresses: string[];
+    sol_addresses: string[];
+    primary: {
+      eth_address: string;
+      sol_address: string | null;
+    };
+  };
+  verified_accounts: {
+    platform: string;
+    username: string;
+  }[];
+  power_badge: boolean;
+};
+
 export type User = {
   custodyAddress: string;
   displayName: string;
@@ -482,4 +545,15 @@ type FarcasterUserViewerContext = {
   following: boolean;
   enableNotifications: boolean;
   hasUploadedInboxKeys: boolean;
+};
+
+export type KeyType = 'AUTH' | 'SIGNER';
+
+export type ProfileKeysPage = {
+  fid: bigint;
+  authAddresses: `0x${string}`[];
+  signerKeys: `0x${string}`[];
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 };

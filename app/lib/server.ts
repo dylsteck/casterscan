@@ -1,6 +1,7 @@
 'use server';
 
-import { NeynarV2Cast, FarcasterCast, HubCast } from './types';
+import { NeynarV2Cast, NeynarV2User, FarcasterCast, HubCast, ProfileKeysPage } from './types';
+import { fetchKeysForFid } from './farcaster/keys';
 import { BASE_URL, NEYNAR_API_URL, FARCASTER_API_URL } from './utils';
 
 export async function getNeynarCast(identifier: string, type: 'url' | 'hash') {
@@ -71,5 +72,43 @@ export async function getHubCast(fid: number, hash: string, type: 'neynar' | 'fa
   } catch (error) {
     console.error(`Error fetching ${type} hub cast:`, error);
     return null;
+  }
+}
+
+export async function getNeynarUser(fid: string) {
+  try {
+    const response = await fetch(
+      `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`,
+      {
+        headers: {
+          'x-api-key': process.env.NEYNAR_API_KEY || '',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error('Failed to fetch Neynar user');
+    const data = await response.json();
+    return data.users[0];
+  } catch (error) {
+    console.error('Error fetching Neynar user:', error);
+    throw error;
+  }
+}
+
+export async function getFarcasterKeys(fid: string): Promise<ProfileKeysPage> {
+  try {
+    const fidBigInt = BigInt(fid);
+    return await fetchKeysForFid(fidBigInt, 0, 250);
+  } catch (error) {
+    console.error('Error fetching Farcaster keys:', error);
+    return {
+      fid: BigInt(fid),
+      authAddresses: [],
+      signerKeys: [],
+      page: 0,
+      pageSize: 250,
+      hasMore: false,
+    };
   }
 }

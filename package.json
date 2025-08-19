@@ -25,7 +25,8 @@
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "tailwind-merge": "^2.5.4",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "viem": "^2.21.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250415.0",
