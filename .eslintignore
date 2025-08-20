@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+*.config.js
+*.config.mjs
+coverage/
+.nyc_output/
+.cache/
+public/
+.vercel/
+**/*.d.ts

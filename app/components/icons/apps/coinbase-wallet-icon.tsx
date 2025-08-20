@@ -5,7 +5,7 @@ export default function CoinbaseWalletIcon({ className }: { className?: string }
     <img
       src={cbWalletIcon.src}
       alt="Coinbase Wallet Icon"
-      className={`size-7 ${className ? className : ''}`}
+      className={`size-7 ${className || ''}`}
     />
   );
-};
+}

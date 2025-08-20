@@ -18,7 +18,7 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
           duration: 300,
           easing: 'ease-in-out',
           fill: 'forwards',
-        }
+        },
       );
     }
   }, []);
@@ -27,21 +27,20 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
     const now = new Date();
     const past = new Date(timestamp);
     const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
-    if(diffInSeconds === 0){
+    if (diffInSeconds === 0) {
       return 'just now';
     }
     if (diffInSeconds < 60) {
       return `${diffInSeconds}s`;
-    } else if (diffInSeconds < 3600) {
+    } if (diffInSeconds < 3600) {
       const minutes = Math.floor(diffInSeconds / 60);
       return `${minutes}m`;
-    } else if (diffInSeconds < 86400) {
+    } if (diffInSeconds < 86400) {
       const hours = Math.floor(diffInSeconds / 3600);
       return `${hours}h`;
-    } else {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `${days}d`;
     }
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days}d`;
   };
 
   return (
@@ -50,13 +49,13 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
         <div className="flex items-center mb-2">
           {cast.author && cast.author.user ? (
             <>
-              <img 
-                src={cast.author.user.pfp?.url || ""} 
-                alt={`${cast.author.user.username}'s PFP`} 
-                className="w-6 h-6 rounded-full mr-2" 
+              <img
+                src={cast.author.user.pfp?.url || ''}
+                alt={`${cast.author.user.username}'s PFP`}
+                className="w-6 h-6 rounded-full mr-2"
               />
-              <FrameLink 
-                href={`https://warpcast.com/${cast.author.user.username}`} 
+              <FrameLink
+                href={`https://warpcast.com/${cast.author.user.username}`}
                 className="text-black font-medium"
               >
                 {cast.author.user.username}
@@ -76,14 +75,12 @@ const ListRow = ({ cast, isFirst }: { cast: HubStreamCast, isFirst: boolean }) =
   );
 };
 
-const Grid = ({ casts }: { casts: HubStreamCast[]}) => {
-  return (
+const Grid = ({ casts }: { casts: HubStreamCast[]}) => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-l border-r border-gray-300">
       {casts.map((cast, index) => (
         <ListRow cast={cast} isFirst={index === 0} key={index} />
       ))}
     </div>
-  );
-};
+);
 
 export default Grid;

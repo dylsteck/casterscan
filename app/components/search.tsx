@@ -1,9 +1,10 @@
 'use client';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { getNeynarCast } from '@/app/lib/server';
 
-export default function Search(){
+export default function Search() {
   const [search, setSearch] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -14,7 +15,7 @@ export default function Search(){
     setSearch('');
     setLoading(false);
     setError(null);
-  }
+  };
 
   const handleSearch = async () => {
     if (!search) return;
@@ -42,13 +43,13 @@ export default function Search(){
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       handleSearch();
     }
-  }
+  };
 
   return (
     <div className="border-b-2 border-[#C1C1C1] justify-center">

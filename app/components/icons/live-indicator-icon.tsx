@@ -14,13 +14,13 @@ export default function LiveIndicatorIcon({ status = 'connected' }: { status?: '
         {
           duration: 3000,
           iterations: Infinity,
-        }
+        },
       );
     }
   }, [status]);
 
   const color = status === 'connected' ? '#FF0000' : '#888888';
-  
+
   return (
     <div
       ref={indicatorRef}

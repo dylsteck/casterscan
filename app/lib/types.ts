@@ -63,14 +63,14 @@ export type NeynarV1Cast = {
   threadHash: string;
   text: string;
   timestamp: string;
-  type?: "cast-mention" | "cast-reply";
+  type?: 'cast-mention' | 'cast-reply';
 };
 
 export type NeynarV2Cast = {
-    object: "cast";
+    object: 'cast';
     hash: string;
     author: {
-      object: "user";
+      object: 'user';
       fid: number;
       username: string;
       display_name: string;
@@ -80,7 +80,7 @@ export type NeynarV2Cast = {
         bio: {
           text: string;
           mentioned_profiles: {
-            object: "user_dehydrated";
+            object: 'user_dehydrated';
             fid: number;
             username: string;
             display_name: string;
@@ -92,7 +92,7 @@ export type NeynarV2Cast = {
             end: number;
           }[];
           mentioned_channels: {
-            object: "channel_dehydrated";
+            object: 'channel_dehydrated';
             id: string;
             name: string;
             image_url: string;
@@ -132,7 +132,7 @@ export type NeynarV2Cast = {
       power_badge: boolean;
     };
     app: {
-      object: "user_dehydrated";
+      object: 'user_dehydrated';
       fid: number;
       username: string;
       display_name: string;
@@ -161,7 +161,7 @@ export type NeynarV2Cast = {
       };
     }[];
     channel: {
-      object: "channel_dehydrated";
+      object: 'channel_dehydrated';
       id: string;
       name: string;
       image_url: string;
@@ -389,7 +389,7 @@ export type WarpcastCast = {
       bookmarked: boolean;
     };
 };
-  
+
 export type WarpcastUser = {
   collectionsOwned: any[];
   extras: {

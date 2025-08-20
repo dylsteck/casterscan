@@ -1,4 +1,5 @@
 'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import CasterscanIcon from './icons/casterscan-icon';
@@ -27,4 +28,4 @@ export default function Header() {
       <Search />
     </>
   );
-};
+}

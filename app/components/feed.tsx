@@ -16,41 +16,41 @@ export default function Feed() {
   React.useEffect(() => {
     let retryCount = 0;
     let timeoutId: number;
-    
+
     const connectEventSource = () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
-      
+
       eventSourceRef.current = new EventSource(`${BASE_URL}/api/hub/stream`);
-      
+
       eventSourceRef.current.onopen = () => {
         setIsConnected(true);
         retryCount = 0;
       };
-      
+
       eventSourceRef.current.onmessage = (e) => {
         try {
           const data = JSON.parse(e.data);
           if (data.ping) return;
-          
+
           const incoming = { ...data, timestamp: new Date().toISOString() };
           setCasts((prev) => [incoming, ...prev.slice(0, 99)]);
         } catch (err) {
-          console.error("Failed to parse message", err);
+          console.error('Failed to parse message', err);
         }
       };
-      
+
       eventSourceRef.current.onerror = (err) => {
-        console.log("EventSource error:", err);
+        console.log('EventSource error:', err);
         setIsConnected(false);
-        
+
         if (eventSourceRef.current?.readyState === EventSource.CLOSED) {
           eventSourceRef.current?.close();
-          
-          const delay = Math.min(1000 * Math.pow(2, retryCount), 30000);
+
+          const delay = Math.min(1000 * 2 ** retryCount, 30000);
           retryCount++;
-          
+
           console.log(`Reconnecting in ${delay}ms...`);
           timeoutId = setTimeout(() => {
             connectEventSource();
@@ -58,9 +58,9 @@ export default function Feed() {
         }
       };
     };
-    
+
     connectEventSource();
-    
+
     return () => {
       eventSourceRef.current?.close();
       clearTimeout(timeoutId);

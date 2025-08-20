@@ -34,8 +34,8 @@ export async function generateMetadata(props: { params: Promise<{ hash: string }
       },
     },
     other: {
-      "fc:frame": JSON.stringify(frame('Inspect Cast', `${BASE_URL}/casts/${hash}`)),
-    }
+      'fc:frame': JSON.stringify(frame('Inspect Cast', `${BASE_URL}/casts/${hash}`)),
+    },
   } as Metadata;
 }
 

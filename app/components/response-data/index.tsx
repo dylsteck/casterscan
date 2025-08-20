@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from "react";
-import CopyClipboardIcon from "../copy-clipboard-icon";
+import { useState } from 'react';
 import { XCircleIcon } from '@heroicons/react/20/solid';
+import CopyClipboardIcon from '../copy-clipboard-icon';
 
 export default function ResponseData({ data, title }: { data: any, title: string }) {
-    const [showModal, setShowModal] = useState(false);
-    return (
+  const [showModal, setShowModal] = useState(false);
+  return (
         <>
             <button className="p-2 text-black border border-black" onClick={() => setShowModal(true)}>
                 {title}
@@ -28,7 +28,7 @@ export default function ResponseData({ data, title }: { data: any, title: string
                     </div>
                 </div>
             </div>
-        )}
+            )}
         </>
-    );
+  );
 }

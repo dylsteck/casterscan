@@ -1,15 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
-import "./globals.css";
-import Header from "./components/header";
-import Script from "next/script";
-import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
-import FrameProvider from "./components/frame-provider";
+import './globals.css';
+import Script from 'next/script';
+import Header from './components/header';
+import { BANNER_IMG_URL, frame, ICON_IMG_URL } from './lib/utils';
+import FrameProvider from './components/frame-provider';
 
 const PAGE = {
-  title: "Casterscan",
-  description: "A block explorer for Farcaster",
-  url: "https://casterscan.com",
+  title: 'Casterscan',
+  description: 'A block explorer for Farcaster',
+  url: 'https://casterscan.com',
 };
 
 export const metadata: Metadata = {
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     images: [BANNER_IMG_URL],
   },
   other: {
-    "fc:frame": JSON.stringify(frame())
-  }
-}
+    'fc:frame': JSON.stringify(frame()),
+  },
+};
 
 export default function RootLayout({
   children,
@@ -58,14 +58,14 @@ export default function RootLayout({
           <Header />
           {children}
         </FrameProvider>
-        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
+        <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ''}`} />
         <Script id="google-analytics">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}');
+            gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ''}');
           `}
         </Script>
       </body>

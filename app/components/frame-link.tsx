@@ -1,9 +1,9 @@
 'use client';
 
-import sdk from "@farcaster/frame-sdk";
-import { useEffect, useState } from "react";
-import { useFrameContext } from "./frame-provider";
-import Link from "next/link";
+import sdk from '@farcaster/frame-sdk';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useFrameContext } from './frame-provider';
 
 export function FrameLink({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
   const { context } = useFrameContext();
@@ -22,7 +22,7 @@ export function FrameLink({ href, children, className }: { href: string; childre
   return (
     <Link
       href={href}
-      target='_blank'
+      target="_blank"
       rel="noreferrer noopener"
       className={`${className} cursor-pointer`}
     >

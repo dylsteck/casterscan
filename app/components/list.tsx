@@ -18,7 +18,7 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
           duration: 300,
           easing: 'ease-in-out',
           fill: 'forwards',
-        }
+        },
       );
     }
   }, []);
@@ -47,21 +47,20 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
     const now = new Date();
     const past = new Date(timestamp);
     const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
-    if(diffInSeconds === 0){
+    if (diffInSeconds === 0) {
       return 'just now';
     }
     if (diffInSeconds < 60) {
       return `${diffInSeconds}s ago`;
-    } else if (diffInSeconds < 3600) {
+    } if (diffInSeconds < 3600) {
       const minutes = Math.floor(diffInSeconds / 60);
       return `${minutes}m ago`;
-    } else if (diffInSeconds < 86400) {
+    } if (diffInSeconds < 86400) {
       const hours = Math.floor(diffInSeconds / 3600);
       return `${hours}h ago`;
-    } else {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `${days}d ago`;
-    } 
+    }
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days}d ago`;
   };
 
   return (
@@ -92,7 +91,7 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
       </td>
       <td className="px-2 py-2 w-1/6">
         <Link href={`/casts/${cast.hash}`}>
-            <p className="underline text-[#71579E]">{`link =>`}</p>
+            <p className="underline text-[#71579E]">{'link =>'}</p>
         </Link>
       </td>
       <td className="px-2 py-2 w-1/6">
@@ -102,8 +101,7 @@ const ListRow = ({ cast }: { cast: HubStreamCast }) => {
   );
 };
 
-const List = ({ casts }: { casts: HubStreamCast[] }) => {
-  return (
+const List = ({ casts }: { casts: HubStreamCast[] }) => (
     <div className="overflow-x-auto w-full pl-2">
       <table className="min-w-full text-sm text-left table-fixed">
         <thead className="text-md text-[#494949] font-normal">
@@ -122,7 +120,6 @@ const List = ({ casts }: { casts: HubStreamCast[] }) => {
         </tbody>
       </table>
     </div>
-  );
-};
+);
 
 export default List;

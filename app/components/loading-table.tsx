@@ -3,22 +3,22 @@ import React from 'react';
 function LoadingTableRow() {
   const [style, setStyle] = React.useState({
     opacity: 0,
-    transform: "translateY(20px)",
+    transform: 'translateY(20px)',
   });
 
   React.useEffect(() => {
     const animation: Keyframe[] = [
-      { opacity: 0, transform: "translateY(20px)" },
-      { opacity: 1, transform: "translateY(0)" },
+      { opacity: 0, transform: 'translateY(20px)' },
+      { opacity: 1, transform: 'translateY(0)' },
     ];
     const timing: KeyframeAnimationOptions = {
       duration: 300,
-      easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-      fill: "forwards" as FillMode,
+      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      fill: 'forwards' as FillMode,
     };
     const row = document.getElementById(`row-${Date.now()}`);
     if (row) row.animate(animation, timing);
-    setStyle({ opacity: 1, transform: "translateY(0)" });
+    setStyle({ opacity: 1, transform: 'translateY(0)' });
   }, []);
 
   const secondsAgo = (timestamp: number) => {

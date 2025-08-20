@@ -1,8 +1,10 @@
-'use client'
+'use client';
 
-import { sdk } from "@farcaster/frame-sdk";
-import type { Context } from "@farcaster/frame-sdk";
-import React, { createContext, useState, useContext, useMemo } from "react";
+import { sdk } from '@farcaster/frame-sdk';
+import type { Context } from '@farcaster/frame-sdk';
+import React, {
+  createContext, useState, useContext, useMemo,
+} from 'react';
 
 interface FrameContextType {
   context: Context.FrameContext | undefined;
@@ -19,30 +21,30 @@ export function useFrameContext() {
   return context;
 }
 
-export default function FrameProvider({ children }: { children: React.ReactNode }){
-    const [context, setContext] = useState<Context.FrameContext | undefined>(undefined);
-    const [ready, setReady] = useState(false);
+export default function FrameProvider({ children }: { children: React.ReactNode }) {
+  const [context, setContext] = useState<Context.FrameContext | undefined>(undefined);
+  const [ready, setReady] = useState(false);
 
-    React.useEffect(() => {
-        const init = async () => {
-          const sdkContext = await sdk.context;
-          setContext(sdkContext);
-          setTimeout(() => {
-            sdk.actions.ready();
-            setReady(true);
-          }, 500)
-        }
-        init()
-      }, [])
+  React.useEffect(() => {
+    const init = async () => {
+      const sdkContext = await sdk.context;
+      setContext(sdkContext);
+      setTimeout(() => {
+        sdk.actions.ready();
+        setReady(true);
+      }, 500);
+    };
+    init();
+  }, []);
 
-    const value = useMemo(() => ({
-      context,
-      ready
-    }), [context, ready]);
+  const value = useMemo(() => ({
+    context,
+    ready,
+  }), [context, ready]);
 
-    return(
+  return (
         <FrameContext.Provider value={value}>
          {children}
         </FrameContext.Provider>
-    )
+  );
 }

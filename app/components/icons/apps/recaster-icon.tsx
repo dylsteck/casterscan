@@ -5,7 +5,7 @@ export default function RecasterIcon({ className }: { className?: string }) {
     <img
       src={recasterIcon.src}
       alt="Recaster Icon"
-      className={`size-7 ${className ? className : ''} rounded-md`}
+      className={`size-7 ${className || ''} rounded-md`}
     />
   );
-};
+}

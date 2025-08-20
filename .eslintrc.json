@@ -1,0 +1,80 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "airbnb-base"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2021,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    // React specific rules (Airbnb style)
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".tsx", ".jsx"] }],
+    "jsx-quotes": ["error", "prefer-double"],
+    
+    // Import rules (Airbnb style)
+    "import/prefer-default-export": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never",
+        "js": "never",
+        "jsx": "never"
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.config.{js,ts,mjs}",
+          "**/*.test.{js,ts,tsx}",
+          "**/*.spec.{js,ts,tsx}",
+          "tailwind.config.ts",
+          "next.config.js",
+          "next.config.mjs",
+          "postcss.config.mjs"
+        ]
+      }
+    ],
+    
+    // TypeScript rules
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "no-unused-vars": "off",
+    
+    // Core Airbnb style rules (safe ones)
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "comma-dangle": ["error", "always-multiline"],
+    "object-curly-spacing": ["error", "always"],
+    "array-bracket-spacing": ["error", "never"],
+    "max-len": ["error", { "code": 100, "ignoreUrls": true, "ignoreStrings": true }],
+    "no-console": "warn",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0 }],
+    "eol-last": ["error", "always"],
+    "no-trailing-spaces": "error"
+  },
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

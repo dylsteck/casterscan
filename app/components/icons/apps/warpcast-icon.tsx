@@ -5,7 +5,7 @@ export default function WarpcastIcon({ className }: { className?: string }) {
     <img
       src={warpcastIcon.src}
       alt="Warpcast Icon"
-      className={`size-5 ${className ? className : ''}`}
+      className={`size-5 ${className || ''}`}
     />
   );
-};
+}

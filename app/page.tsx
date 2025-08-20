@@ -1,10 +1,10 @@
-import Image from "next/image";
-import Feed from "./components/feed";
-import { Metadata } from "next";
-import { frame, SEO } from "./lib/utils";
+import Image from 'next/image';
+import { Metadata } from 'next';
+import Feed from './components/feed';
+import { frame, SEO } from './lib/utils';
 
-export async function generateMetadata(){
-  return{
+export async function generateMetadata() {
+  return {
     metadataBase: new URL(SEO.url),
     title: {
       default: SEO.title,
@@ -32,9 +32,9 @@ export async function generateMetadata(){
       },
     },
     other: {
-      "fc:frame": JSON.stringify(frame())
-    }
-  } as Metadata
+      'fc:frame': JSON.stringify(frame()),
+    },
+  } as Metadata;
 }
 
 export default function Home() {

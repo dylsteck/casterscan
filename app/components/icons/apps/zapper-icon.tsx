@@ -5,7 +5,7 @@ export default function ZapperIcon({ className }: { className?: string }) {
     <img
       src={zapperIcon.src}
       alt="Zapper Icon"
-      className={`size-7 ${className ? className : ''}`}
+      className={`size-7 ${className || ''}`}
     />
   );
-};
+}

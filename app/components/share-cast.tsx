@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { CLIENTS } from '../lib/utils';
@@ -15,31 +16,31 @@ const AVAILABLE_CLIENTS = CLIENTS.filter((client) => client.castLink.length > 0)
 export default function ShareCast({ neynarCast }: ShareCastProps) {
   const { context } = useFrameContext();
   const clientFid = context?.client?.clientFid;
-  
-  const matchedClient = clientFid ? CLIENTS.find(client => client.fid === clientFid) : undefined;
-  
+
+  const matchedClient = clientFid ? CLIENTS.find((client) => client.fid === clientFid) : undefined;
+
   const [selectedOption, setSelectedOption] = React.useState<Client>(
-    matchedClient || 
-    AVAILABLE_CLIENTS.find((client) => client.name === "Warpcast") || 
-    AVAILABLE_CLIENTS[0]
+    matchedClient
+    || AVAILABLE_CLIENTS.find((client) => client.name === 'Warpcast')
+    || AVAILABLE_CLIENTS[0],
   );
-  
+
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const showDropdown = !matchedClient;
 
   const getIcon = (option: Client) => {
-    const client = AVAILABLE_CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
+    const client = AVAILABLE_CLIENTS.find((client) => client.name.toLowerCase() === option.name.toLowerCase());
     return client ? client.icon : null;
   };
 
   const getLink = (option: Client) => {
-    const client = AVAILABLE_CLIENTS.find(client => client.name.toLowerCase() === option.name.toLowerCase());
-    if (client?.name.toLowerCase() === "warpcast") {
+    const client = AVAILABLE_CLIENTS.find((client) => client.name.toLowerCase() === option.name.toLowerCase());
+    if (client?.name.toLowerCase() === 'warpcast') {
       return `${client.castLink}${neynarCast.author.username}/${neynarCast?.hash.slice(0, 10)}`;
     }
-    return client ? client.castLink + (neynarCast?.hash || '') : "#";
+    return client ? client.castLink + (neynarCast?.hash || '') : '#';
   };
 
   useEffect(() => {
@@ -49,29 +50,29 @@ export default function ShareCast({ neynarCast }: ShareCastProps) {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
   useEffect(() => {
     function handleEscapeKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsDropdownOpen(false);
       }
     }
 
-    document.addEventListener("keydown", handleEscapeKey);
+    document.addEventListener('keydown', handleEscapeKey);
     return () => {
-      document.removeEventListener("keydown", handleEscapeKey);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, []);
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <FrameLink 
-        href={getLink(selectedOption)} 
+      <FrameLink
+        href={getLink(selectedOption)}
         className={`flex items-center gap-1.5 ${showDropdown ? 'bg-white border rounded-md px-3 py-1.5 shadow-sm hover:bg-gray-50 transition-colors' : 'p-1.5 rounded-md'}`}
       >
         {!showDropdown ? (
@@ -79,15 +80,15 @@ export default function ShareCast({ neynarCast }: ShareCastProps) {
             {getIcon(selectedOption)}
           </div>
         ) : (
-          <div 
+          <div
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-            }} 
+            }}
             className="flex items-center gap-2"
           >
             {getIcon(selectedOption)}
-            
+
             <button
               onClick={(e) => {
                 e.preventDefault();

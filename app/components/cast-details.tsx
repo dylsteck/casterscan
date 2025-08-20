@@ -35,7 +35,7 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
           </div>
           <ul className="list-none mt-1">
             {neynarCast.embeds && neynarCast.embeds
-              .filter(embed => embed.url && embed.url !== "N/A")
+              .filter((embed) => embed.url && embed.url !== 'N/A')
               .map((embed, index) => (
                 <li key={`embed-${index}`} className="flex justify-between items-center mb-1">
                   <span className="font-semibold mr-1">{`embed ${index + 1}`}</span>
