@@ -6,9 +6,9 @@ import { NeynarV2Cast, type Client } from '../lib/types';
 import { CLIENTS } from '../lib/utils';
 import ResponseData from './response-data';
 import NeynarApiResponseData from './response-data/neynar-api-response-data';
-import WarpcastApiResponseData from './response-data/warpcast-api-response-data';
+import FarcasterApiResponseData from './response-data/farcaster-api-response-data';
 import NeynarHubResponseData from './response-data/neynar-hub-response-data';
-import WarpcastHubResponseData from './response-data/warpcast-hub-response-data';
+import FarcasterHubResponseData from './response-data/farcaster-hub-response-data';
 
 export default function CastDetails({ hash, neynarCast }: { hash: string, neynarCast: NeynarV2Cast }) {
   return (
@@ -109,9 +109,9 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
         </p>
         <div className="flex flex-row gap-2 items-center">
           <NeynarApiResponseData neynarCast={neynarCast} />
-          <WarpcastApiResponseData hash={hash} />
+          <FarcasterApiResponseData hash={hash} />
           <NeynarHubResponseData fid={neynarCast.author.fid} hash={hash} />
-          <WarpcastHubResponseData fid={neynarCast.author.fid} hash={hash} />
+          <FarcasterHubResponseData fid={neynarCast.author.fid} hash={hash} />
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@ module.exports = {
     eslint: {
       ignoreDuringBuilds: true,
     },
+    devIndicators: false,
     images: {
       domains: [
         'i.seadn.io',

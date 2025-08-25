@@ -45,12 +45,42 @@ export type HubCast = {
 };
 
 export type HubStreamCast = {
-  author: WarpcastUser;
+  author: FarcasterUser;
   castAddBody?: never;
   embeds: any[];
   hash: string;
   text: string;
   timestamp: string;
+};
+
+export type SnapchainEvent = {
+  type: 'CAST_ADD' | 'REACTION_ADD' | 'LINK_ADD' | 'VERIFICATION_ADD' | 'ON_CHAIN_EVENT' | 'OTHER';
+  id: number;
+  hash: string;
+  timestamp: string;
+  fid: number;
+  author: any;
+  link: string;
+  // Cast-specific fields
+  text?: string;
+  embeds?: any[];
+  mentions?: any[];
+  parentCastId?: any;
+  parentUrl?: string;
+  // Reaction-specific fields
+  reactionType?: string;
+  targetCastId?: any;
+  // Link-specific fields
+  linkType?: string;
+  targetFid?: number;
+  // Verification-specific fields
+  address?: string;
+  // On-chain event fields
+  chainEventType?: string;
+  chainId?: number;
+  blockNumber?: number;
+  // Other event fields
+  eventType?: string;
 };
 
 export type NeynarV1Cast = {
@@ -190,6 +220,69 @@ export type NeynarV2Cast = {
     };
 };
 
+export type NeynarV2User = {
+  object: "user";
+  fid: number;
+  username: string;
+  display_name: string;
+  pfp_url: string;
+  custody_address: string;
+  profile: {
+    bio: {
+      text: string;
+      mentioned_profiles: {
+        object: "user_dehydrated";
+        fid: number;
+        username: string;
+        display_name: string;
+        pfp_url: string;
+        custody_address: string;
+      }[];
+      mentioned_profiles_ranges: {
+        start: number;
+        end: number;
+      }[];
+      mentioned_channels: {
+        object: "channel_dehydrated";
+        id: string;
+        name: string;
+        image_url: string;
+      }[];
+      mentioned_channels_ranges: {
+        start: number;
+        end: number;
+      }[];
+    };
+    location: {
+      latitude: number;
+      longitude: number;
+      address: {
+        city: string;
+        state: string;
+        state_code: string;
+        country: string;
+        country_code: string;
+      };
+    };
+  };
+  follower_count: number;
+  following_count: number;
+  verifications: string[];
+  verified_addresses: {
+    eth_addresses: string[];
+    sol_addresses: string[];
+    primary: {
+      eth_address: string;
+      sol_address: string | null;
+    };
+  };
+  verified_accounts: {
+    platform: string;
+    username: string;
+  }[];
+  power_badge: boolean;
+};
+
 export type User = {
   custodyAddress: string;
   displayName: string;
@@ -210,7 +303,7 @@ export type User = {
   viewerContext?: UserViewerContext;
 };
 
-export type WarpcastCast = {
+export type FarcasterCast = {
     hash: string;
     threadHash: string;
     parentSource?: {
@@ -390,7 +483,7 @@ export type WarpcastCast = {
     };
 };
   
-export type WarpcastUser = {
+export type FarcasterUser = {
   collectionsOwned: any[];
   extras: {
       custodyAddress: string;
@@ -429,7 +522,7 @@ export type WarpcastUser = {
           };
       };
       username: string;
-      viewerContext: WarpcastUserViewerContext;
+      viewerContext: FarcasterUserViewerContext;
   };
 };
 
@@ -440,16 +533,27 @@ type UserViewerContext = {
   recasted?: boolean;
 };
 
-type WarpcastCastViewerContext = {
+type FarcasterCastViewerContext = {
   bookmarked: boolean;
   recast: boolean;
   reacted: boolean;
 };
 
-type WarpcastUserViewerContext = {
+type FarcasterUserViewerContext = {
   canSendDirectCasts: boolean;
   followedBy: boolean;
   following: boolean;
   enableNotifications: boolean;
   hasUploadedInboxKeys: boolean;
+};
+
+export type KeyType = 'AUTH' | 'SIGNER';
+
+export type ProfileKeysPage = {
+  fid: bigint;
+  authAddresses: `0x${string}`[];
+  signerKeys: `0x${string}`[];
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 };

@@ -23,11 +23,11 @@ export default function Search(){
 
     try {
       const isHash = /^0x[a-fA-F0-9]{40}$/.test(search);
-      const isWarpcastUrl = search.includes('warpcast.com/');
+      const isFarcasterUrl = search.includes('farcaster.xyz/');
       let cast;
       if (isHash) {
         cast = await getNeynarCast(search, 'hash');
-      } else if (isWarpcastUrl) {
+      } else if (isFarcasterUrl) {
         cast = await getNeynarCast(search, 'url');
       } else {
         throw new Error('Invalid cast identifier');

@@ -10,7 +10,7 @@ You can [check it out here](https://casterscan.com)
 Casterscan is a block explorer for Farcaster. It currently lets you view:
 - a firehose of the latest casts, either as a list or grid
 - the details of any cast(text, embeds, responses per api/hub provider)
-    - you can also view cast details with our [cast action](https://warpcast.com/~/add-cast-action?url=https://casterscan.com/frames/actions/inspect-cast)
+    - you can also view cast details with our [cast action](https://farcaster.xyz/~/add-cast-action?url=https://casterscan.com/frames/actions/inspect-cast)
 
 There are two goals for Casterscan's utility:
 - make it easy to access Farcaster data
@@ -23,5 +23,5 @@ There are two goals for Casterscan's utility:
 3. `npm run dev`
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 
-- [Message on Warpcast](https://warpcast.com/dylsteck.eth)
+- [Message on Farcaster](https://farcaster.xyz/dylsteck.eth)
 - [Create an issue](https://github.com/dylsteck/casterscan/issues)

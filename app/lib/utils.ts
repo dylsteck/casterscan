@@ -1,4 +1,4 @@
-import WarpcastIcon from "../components/icons/apps/warpcast-icon";
+import FarcasterIcon from "../components/icons/apps/farcaster-icon";
 import SuperIcon from "../components/icons/apps/super-icon";
 import RecasterIcon from "../components/icons/apps/recaster-icon";
 import React from "react";
@@ -41,17 +41,24 @@ export const cachedRequest = async (url: string, revalidate: number, method = 'G
 
     const response = await fetch(url, {
         method: method,
-        headers: headers
+        headers: headers,
+        // Add timeout to prevent hanging requests
+        signal: AbortSignal.timeout(15000)
     });
 
     if (!response.ok) {
-        throw new Error('Failed to fetch cast from the selected hub');
+        throw new Error(`Failed to fetch from ${url} (status: ${response.status})`);
     }
 
     const data = await response.json();
     
     if (cacheTag) {
-        await cacheData(cacheTag, data, revalidate);
+        try {
+            await cacheData(cacheTag, data, revalidate);
+        } catch (cacheError) {
+            console.warn('Failed to cache data:', cacheError);
+            // Don't fail the request if caching fails
+        }
     }
 
     return data;
@@ -59,11 +66,11 @@ export const cachedRequest = async (url: string, revalidate: number, method = 'G
 
 export const CLIENTS: Client[] = [
   {
-    name: "Warpcast",
-    username: "warpcast",
+    name: "Farcaster",
+    username: "farcaster",
     fid: 9152,
-    icon: React.createElement(WarpcastIcon, { className: "ml-2 size-7" }),
-    castLink: "https://warpcast.com/",
+    icon: React.createElement(FarcasterIcon, { className: "ml-2 size-7" }),
+    castLink: "https://farcaster.xyz/",
   },
   {
     name: "Super",
@@ -123,8 +130,8 @@ export const MAX_CAST_PREVIEW_CHARS = 280;
 
 export const HUB_GRPC_URL = 'hub-grpc.pinata.cloud';
 export const NEYNAR_API_URL = 'https://api.neynar.com';
-export const NEYNAR_HUB_API_URL = 'https://hub-api.neynar.com';
-export const WARPCAST_API_URL = 'https://api.warpcast.com';
+export const NEYNAR_HUB_API_URL = 'https://snapchain-api.neynar.com';
+export const FARCASTER_API_URL = 'https://api.farcaster.xyz';
 
 export const renderCastText = (text: string) => {
   if(text.length > MAX_CAST_PREVIEW_CHARS){
@@ -133,7 +140,8 @@ export const renderCastText = (text: string) => {
   return text;
 }
 
-export const WARPCAST_HUB_URLS = [
-  'https://hoyt.farcaster.xyz:2281',
-  'https://lamia.farcaster.xyz:2281',
+export const FARCASTER_HUB_URLS = [
+  'https://snap.farcaster.xyz:3381',
+  // https://hub.merv.fun/v1/info
+  // ^ non farcaster
 ];

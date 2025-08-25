@@ -5,6 +5,7 @@ import Header from "./components/header";
 import Script from "next/script";
 import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
 import FrameProvider from "./components/frame-provider";
+import Providers from "./providers";
 
 const PAGE = {
   title: "Casterscan",
@@ -54,10 +55,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={GeistSans.className}>
-        <FrameProvider>
-          <Header />
-          {children}
-        </FrameProvider>
+        <Providers>
+          <FrameProvider>
+            <Header />
+            {children}
+          </FrameProvider>
+        </Providers>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
         <Script id="google-analytics">
           {`

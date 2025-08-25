@@ -1,11 +1,18 @@
-import { getHubCast } from "@/app/lib/server";
-import ResponseData from ".";
+'use client';
 
-export default async function NeynarHubResponseData({ fid, hash }: { fid: number, hash: string }) {
-    const neynarHubCast = await getHubCast(fid, hash, 'neynar');
-    return(
-        <>
-            <ResponseData data={neynarHubCast} title="neynar hub" />
-        </>
-    )
+import ResponseData from ".";
+import { useNeynarHubCast } from "../../hooks/useApiData";
+
+export default function NeynarHubResponseData({ fid, hash }: { fid: number, hash: string }) {
+    const { data, isLoading, error } = useNeynarHubCast(fid, hash);
+
+    if (isLoading) {
+        return <ResponseData data={{ loading: true }} title="neynar hub" />;
+    }
+
+    if (error) {
+        return <ResponseData data={{ error: error.message }} title="neynar hub" />;
+    }
+
+    return <ResponseData data={data} title="neynar hub" />;
 }

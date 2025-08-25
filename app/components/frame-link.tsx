@@ -1,6 +1,6 @@
 'use client';
 
-import sdk from "@farcaster/frame-sdk";
+import sdk from "@farcaster/miniapp-sdk";
 import { useEffect, useState } from "react";
 import { useFrameContext } from "./frame-provider";
 import Link from "next/link";
