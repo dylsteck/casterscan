@@ -189,8 +189,6 @@ app.get('/api/events/recent', async (c) => {
 app.get('/api/events/stream', async (c) => {
   const { searchParams } = new URL(c.req.url);
   const isStream = searchParams.get('stream') === 'true';
-  const isProduction = process.env.NODE_ENV === 'production';
-  const isFly = process.env.FLY_APP_NAME !== undefined;
   
   // Use polling for non-stream requests
   if (!isStream) {
@@ -200,7 +198,7 @@ app.get('/api/events/stream', async (c) => {
     
     try {
       const eventStream = await snapchain.subscribe({
-        eventTypes: [HubEventType.MERGE_MESSAGE, HubEventType.PRUNE_MESSAGE, HubEventType.REVOKE_MESSAGE],
+        eventTypes: [HubEventType.MERGE_MESSAGE],
         shardIndex: 1
       });
 
@@ -256,51 +254,20 @@ app.get('/api/events/stream', async (c) => {
       const startStream = async () => {
         try {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383";
-          
-          const grpcOptions: any = {};
-          
-          if (isProduction || isFly) {
-            grpcOptions['grpc.keepalive_time_ms'] = 30000;
-            grpcOptions['grpc.keepalive_timeout_ms'] = 10000;
-            grpcOptions['grpc.keepalive_permit_without_calls'] = 1;
-            grpcOptions['grpc.http2.max_pings_without_data'] = 0;
-            grpcOptions['grpc.http2.min_time_between_pings_ms'] = 10000;
-            grpcOptions['grpc.http2.min_ping_interval_without_data_ms'] = 300000;
-            grpcOptions['grpc.ssl_target_name_override'] = 'snap.farcaster.xyz';
-            grpcOptions['grpc.default_authority'] = 'snap.farcaster.xyz';
-            grpcOptions['grpc.enable_http_proxy'] = 0;
-            grpcOptions['grpc.max_receive_message_length'] = 4194304;
-            grpcOptions['grpc.max_send_message_length'] = 4194304;
-            grpcOptions['grpc.initial_reconnect_backoff_ms'] = 1000;
-            grpcOptions['grpc.max_reconnect_backoff_ms'] = 30000;
-          }
-          
-          nodeClient = getSSLHubRpcClient(hubRpcEndpoint, grpcOptions);
+          nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
 
-          const timeout = isProduction || isFly ? 45000 : 15000;
+          const timeout = 10000;
           
           nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
             if (e) {
-              if (isProduction || isFly) {
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'gRPC connection failed, switching to polling',
-                    fallback: true,
-                    platform: isFly ? 'fly.io' : 'production'
-                  })}\n\n`));
-                } catch (controllerError) {
-                  // Silent fail
-                }
-              } else {
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'Failed to connect to hub'
-                  })}\n\n`));
-                } catch (controllerError) {
-                  // Silent fail
-                }
+              try {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                  type: 'error', 
+                  error: 'gRPC connection failed, switching to polling',
+                  fallback: true
+                })}\n\n`));
+              } catch (controllerError) {
+                // Silent fail
               }
               
               try {
