@@ -1,0 +1,20 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "tsc",
+    "start": "bun run dist/index.js"
+  },
+  "dependencies": {
+    "@farcaster/hub-nodejs": "^0.12.6",
+    "hono": "^4.9.4",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/bun": "latest"
+  }
+}
