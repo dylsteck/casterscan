@@ -1,3 +1,8 @@
+# fly.toml app configuration file generated for casterscan on 2025-08-26T15:51:27-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = 'casterscan'
 primary_region = 'ewr'
 
