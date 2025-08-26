@@ -26,19 +26,17 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Debug endpoint to check stream connectivity and environment
+// Debug endpoint to check stream connectivity
 app.get('/api/debug/stream', async (c) => {
   const snapchain = new SnapchainClient();
   const startTime = Date.now();
   
   try {
-    console.log('🔍 Debug: Testing stream connection...');
     const eventStream = await snapchain.subscribe({
       eventTypes: [1, 2, 3],
       shardIndex: 1
     });
     
-    // Test if we can get the stream (don't wait for events)
     const streamTest = eventStream[Symbol.asyncIterator]();
     const connectionTime = Date.now() - startTime;
     
@@ -49,15 +47,8 @@ app.get('/api/debug/stream', async (c) => {
       environment: {
         NODE_ENV: process.env.NODE_ENV || 'development',
         platform: process.platform,
-        isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-        isFly: process.env.FLY_APP_NAME !== undefined,
-        flyRegion: process.env.FLY_REGION,
-        flyMachineId: process.env.FLY_MACHINE_ID,
+        isFly: !!process.env.FLY_APP_NAME,
         hasNeynarKey: !!process.env.NEYNAR_API_KEY
-      },
-      network: {
-        hostname: process.env.HOSTNAME,
-        port: process.env.PORT || '3000'
       }
     });
   } catch (error) {
@@ -65,32 +56,18 @@ app.get('/api/debug/stream', async (c) => {
       status: 'stream_error',
       error: error instanceof Error ? error.message : 'Unknown error',
       connectionTime: Date.now() - startTime,
-      timestamp: new Date().toISOString(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV || 'development',
-        platform: process.platform,
-        isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-        isFly: process.env.FLY_APP_NAME !== undefined,
-        flyRegion: process.env.FLY_REGION,
-        flyMachineId: process.env.FLY_MACHINE_ID,
-        hasNeynarKey: !!process.env.NEYNAR_API_KEY
-      },
-      network: {
-        hostname: process.env.HOSTNAME,
-        port: process.env.PORT || '3000'
-      }
+      timestamp: new Date().toISOString()
     }, 500);
   }
 })
 
-// Enhanced connectivity test endpoint
+// Connectivity test endpoint
 app.get('/api/debug/connectivity', async (c) => {
   const results = {
     timestamp: new Date().toISOString(),
     tests: {} as Record<string, any>
   };
   
-  // Test HTTP connectivity to Farcaster
   try {
     const httpStart = Date.now();
     const response = await fetch('https://snap.farcaster.xyz:3381/v1/info', {
@@ -99,18 +76,15 @@ app.get('/api/debug/connectivity', async (c) => {
     results.tests.farcaster_http = {
       success: response.ok,
       status: response.status,
-      time: Date.now() - httpStart,
-      url: 'https://snap.farcaster.xyz:3381/v1/info'
+      time: Date.now() - httpStart
     };
   } catch (error) {
     results.tests.farcaster_http = {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      url: 'https://snap.farcaster.xyz:3381/v1/info'
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
   
-  // Test gRPC client creation (without connection)
   try {
     const grpcStart = Date.now();
     const client = getSSLHubRpcClient('snap.farcaster.xyz:3383');
@@ -148,7 +122,6 @@ app.get('/api/info', async (c) => {
     const data = await response.json()
     return c.json(data as any)
   } catch (error) {
-    console.error('Failed to fetch Snapchain info:', error)
     return c.json({ error: 'Failed to fetch info' }, { status: 500 })
   }
 })
@@ -159,7 +132,6 @@ app.get('/api/fids/:fid', async (c) => {
     const user = await neynarService.getNeynarUser(fid)
     return c.json(user)
   } catch (error) {
-    console.error('Failed to fetch user:', error)
     return c.json({ error: 'Failed to fetch user' }, { status: 500 })
   }
 })
@@ -170,7 +142,6 @@ app.get('/api/casts/:hash', async (c) => {
     const cast = await neynarService.getNeynarCast(hash, 'hash')
     return c.json(cast)
   } catch (error) {
-    console.error('Failed to fetch cast:', error)
     return c.json({ error: 'Failed to fetch cast' }, { status: 500 })
   }
 })
@@ -210,7 +181,6 @@ app.get('/api/events/recent', async (c) => {
     
     return c.json({ events, count: events.length });
   } catch (error) {
-    console.error('❌ Failed to get recent events:', error);
     return c.json({ error: 'Failed to get recent events', events: [], count: 0 }, 500);
   }
 });
@@ -222,10 +192,8 @@ app.get('/api/events/stream', async (c) => {
   const isProduction = process.env.NODE_ENV === 'production';
   const isFly = process.env.FLY_APP_NAME !== undefined;
   
-  // Use polling for non-stream requests or in problematic environments
+  // Use polling for non-stream requests
   if (!isStream) {
-    console.log('📡 Polling mode request received');
-    
     const snapchain = new SnapchainClient();
     const limit = parseInt(c.req.query('limit') || '5');
     const maxWaitTime = parseInt(c.req.query('wait') || '3000');
@@ -269,7 +237,6 @@ app.get('/api/events/stream', async (c) => {
       });
       
     } catch (error) {
-      console.error('❌ Polling fallback error:', error);
       return c.json({ 
         events: [], 
         count: 0,
@@ -279,9 +246,6 @@ app.get('/api/events/stream', async (c) => {
     }
   }
 
-  console.log(`📡 SSE stream request received (production: ${isProduction}, fly: ${isFly})`);
-  
-  // Use native ReadableStream for better compatibility
   const encoder = new TextEncoder();
   
   const customReadable = new ReadableStream({
@@ -292,14 +256,10 @@ app.get('/api/events/stream', async (c) => {
       const startStream = async () => {
         try {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383";
-          console.log('📡 SSE connecting to Snapchain hub:', hubRpcEndpoint);
-          console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}, Platform: ${process.platform}`);
           
-          // Enhanced gRPC client configuration for production
           const grpcOptions: any = {};
           
           if (isProduction || isFly) {
-            console.log('🏭 Production/Fly.io mode: Using enhanced gRPC connection settings');
             grpcOptions['grpc.keepalive_time_ms'] = 30000;
             grpcOptions['grpc.keepalive_timeout_ms'] = 10000;
             grpcOptions['grpc.keepalive_permit_without_calls'] = 1;
@@ -317,58 +277,40 @@ app.get('/api/events/stream', async (c) => {
           
           nodeClient = getSSLHubRpcClient(hubRpcEndpoint, grpcOptions);
 
-          // Wait for client to be ready - longer timeout for production
-          const timeout = isProduction || isFly ? 45000 : 15000; // 45s for prod/fly, 15s for dev
-          console.log(`⏱️ Waiting for gRPC connection (timeout: ${timeout}ms)...`);
+          const timeout = isProduction || isFly ? 45000 : 15000;
           
           nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
             if (e) {
-              console.error(`❌ Failed to connect to ${hubRpcEndpoint}:`, e);
-              console.error('🔍 gRPC Error details:', {
-                code: e.code,
-                details: e.details,
-                message: e.message,
-                metadata: e.metadata?.toJSON?.() || e.metadata
-              });
-              
-              // Always send fallback message for production/fly environments
               if (isProduction || isFly) {
-                console.log('🏭 Production/Fly gRPC failed, client should use polling fallback');
                 try {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                     type: 'error', 
-                    error: 'gRPC connection failed in production, switching to polling',
+                    error: 'gRPC connection failed, switching to polling',
                     fallback: true,
-                    environment: process.env.NODE_ENV || 'development',
                     platform: isFly ? 'fly.io' : 'production'
                   })}\n\n`));
                 } catch (controllerError) {
-                  console.log('📡 Controller already closed during error handling');
+                  // Silent fail
                 }
               } else {
                 try {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                     type: 'error', 
-                    error: 'Failed to connect to hub',
-                    details: e.message || 'Unknown gRPC error'
+                    error: 'Failed to connect to hub'
                   })}\n\n`));
                 } catch (controllerError) {
-                  console.log('📡 Controller already closed during error handling');
+                  // Silent fail
                 }
               }
               
-              // Close the stream properly
               try {
                 controller.close();
               } catch (closeError) {
-                console.log('📡 Controller already closed during cleanup');
+                // Silent fail
               }
               return;
             }
 
-            console.log(`✅ Connected to ${hubRpcEndpoint}`);
-            
-            // Send connection confirmation
             try {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                 type: 'connected', 
@@ -376,7 +318,6 @@ app.get('/api/events/stream', async (c) => {
                 message: 'gRPC connection established'
               })}\n\n`));
             } catch (e) {
-              console.log('📡 Controller already closed during connection');
               return;
             }
 
@@ -387,9 +328,7 @@ app.get('/api/events/stream', async (c) => {
 
               if (subscribeResult.isOk()) {
                 const eventStream = subscribeResult.value;
-                console.log('📡 SSE subscription established');
 
-                // Send heartbeat every 30 seconds
                 const heartbeatInterval = setInterval(() => {
                   if (isStreamActive) {
                     try {
@@ -398,7 +337,6 @@ app.get('/api/events/stream', async (c) => {
                         timestamp: new Date().toISOString() 
                       })}\n\n`));
                     } catch (error) {
-                      console.log('📡 Heartbeat failed, controller closed');
                       clearInterval(heartbeatInterval);
                       isStreamActive = false;
                     }
@@ -432,43 +370,38 @@ app.get('/api/events/stream', async (c) => {
                           time: new Date(messageData.timestamp * 1000).toLocaleString()
                         };
 
-                        console.log(`📡 SSE sending cast: ${hash.substring(0, 8)}... by fid${messageData.fid}`);
                         try {
                           controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
                         } catch (controllerError) {
-                          console.log('📡 Controller closed, stopping stream');
                           isStreamActive = false;
                           break;
                         }
                       }
                     }
                   } catch (writeError) {
-                    console.error('📡 SSE write error:', writeError);
                     break;
                   }
                 }
 
                 clearInterval(heartbeatInterval);
               } else {
-                console.error('❌ Failed to subscribe');
                 try {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                     type: 'error', 
                     error: 'Failed to subscribe' 
                   })}\n\n`));
                 } catch (e) {
-                  console.log('📡 Controller already closed during error');
+                  // Silent fail
                 }
               }
             } catch (subscribeError) {
-              console.error('❌ Subscription error:', subscribeError);
               try {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                   type: 'error', 
                   error: 'Subscription failed' 
                 })}\n\n`));
               } catch (e) {
-                console.log('📡 Controller already closed during subscription error');
+                // Silent fail
               }
             } finally {
               if (nodeClient) {
@@ -477,14 +410,13 @@ app.get('/api/events/stream', async (c) => {
             }
           });
         } catch (error) {
-          console.error('❌ Error starting stream:', error);
           try {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
               type: 'error', 
               error: 'Connection failed' 
             })}\n\n`));
           } catch (e) {
-            console.log('📡 Controller already closed during stream error');
+            // Silent fail
           }
         }
       };
@@ -493,7 +425,7 @@ app.get('/api/events/stream', async (c) => {
     },
     
     cancel() {
-      console.log('📡 SSE stream cancelled by client');
+      // Stream cancelled by client
     }
   });
 
@@ -526,7 +458,6 @@ app.get('/api/events/:id', async (c) => {
     const event = await response.json()
     return c.json(event as any)
   } catch (error) {
-    console.error('Failed to fetch event:', error)
     return c.json({ error: 'Failed to fetch event' }, { status: 500 })
   }
 })
@@ -554,4 +485,4 @@ export default {
   fetch: app.fetch,
 }
 
-console.log(`🦫 bhvr server running on port ${port}`)
+// Server running on port ${port}

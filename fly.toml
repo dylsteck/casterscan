@@ -44,5 +44,6 @@ primary_region = 'ewr'
 [env]
   NODE_ENV = 'production'
   PORT = '3000'
-  # Add your Neynar API key here for fallback functionality
-  # NEYNAR_API_KEY = 'your-api-key-here'
+
+# Set your Neynar API key as a secret:
+# fly secrets set NEYNAR_API_KEY=your-api-key-here
