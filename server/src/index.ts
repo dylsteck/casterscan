@@ -192,40 +192,74 @@ app.get('/api/events/stream', async (c) => {
   
   // Use polling for non-stream requests
   if (!isStream) {
-    const snapchain = new SnapchainClient();
     const limit = parseInt(c.req.query('limit') || '5');
     const maxWaitTime = parseInt(c.req.query('wait') || '3000');
     
     try {
-      const eventStream = await snapchain.subscribe({
-        eventTypes: [HubEventType.MERGE_MESSAGE],
-        shardIndex: 1
-      });
-
+      const hubRpcEndpoint = "snap.farcaster.xyz:3383";
+      const nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
       const events: any[] = [];
-      const startTime = Date.now();
       
-      for await (const event of eventStream) {
-        const formattedEvent = {
-          type: 'event',
-          data: {
-            type: 'cast',
-            id: event.id || `event-${Date.now()}-${Math.random()}`,
-            username: event.username || `fid${(event as any).fid || 'unknown'}`,
-            content: event.content || '',
-            timestamp: (event as any).timestamp || new Date().toISOString(),
-            embeds: event.embeds || '0',
-            link: event.link || `https://warpcast.com/~/conversations/${event.id}`,
-            time: (event as any).time || new Date().toLocaleString()
+      const timeoutPromise = new Promise<void>((resolve) => {
+        setTimeout(() => resolve(), maxWaitTime);
+      });
+      
+      const eventPromise = new Promise<void>((resolve) => {
+        nodeClient.$.waitForReady(Date.now() + 5000, async (e) => {
+          if (e) {
+            resolve();
+            return;
           }
-        };
-        
-        events.push(formattedEvent);
-        
-        if (events.length >= limit || (Date.now() - startTime) > maxWaitTime) {
-          break;
-        }
-      }
+
+          try {
+            const subscribeResult = await nodeClient.subscribe({
+              eventTypes: [HubEventType.MERGE_MESSAGE],
+            });
+
+            if (subscribeResult.isOk()) {
+              const eventStream = subscribeResult.value;
+
+              for await (const event of eventStream) {
+                if (event.mergeMessageBody?.message?.data?.type === 1) {
+                  const message = event.mergeMessageBody.message;
+                  const messageData = message.data;
+                  const castBody = messageData.castAddBody;
+
+                  if (castBody && message.hash) {
+                    const hash = Buffer.from(message.hash).toString('hex');
+                    const eventData = {
+                      type: 'event',
+                      data: {
+                        type: 'cast',
+                        id: hash,
+                        username: `fid${messageData.fid}`,
+                        content: castBody.text || '',
+                        timestamp: new Date(messageData.timestamp * 1000).toISOString(),
+                        embeds: castBody.embeds?.length.toString() || '0',
+                        link: `https://warpcast.com/~/conversations/${hash}`,
+                        time: new Date(messageData.timestamp * 1000).toLocaleString()
+                      }
+                    };
+                    
+                    events.push(eventData);
+                    
+                    if (events.length >= limit) {
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            // Silent fail
+          } finally {
+            nodeClient.close();
+            resolve();
+          }
+        });
+      });
+      
+      await Promise.race([eventPromise, timeoutPromise]);
       
       return c.json({
         events,
@@ -248,143 +282,101 @@ app.get('/api/events/stream', async (c) => {
   
   const customReadable = new ReadableStream({
     start(controller) {
-      let nodeClient: ReturnType<typeof getSSLHubRpcClient> | null = null;
       let isStreamActive = true;
       
       const startStream = async () => {
         try {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383";
-          nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
+          const nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
 
-          const timeout = 10000;
-          
-          nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
-            if (e) {
-              try {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  type: 'error', 
-                  error: 'gRPC connection failed, switching to polling',
-                  fallback: true
-                })}\n\n`));
-              } catch (controllerError) {
-                // Silent fail
-              }
-              
-              try {
-                controller.close();
-              } catch (closeError) {
-                // Silent fail
-              }
-              return;
-            }
-
-            try {
+          const connectionTimeout = setTimeout(() => {
+            if (isStreamActive) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                type: 'connected', 
-                timestamp: new Date().toISOString(),
-                message: 'gRPC connection established'
+                type: 'error', 
+                error: 'Connection timeout, switching to polling',
+                fallback: true
               })}\n\n`));
-            } catch (e) {
+              nodeClient.close();
+              isStreamActive = false;
+            }
+          }, 3000);
+
+          nodeClient.$.waitForReady(Date.now() + 3000, async (e) => {
+            clearTimeout(connectionTimeout);
+            
+            if (!isStreamActive) return;
+            
+            if (e) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                type: 'error', 
+                error: 'Failed to connect to gRPC, switching to polling',
+                fallback: true
+              })}\n\n`));
               return;
             }
 
             try {
-              const subscribeResult = await nodeClient!.subscribe({
+              const subscribeResult = await nodeClient.subscribe({
                 eventTypes: [HubEventType.MERGE_MESSAGE],
               });
 
               if (subscribeResult.isOk()) {
                 const eventStream = subscribeResult.value;
 
-                const heartbeatInterval = setInterval(() => {
-                  if (isStreamActive) {
-                    try {
-                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                        type: 'heartbeat', 
-                        timestamp: new Date().toISOString() 
-                      })}\n\n`));
-                    } catch (error) {
-                      clearInterval(heartbeatInterval);
-                      isStreamActive = false;
-                    }
-                  } else {
-                    clearInterval(heartbeatInterval);
-                  }
-                }, 30000);
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                  type: 'connected', 
+                  message: 'gRPC stream connected'
+                })}\n\n`));
 
-                // Process events
                 for await (const event of eventStream) {
                   if (!isStreamActive) break;
+                  
+                  if (event.mergeMessageBody?.message?.data?.type === 1) {
+                    const message = event.mergeMessageBody.message;
+                    const messageData = message.data;
+                    const castBody = messageData.castAddBody;
 
-                  try {
-                    // Filter for cast messages (type 1)
-                    if (event.mergeMessageBody?.message?.data?.type === 1) {
-                      const message = event.mergeMessageBody.message;
-                      const messageData = message.data;
-                      const castBody = messageData.castAddBody;
+                    if (castBody && message.hash) {
+                      const hash = Buffer.from(message.hash).toString('hex');
+                      const eventData = {
+                        type: 'cast',
+                        id: hash,
+                        fid: Number(messageData.fid),
+                        username: `fid${messageData.fid}`,
+                        content: castBody.text || '',
+                        timestamp: new Date(messageData.timestamp * 1000).toISOString(),
+                        embeds: castBody.embeds?.length.toString() || '0',
+                        link: `https://warpcast.com/~/conversations/${hash}`,
+                        time: new Date(messageData.timestamp * 1000).toLocaleString()
+                      };
 
-                      if (castBody && message.hash) {
-                        const hash = Buffer.from(message.hash).toString('hex');
-                        const eventData = {
-                          type: 'cast',
-                          id: hash,
-                          fid: Number(messageData.fid),
-                          username: `fid${messageData.fid}`,
-                          content: castBody.text || '',
-                          timestamp: new Date(messageData.timestamp * 1000).toISOString(),
-                          embeds: castBody.embeds?.length.toString() || '',
-                          link: `https://warpcast.com/~/conversations/${hash}`,
-                          time: new Date(messageData.timestamp * 1000).toLocaleString()
-                        };
-
-                        try {
-                          controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
-                        } catch (controllerError) {
-                          isStreamActive = false;
-                          break;
-                        }
-                      }
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
                     }
-                  } catch (writeError) {
-                    break;
                   }
                 }
-
-                clearInterval(heartbeatInterval);
               } else {
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'Failed to subscribe' 
-                  })}\n\n`));
-                } catch (e) {
-                  // Silent fail
-                }
-              }
-            } catch (subscribeError) {
-              try {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                   type: 'error', 
-                  error: 'Subscription failed' 
+                  error: 'Failed to subscribe, switching to polling',
+                  fallback: true
                 })}\n\n`));
-              } catch (e) {
-                // Silent fail
               }
+            } catch (subscribeError) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                type: 'error', 
+                error: 'Subscription failed, switching to polling',
+                fallback: true
+              })}\n\n`));
             } finally {
-              if (nodeClient) {
-                nodeClient.close();
-              }
+              nodeClient.close();
             }
           });
         } catch (error) {
-          try {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-              type: 'error', 
-              error: 'Connection failed' 
-            })}\n\n`));
-          } catch (e) {
-            // Silent fail
-          }
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            type: 'error', 
+            error: 'Connection failed, switching to polling',
+            fallback: true
+          })}\n\n`));
         }
       };
 
@@ -392,7 +384,7 @@ app.get('/api/events/stream', async (c) => {
     },
     
     cancel() {
-      // Stream cancelled by client
+      
     }
   });
 

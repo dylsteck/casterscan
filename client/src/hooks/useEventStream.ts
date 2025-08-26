@@ -47,7 +47,7 @@ export function useEventStream() {
           try {
             const data = JSON.parse(event.data);
             
-            if (data.type === 'connected') {
+            if (data.type === 'connected' || data.type === 'connecting' || data.type === 'heartbeat') {
               return;
             }
             
@@ -75,7 +75,7 @@ export function useEventStream() {
           }
         };
         
-        eventSource.onerror = (event) => {
+        eventSource.onerror = () => {
           setIsConnected(false);
           
           if (eventSource?.readyState === EventSource.CLOSED) {
