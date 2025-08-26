@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@farcaster/miniapp-sdk": "^0.1.8",
+    "@farcaster/miniapp-sdk": "^0.1.9",
     "@farcaster/hub-nodejs": "^0.15.5",
     "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.84.2",
@@ -21,12 +21,12 @@
     "framer-motion": "^12.16.0",
     "geist": "^1.3.1",
     "lucide-react": "^0.471.0",
-    "next": "15.4.6",
+    "next": "15.5.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.21.0"
+    "viem": "^2.35.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250415.0",
@@ -34,13 +34,9 @@
     "@types/react": "19.1.6",
     "@types/react-dom": "19.1.6",
     "eslint": "^8",
-    "eslint-config-next": "15.4.6",
+    "eslint-config-next": "15.5.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  },
-  "overrides": {
-    "@types/react": "19.1.1",
-    "@types/react-dom": "19.1.2"
   }
 }
