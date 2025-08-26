@@ -19,6 +19,8 @@ export function useEventStream() {
 
   useEffect(() => {
     console.log('🔍 useEventStream effect - SERVER_URL:', SERVER_URL);
+    console.log('🔍 Environment check - hostname:', typeof window !== 'undefined' ? window.location.hostname : 'SSR');
+    console.log('🔍 Environment check - NODE_ENV:', process.env.NODE_ENV);
     if (!SERVER_URL) {
       console.log('❌ No SERVER_URL, not starting stream');
       return;
@@ -61,6 +63,14 @@ export function useEventStream() {
             if (data.type === 'error') {
               console.error('📡 SSE stream error:', data.error);
               setError(data.error);
+              
+              // If it's a gRPC fallback error in production, immediately switch to polling
+              if (data.fallback && window.location.hostname !== 'localhost') {
+                console.log('🏭 Production gRPC failed, switching to polling immediately');
+                setConnectionMethod('polling');
+                eventSource?.close();
+                startPolling();
+              }
               return;
             }
             
@@ -104,8 +114,23 @@ export function useEventStream() {
             } else {
               console.error(`❌ Max SSE retries (${maxRetries}) reached, falling back to polling`);
               setConnectionMethod('polling');
-              setError('SSE failed, switching to polling mode');
+              setError('Connection failed, using polling mode');
               startPolling();
+            }
+          } else if (eventSource?.readyState === EventSource.CONNECTING) {
+            // Connection is still trying, give it more time in production
+            const isProduction = window.location.hostname !== 'localhost';
+            if (isProduction && retryCount < maxRetries) {
+              retryCount++;
+              const delay = getRetryDelay(retryCount - 1);
+              setError(`Connecting... (${retryCount}/${maxRetries})`);
+              
+              retryTimeout = setTimeout(() => {
+                if (eventSource?.readyState !== EventSource.OPEN) {
+                  eventSource?.close();
+                  connectSSE();
+                }
+              }, delay);
             }
           } else {
             setError('Connection error');
@@ -169,8 +194,13 @@ export function useEventStream() {
       pollEvents();
     };
     
-    // Start with SSE, fallback to polling if needed
-    if (connectionMethod === 'sse') {
+    // Force polling in production, SSE for development
+    const isProduction = window.location.hostname !== 'localhost';
+    if (isProduction) {
+      console.log('🏭 Production detected, using polling mode');
+      setConnectionMethod('polling');
+      startPolling();
+    } else if (connectionMethod === 'sse') {
       connectSSE();
     } else {
       startPolling();

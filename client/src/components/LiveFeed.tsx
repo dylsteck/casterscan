@@ -50,7 +50,7 @@ export function LiveFeed() {
                   </span>
                 </div>
                 <div className="col-span-1">
-                  {event.embeds && event.embeds !== '0' && (
+                  {event.embeds && parseInt(event.embeds) > 0 && (
                     <div className="flex items-center justify-center bg-gray-400 w-10 h-10 ml-2">
                       <p className="text-center text-white text-sm">{event.embeds}</p>
                     </div>

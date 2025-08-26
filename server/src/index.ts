@@ -156,10 +156,11 @@ app.get('/api/events/recent', async (c) => {
 app.get('/api/events/stream', async (c) => {
   const { searchParams } = new URL(c.req.url);
   const isStream = searchParams.get('stream') === 'true';
+  const isProduction = process.env.NODE_ENV === 'production';
   
-  // Fallback to polling mode if stream=true is not set
-  if (!isStream) {
-    console.log('📡 Fallback polling mode request received');
+  // Force polling mode in production due to gRPC connection issues on Fly.io
+  if (!isStream || isProduction) {
+    console.log(isProduction ? '📡 Production polling mode (gRPC blocked)' : '📡 Fallback polling mode request received');
     
     const snapchain = new SnapchainClient();
     const limit = parseInt(c.req.query('limit') || '5');
@@ -175,10 +176,22 @@ app.get('/api/events/stream', async (c) => {
       const startTime = Date.now();
       
       for await (const event of eventStream) {
-        events.push({
+        // Process the event and format it properly
+        const formattedEvent = {
           type: 'event',
-          data: event
-        });
+          data: {
+            type: 'cast',
+            id: event.id || `event-${Date.now()}-${Math.random()}`,
+            username: event.username || `fid${(event as any).fid || 'unknown'}`,
+            content: event.content || '',
+            timestamp: (event as any).timestamp || new Date().toISOString(),
+            embeds: event.embeds || '0',
+            link: event.link || `https://warpcast.com/~/conversations/${event.id}`,
+            time: (event as any).time || new Date().toLocaleString()
+          }
+        };
+        
+        events.push(formattedEvent);
         
         if (events.length >= limit || (Date.now() - startTime) > maxWaitTime) {
           break;
@@ -216,21 +229,43 @@ app.get('/api/events/stream', async (c) => {
       const startStream = async () => {
         try {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383";
+          console.log('📡 SSE connecting to Snapchain hub:', hubRpcEndpoint);
+          
+          // Try multiple connection approaches for production reliability
+          const isProduction = process.env.NODE_ENV === 'production';
+          if (isProduction) {
+            console.log('🏭 Production mode: Using enhanced gRPC connection settings');
+          }
+          
           nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
 
-          console.log('📡 SSE connecting to Snapchain hub:', hubRpcEndpoint);
-
-          // Wait for client to be ready
-          nodeClient.$.waitForReady(Date.now() + 10000, async (e) => {
+          // Wait for client to be ready - increase timeout for production
+          const timeout = isProduction ? 30000 : 10000; // 30s for prod, 10s for dev
+          nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
             if (e) {
               console.error(`❌ Failed to connect to ${hubRpcEndpoint}:`, e);
-              try {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  type: 'error', 
-                  error: 'Failed to connect to hub' 
-                })}\n\n`));
-              } catch (e) {
-                console.log('📡 Controller already closed');
+              
+              // In production, send a fallback message and suggest polling
+              if (isProduction) {
+                console.log('🏭 Production gRPC failed, client should use polling fallback');
+                try {
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                    type: 'error', 
+                    error: 'gRPC connection failed, use polling',
+                    fallback: true
+                  })}\n\n`));
+                } catch (e) {
+                  console.log('📡 Controller already closed');
+                }
+              } else {
+                try {
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                    type: 'error', 
+                    error: 'Failed to connect to hub' 
+                  })}\n\n`));
+                } catch (e) {
+                  console.log('📡 Controller already closed');
+                }
               }
               return;
             }
@@ -375,6 +410,9 @@ app.get('/api/events/stream', async (c) => {
       'Access-Control-Allow-Methods': 'GET',
       'Access-Control-Allow-Headers': 'Cache-Control',
       'X-Accel-Buffering': 'no',
+      // Production fixes for Fly.io
+      'X-Forwarded-Proto': 'https',
+      'Vary': 'Accept-Encoding',
     },
   });
 });
