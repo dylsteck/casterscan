@@ -16,12 +16,17 @@ primary_region = 'ewr'
   min_machines_running = 1
   processes = ['app']
   
-  # Increase timeouts for SSE streams  
+  # Increase timeouts for SSE streams and gRPC connections
   [http_service.http_options.response]
-    complete_timeout = "60s"
+    complete_timeout = "120s"
     
   [http_service.http_options.request]
-    body_timeout = "60s"
+    body_timeout = "120s"
+    read_timeout = "120s"
+    
+  # HTTP/2 settings for gRPC compatibility
+  [http_service.http_options.h2_backend]
+    enabled = true
 
   # Health check
   [[http_service.checks]]
@@ -39,3 +44,5 @@ primary_region = 'ewr'
 [env]
   NODE_ENV = 'production'
   PORT = '3000'
+  # Add your Neynar API key here for fallback functionality
+  # NEYNAR_API_KEY = 'your-api-key-here'

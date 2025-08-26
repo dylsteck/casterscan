@@ -64,9 +64,10 @@ export function useEventStream() {
               console.error('📡 SSE stream error:', data.error);
               setError(data.error);
               
-              // If it's a gRPC fallback error in production, immediately switch to polling
-              if (data.fallback && window.location.hostname !== 'localhost') {
-                console.log('🏭 Production gRPC failed, switching to polling immediately');
+              // If it's a gRPC fallback error, immediately switch to polling
+              if (data.fallback) {
+                console.log(`🏭 ${data.platform || 'Production'} gRPC failed, switching to polling immediately`);
+                console.log('🔄 Environment details:', data.environment, data.platform);
                 setConnectionMethod('polling');
                 eventSource?.close();
                 startPolling();
@@ -194,13 +195,16 @@ export function useEventStream() {
       pollEvents();
     };
     
-    // Force polling in production, SSE for development
-    const isProduction = window.location.hostname !== 'localhost';
+    // Try SSE first, fall back to polling if it fails
+    const isLocalhost = window.location.hostname === 'localhost';
+    const isProduction = !isLocalhost;
+    
     if (isProduction) {
-      console.log('🏭 Production detected, using polling mode');
-      setConnectionMethod('polling');
-      startPolling();
-    } else if (connectionMethod === 'sse') {
+      console.log('🏭 Production environment detected');
+      console.log('🔄 Attempting SSE connection with polling fallback ready');
+    }
+    
+    if (connectionMethod === 'sse') {
       connectSSE();
     } else {
       startPolling();

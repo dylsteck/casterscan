@@ -26,7 +26,7 @@ app.get('/health', (c) => {
   return c.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Debug endpoint to check stream connectivity
+// Debug endpoint to check stream connectivity and environment
 app.get('/api/debug/stream', async (c) => {
   const snapchain = new SnapchainClient();
   const startTime = Date.now();
@@ -46,10 +46,19 @@ app.get('/api/debug/stream', async (c) => {
       status: 'stream_accessible',
       connectionTime,
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      platform: process.platform,
-      isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-      isFly: process.env.FLY_APP_NAME !== undefined
+      environment: {
+        NODE_ENV: process.env.NODE_ENV || 'development',
+        platform: process.platform,
+        isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
+        isFly: process.env.FLY_APP_NAME !== undefined,
+        flyRegion: process.env.FLY_REGION,
+        flyMachineId: process.env.FLY_MACHINE_ID,
+        hasNeynarKey: !!process.env.NEYNAR_API_KEY
+      },
+      network: {
+        hostname: process.env.HOSTNAME,
+        port: process.env.PORT || '3000'
+      }
     });
   } catch (error) {
     return c.json({
@@ -57,12 +66,66 @@ app.get('/api/debug/stream', async (c) => {
       error: error instanceof Error ? error.message : 'Unknown error',
       connectionTime: Date.now() - startTime,
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      platform: process.platform,
-      isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-      isFly: process.env.FLY_APP_NAME !== undefined
+      environment: {
+        NODE_ENV: process.env.NODE_ENV || 'development',
+        platform: process.platform,
+        isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
+        isFly: process.env.FLY_APP_NAME !== undefined,
+        flyRegion: process.env.FLY_REGION,
+        flyMachineId: process.env.FLY_MACHINE_ID,
+        hasNeynarKey: !!process.env.NEYNAR_API_KEY
+      },
+      network: {
+        hostname: process.env.HOSTNAME,
+        port: process.env.PORT || '3000'
+      }
     }, 500);
   }
+})
+
+// Enhanced connectivity test endpoint
+app.get('/api/debug/connectivity', async (c) => {
+  const results = {
+    timestamp: new Date().toISOString(),
+    tests: {} as Record<string, any>
+  };
+  
+  // Test HTTP connectivity to Farcaster
+  try {
+    const httpStart = Date.now();
+    const response = await fetch('https://snap.farcaster.xyz:3381/v1/info', {
+      signal: AbortSignal.timeout(10000)
+    });
+    results.tests.farcaster_http = {
+      success: response.ok,
+      status: response.status,
+      time: Date.now() - httpStart,
+      url: 'https://snap.farcaster.xyz:3381/v1/info'
+    };
+  } catch (error) {
+    results.tests.farcaster_http = {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      url: 'https://snap.farcaster.xyz:3381/v1/info'
+    };
+  }
+  
+  // Test gRPC client creation (without connection)
+  try {
+    const grpcStart = Date.now();
+    const client = getSSLHubRpcClient('snap.farcaster.xyz:3383');
+    results.tests.grpc_client_creation = {
+      success: true,
+      time: Date.now() - grpcStart
+    };
+  } catch (error) {
+    results.tests.grpc_client_creation = {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+  
+  return c.json(results);
 })
 
 app.get('/api/hello', async (c) => {
@@ -157,10 +220,11 @@ app.get('/api/events/stream', async (c) => {
   const { searchParams } = new URL(c.req.url);
   const isStream = searchParams.get('stream') === 'true';
   const isProduction = process.env.NODE_ENV === 'production';
+  const isFly = process.env.FLY_APP_NAME !== undefined;
   
-  // Force polling mode in production due to gRPC connection issues on Fly.io
-  if (!isStream || isProduction) {
-    console.log(isProduction ? '📡 Production polling mode (gRPC blocked)' : '📡 Fallback polling mode request received');
+  // Use polling for non-stream requests or in problematic environments
+  if (!isStream) {
+    console.log('📡 Polling mode request received');
     
     const snapchain = new SnapchainClient();
     const limit = parseInt(c.req.query('limit') || '5');
@@ -176,7 +240,6 @@ app.get('/api/events/stream', async (c) => {
       const startTime = Date.now();
       
       for await (const event of eventStream) {
-        // Process the event and format it properly
         const formattedEvent = {
           type: 'event',
           data: {
@@ -216,7 +279,7 @@ app.get('/api/events/stream', async (c) => {
     }
   }
 
-  console.log('📡 SSE stream request received');
+  console.log(`📡 SSE stream request received (production: ${isProduction}, fly: ${isFly})`);
   
   // Use native ReadableStream for better compatibility
   const encoder = new TextEncoder();
@@ -230,42 +293,75 @@ app.get('/api/events/stream', async (c) => {
         try {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383";
           console.log('📡 SSE connecting to Snapchain hub:', hubRpcEndpoint);
+          console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}, Platform: ${process.platform}`);
           
-          // Try multiple connection approaches for production reliability
-          const isProduction = process.env.NODE_ENV === 'production';
-          if (isProduction) {
-            console.log('🏭 Production mode: Using enhanced gRPC connection settings');
+          // Enhanced gRPC client configuration for production
+          const grpcOptions: any = {};
+          
+          if (isProduction || isFly) {
+            console.log('🏭 Production/Fly.io mode: Using enhanced gRPC connection settings');
+            grpcOptions['grpc.keepalive_time_ms'] = 30000;
+            grpcOptions['grpc.keepalive_timeout_ms'] = 10000;
+            grpcOptions['grpc.keepalive_permit_without_calls'] = 1;
+            grpcOptions['grpc.http2.max_pings_without_data'] = 0;
+            grpcOptions['grpc.http2.min_time_between_pings_ms'] = 10000;
+            grpcOptions['grpc.http2.min_ping_interval_without_data_ms'] = 300000;
+            grpcOptions['grpc.ssl_target_name_override'] = 'snap.farcaster.xyz';
+            grpcOptions['grpc.default_authority'] = 'snap.farcaster.xyz';
+            grpcOptions['grpc.enable_http_proxy'] = 0;
+            grpcOptions['grpc.max_receive_message_length'] = 4194304;
+            grpcOptions['grpc.max_send_message_length'] = 4194304;
+            grpcOptions['grpc.initial_reconnect_backoff_ms'] = 1000;
+            grpcOptions['grpc.max_reconnect_backoff_ms'] = 30000;
           }
           
-          nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
+          nodeClient = getSSLHubRpcClient(hubRpcEndpoint, grpcOptions);
 
-          // Wait for client to be ready - increase timeout for production
-          const timeout = isProduction ? 30000 : 10000; // 30s for prod, 10s for dev
+          // Wait for client to be ready - longer timeout for production
+          const timeout = isProduction || isFly ? 45000 : 15000; // 45s for prod/fly, 15s for dev
+          console.log(`⏱️ Waiting for gRPC connection (timeout: ${timeout}ms)...`);
+          
           nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
             if (e) {
               console.error(`❌ Failed to connect to ${hubRpcEndpoint}:`, e);
+              console.error('🔍 gRPC Error details:', {
+                code: e.code,
+                details: e.details,
+                message: e.message,
+                metadata: e.metadata?.toJSON?.() || e.metadata
+              });
               
-              // In production, send a fallback message and suggest polling
-              if (isProduction) {
-                console.log('🏭 Production gRPC failed, client should use polling fallback');
+              // Always send fallback message for production/fly environments
+              if (isProduction || isFly) {
+                console.log('🏭 Production/Fly gRPC failed, client should use polling fallback');
                 try {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                     type: 'error', 
-                    error: 'gRPC connection failed, use polling',
-                    fallback: true
+                    error: 'gRPC connection failed in production, switching to polling',
+                    fallback: true,
+                    environment: process.env.NODE_ENV || 'development',
+                    platform: isFly ? 'fly.io' : 'production'
                   })}\n\n`));
-                } catch (e) {
-                  console.log('📡 Controller already closed');
+                } catch (controllerError) {
+                  console.log('📡 Controller already closed during error handling');
                 }
               } else {
                 try {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
                     type: 'error', 
-                    error: 'Failed to connect to hub' 
+                    error: 'Failed to connect to hub',
+                    details: e.message || 'Unknown gRPC error'
                   })}\n\n`));
-                } catch (e) {
-                  console.log('📡 Controller already closed');
+                } catch (controllerError) {
+                  console.log('📡 Controller already closed during error handling');
                 }
+              }
+              
+              // Close the stream properly
+              try {
+                controller.close();
+              } catch (closeError) {
+                console.log('📡 Controller already closed during cleanup');
               }
               return;
             }

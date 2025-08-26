@@ -34,35 +34,48 @@ export class SnapchainClient {
     console.log(`🚂 Railway detected: ${this.isRailwayEnvironment()}`);
     console.log(`🪰 Fly.io detected: ${this.isFlyEnvironment()}`);
 
-    // For Fly.io, try multiple connection approaches
-    if (this.isFlyEnvironment()) {
-      console.log('🪰 Fly.io detected - trying multiple gRPC connection approaches...');
-
-      // Try insecure connection first to test basic connectivity
-      try {
-        console.log('🔗 Attempting insecure gRPC connection for Fly.io...');
-        const insecureHost = grpcHost.replace(':3383', ':3381'); // Try HTTP port
-        this.client = getSSLHubRpcClient(insecureHost, {
-          'grpc.ssl_target_name_override': 'snap.farcaster.xyz',
-          'grpc.enable_http_proxy': 0,
-          'grpc.enable_channelz': 1
-        });
-        console.log('✅ Insecure gRPC client created for Fly.io');
-      } catch (insecureError) {
-        console.log('❌ Insecure gRPC failed, trying SSL with different settings');
-        this.client = getSSLHubRpcClient(grpcHost, {
-          'grpc.keepalive_time_ms': 10000,
-          'grpc.keepalive_timeout_ms': 3000,
-          'grpc.keepalive_permit_without_calls': 1,
-          'grpc.http2.max_pings_without_data': 0,
-          'grpc.http2.min_time_between_pings_ms': 5000,
-          'grpc.http2.min_ping_interval_without_data_ms': 60000,
-          'grpc.ssl_target_name_override': 'snap.farcaster.xyz',
-          'grpc.enable_http_proxy': 0,
-          'grpc.enable_channelz': 1,
-          'grpc.default_authority': 'snap.farcaster.xyz'
-        });
-      }
+    // Enhanced gRPC configuration for production environments
+    if (this.isFlyEnvironment() || process.env.NODE_ENV === 'production') {
+      console.log('🪰 Production/Fly.io detected - using optimized gRPC configuration...');
+      
+      const productionGrpcOptions = {
+        // Connection settings
+        'grpc.keepalive_time_ms': 30000,
+        'grpc.keepalive_timeout_ms': 10000,
+        'grpc.keepalive_permit_without_calls': 1,
+        'grpc.http2.max_pings_without_data': 0,
+        'grpc.http2.min_time_between_pings_ms': 10000,
+        'grpc.http2.min_ping_interval_without_data_ms': 300000,
+        
+        // SSL/TLS settings
+        'grpc.ssl_target_name_override': 'snap.farcaster.xyz',
+        'grpc.default_authority': 'snap.farcaster.xyz',
+        
+        // Connection reliability
+        'grpc.enable_http_proxy': 0,
+        'grpc.enable_channelz': 1,
+        'grpc.max_receive_message_length': 4194304,
+        'grpc.max_send_message_length': 4194304,
+        
+        // Retry settings
+        'grpc.initial_reconnect_backoff_ms': 1000,
+        'grpc.max_reconnect_backoff_ms': 30000,
+        'grpc.service_config': JSON.stringify({
+          methodConfig: [{
+            name: [{}],
+            retryPolicy: {
+              maxAttempts: 3,
+              initialBackoff: '1s',
+              maxBackoff: '10s',
+              backoffMultiplier: 2,
+              retryableStatusCodes: ['UNAVAILABLE', 'DEADLINE_EXCEEDED']
+            }
+          }]
+        })
+      };
+      
+      this.client = getSSLHubRpcClient(grpcHost, productionGrpcOptions);
+      console.log('✅ Production-optimized gRPC client created');
     } else {
       this.client = getSSLHubRpcClient(grpcHost);
     }
@@ -373,34 +386,65 @@ export class SnapchainClient {
    * Dedicated gRPC connection method for Fly.io with proper SSL configuration
    */
   private async tryFlyGrpcConnection(request: SubscribeRequest): Promise<AsyncGenerator<EnrichedEvent, void, unknown>> {
-    console.log('🪰 Starting Fly.io gRPC connection attempt...');
+    console.log('🪰 Starting enhanced Fly.io gRPC connection attempt...');
     
-    // Use the main Snapchain endpoint with proper SSL settings for Fly.io
     const grpcHost = 'snap.farcaster.xyz:3383';
     console.log(`🔗 Connecting to: ${grpcHost}`);
     
-    // Create gRPC client with Fly.io-optimized settings
-    const flyClient = getSSLHubRpcClient(grpcHost, {
-      'grpc.keepalive_time_ms': 30000,
-      'grpc.keepalive_timeout_ms': 10000,
+    // Production-grade gRPC client settings for Fly.io
+    const flyGrpcOptions = {
+      // Enhanced keepalive settings
+      'grpc.keepalive_time_ms': 20000,
+      'grpc.keepalive_timeout_ms': 5000,
       'grpc.keepalive_permit_without_calls': 1,
       'grpc.http2.max_pings_without_data': 0,
-      'grpc.http2.min_time_between_pings_ms': 10000,
-      'grpc.http2.min_ping_interval_without_data_ms': 300000,
+      'grpc.http2.min_time_between_pings_ms': 5000,
+      'grpc.http2.min_ping_interval_without_data_ms': 120000,
+      
+      // SSL/TLS configuration
       'grpc.ssl_target_name_override': 'snap.farcaster.xyz',
       'grpc.default_authority': 'snap.farcaster.xyz',
+      
+      // Connection reliability
       'grpc.enable_http_proxy': 0,
-      'grpc.max_receive_message_length': 4194304,
-      'grpc.max_send_message_length': 4194304,
-      'grpc.initial_reconnect_backoff_ms': 1000,
-      'grpc.max_reconnect_backoff_ms': 30000
-    });
+      'grpc.enable_channelz': 1,
+      'grpc.max_receive_message_length': 8388608, // 8MB
+      'grpc.max_send_message_length': 8388608,
+      
+      // Enhanced retry configuration
+      'grpc.initial_reconnect_backoff_ms': 500,
+      'grpc.max_reconnect_backoff_ms': 15000,
+      'grpc.service_config': JSON.stringify({
+        methodConfig: [{
+          name: [{}],
+          retryPolicy: {
+            maxAttempts: 5,
+            initialBackoff: '0.5s',
+            maxBackoff: '5s',
+            backoffMultiplier: 1.5,
+            retryableStatusCodes: ['UNAVAILABLE', 'DEADLINE_EXCEEDED', 'RESOURCE_EXHAUSTED']
+          }
+        }]
+      }),
+      
+      // Additional production settings
+      'grpc.dns_resolution_timeout': 10000,
+      'grpc.client_idle_timeout_ms': 300000
+    };
+    
+    const flyClient = getSSLHubRpcClient(grpcHost, flyGrpcOptions);
 
     return new Promise<AsyncGenerator<EnrichedEvent, void, unknown>>((resolve, reject) => {
-      const timeout = 15000; // Longer timeout for Fly.io
+      const timeout = 30000; // Extended timeout for production reliability
       const deadline = Date.now() + timeout;
 
       console.log(`🪰 Waiting for gRPC ready state (timeout: ${timeout}ms)...`);
+      console.log('🔍 Connection attempt details:', {
+        environment: process.env.NODE_ENV,
+        platform: process.platform,
+        flyRegion: process.env.FLY_REGION,
+        timestamp: new Date().toISOString()
+      });
 
       (flyClient as any).$.waitForReady(deadline, async (e: any) => {
         if (e) {
@@ -592,18 +636,11 @@ export class SnapchainClient {
     return this.httpFallbackStream(request);
   }
   
-  // For production environments, prefer HTTP fallback for reliability
-  if (isProduction && isFly) {
-    console.log('🪰 Fly.io production environment detected - using HTTP fallback for reliability');
-    console.log('💡 gRPC can be unstable in Fly.io production due to proxy/load balancer issues');
-    return this.httpFallbackStream(request);
-  }
-  
-  // Try gRPC on Fly.io development/staging with proper configuration
+  // For Fly.io environments, try gRPC first with enhanced configuration
   if (isFly) {
-    console.log('🪰 Fly.io development environment detected - attempting gRPC with optimized settings');
-    console.log(`🌐 NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
-    console.log(`🔍 isFly: ${isFly}, isProduction: ${isProduction}`);
+    console.log(`🪰 Fly.io environment detected (production: ${isProduction})`);
+    console.log('🔄 Attempting enhanced gRPC connection with production-grade settings');
+    console.log(`🌐 Environment details - NODE_ENV: ${process.env.NODE_ENV || 'undefined'}, Platform: ${process.platform}`);
     return this.tryFlyGrpcConnection(request);
   }
     
