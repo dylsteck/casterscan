@@ -79,7 +79,7 @@ export class FarcasterApiClient {
       this.cache.set(fid, username);
       return username;
     } catch (error) {
-      console.error(`Failed to fetch username for FID ${fid}:`, error);
+      // Failed to fetch username
       return `${fid}`;
     }
   }

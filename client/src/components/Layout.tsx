@@ -1,3 +1,4 @@
+import type * as React from "react";
 import { Header } from "./Header";
 
 interface LayoutProps {

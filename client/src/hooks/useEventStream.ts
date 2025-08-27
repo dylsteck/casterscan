@@ -7,7 +7,7 @@ export interface StreamEvent {
   content: string;
   link: string;
   time: string;
-  type: string;
+  type?: string;
   embeds?: string;
 }
 
@@ -16,17 +16,13 @@ export function useEventStream() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connectionMethod, setConnectionMethod] = useState<'sse' | 'polling'>('sse');
+  
+  const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 
   useEffect(() => {
-    console.log('🔍 useEventStream effect - SERVER_URL:', SERVER_URL);
-    console.log('🔍 Environment check - hostname:', typeof window !== 'undefined' ? window.location.hostname : 'SSR');
-    console.log('🔍 Environment check - NODE_ENV:', process.env.NODE_ENV);
     if (!SERVER_URL) {
-      console.log('❌ No SERVER_URL, not starting stream');
       return;
     }
-
-    console.log('🔗 Starting SSE connection:', `${SERVER_URL}/api/events/stream?stream=true`);
     
     let eventSource: EventSource | null = null;
     let retryCount = 0;
@@ -41,89 +37,69 @@ export function useEventStream() {
     
     const connectSSE = () => {
       try {
-        eventSource = new EventSource(`${SERVER_URL}/api/events/stream?stream=true`);
+        eventSource = new EventSource(`${SERVER_URL}/api/events/stream`);
         
         eventSource.onopen = () => {
-          console.log('📡 SSE connection opened');
           setIsConnected(true);
           setError(null);
-          retryCount = 0; // Reset retry count on successful connection
+          retryCount = 0;
         };
         
         eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            console.log('📡 SSE message received:', data.type);
             
-            if (data.type === 'connected') {
-              console.log('📡 SSE stream confirmed connected:', data.message);
+            if (data.type === 'connected' || data.type === 'ready' || data.type === 'heartbeat') {
+              return;
+            }
+            
+            if (data.type === 'streaming') {
               return;
             }
             
             if (data.type === 'error') {
-              console.error('📡 SSE stream error:', data.error);
               setError(data.error);
-              
-              // If it's a gRPC fallback error in production, immediately switch to polling
-              if (data.fallback && window.location.hostname !== 'localhost') {
-                console.log('🏭 Production gRPC failed, switching to polling immediately');
+              // Switch to polling on SSE error in production
+              if (isProduction) {
                 setConnectionMethod('polling');
-                eventSource?.close();
-                startPolling();
+                return;
               }
-              return;
             }
             
             if (data.type === 'cast' && data.id && data.content) {
-              console.log('📡 Adding SSE cast to UI:', data.id.substring(0, 8), 'by', data.username);
-              
               setEvents(prev => {
-                // Avoid duplicates by checking ID
                 if (prev.some(e => e.id === data.id)) {
                   return prev;
                 }
-                return [data, ...prev.slice(0, 49)]; // Keep last 50 events
+                return [data, ...prev.slice(0, 49)];
               });
             }
-            else if (data.type === 'heartbeat') {
-              console.log('📡 SSE heartbeat received');
-            }
           } catch (parseError) {
-            console.error('❌ Error parsing SSE data:', parseError);
+            // Silent fail
           }
         };
         
-        eventSource.onerror = (event) => {
-          console.error('❌ SSE connection error:', event);
+        eventSource.onerror = () => {
           setIsConnected(false);
           
           if (eventSource?.readyState === EventSource.CLOSED) {
-            console.log('📡 SSE connection closed by server');
-            
-            // Attempt to reconnect with exponential backoff
             if (retryCount < maxRetries) {
               retryCount++;
               const delay = getRetryDelay(retryCount - 1);
               setError(`Connection lost, retrying in ${Math.ceil(delay/1000)}s... (${retryCount}/${maxRetries})`);
               
-              console.log(`⏳ SSE reconnecting in ${delay}ms (attempt ${retryCount}/${maxRetries})`);
-              
               retryTimeout = setTimeout(() => {
                 connectSSE();
               }, delay);
             } else {
-              console.error(`❌ Max SSE retries (${maxRetries}) reached, falling back to polling`);
               setConnectionMethod('polling');
               setError('Connection failed, using polling mode');
-              startPolling();
             }
           } else if (eventSource?.readyState === EventSource.CONNECTING) {
-            // Connection is still trying, give it more time in production
-            const isProduction = window.location.hostname !== 'localhost';
-            if (isProduction && retryCount < maxRetries) {
+            if (isProduction && retryCount < 2) {
               retryCount++;
               const delay = getRetryDelay(retryCount - 1);
-              setError(`Connecting... (${retryCount}/${maxRetries})`);
+              setError(`Connecting... (${retryCount}/2)`);
               
               retryTimeout = setTimeout(() => {
                 if (eventSource?.readyState !== EventSource.OPEN) {
@@ -131,16 +107,25 @@ export function useEventStream() {
                   connectSSE();
                 }
               }, delay);
+            } else if (isProduction) {
+              // In production, switch to polling faster
+              setConnectionMethod('polling');
+              setError('Switched to polling mode');
             }
           } else {
-            setError('Connection error');
+            if (retryCount >= 2 || isProduction) {
+              setConnectionMethod('polling');
+              setError('Connection failed, using polling mode');
+            }
           }
         };
         
       } catch (err) {
-        console.error('❌ Error creating SSE connection:', err);
         setError('Failed to create connection');
         setIsConnected(false);
+        if (isProduction) {
+          setConnectionMethod('polling');
+        }
       }
     };
     
@@ -150,9 +135,7 @@ export function useEventStream() {
       const pollEvents = async () => {
         while (isPollingActive && connectionMethod === 'polling') {
           try {
-            console.log('📡 Polling for new events (fallback mode)...');
-            
-            const response = await fetch(`${SERVER_URL}/api/events/stream?limit=5&wait=3000`);
+            const response = await fetch(`${SERVER_URL}/api/events/recent?limit=10`);
             
             if (!response.ok) {
               throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -161,17 +144,13 @@ export function useEventStream() {
             const data = await response.json();
             
             if (data.events && data.events.length > 0) {
-              console.log(`📡 Got ${data.events.length} new events from polling`);
-              
-              data.events.forEach((eventWrapper: any) => {
-                if (eventWrapper.type === 'event' && eventWrapper.data) {
-                  const eventData = eventWrapper.data;
-                  console.log('📡 Adding polling event to UI:', eventData.type, eventData.username);
+              data.events.forEach((event: any) => {
+                if (event.type === 'cast' && event.id && event.content) {
                   setEvents(prev => {
-                    if (prev.some(e => e.id === eventData.id)) {
+                    if (prev.some(e => e.id === event.id)) {
                       return prev;
                     }
-                    return [eventData, ...prev.slice(0, 49)];
+                    return [event, ...prev.slice(0, 49)];
                   });
                 }
               });
@@ -180,13 +159,15 @@ export function useEventStream() {
             setIsConnected(true);
             setError(null);
             
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Faster polling in production, slower in development
+            const pollInterval = isProduction ? 2000 : 3000;
+            await new Promise(resolve => setTimeout(resolve, pollInterval));
             
           } catch (err) {
-            console.error('❌ Polling error:', err);
             setIsConnected(false);
-            setError('Polling failed');
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            const errorMsg = err instanceof Error ? err.message : 'Polling failed';
+            setError(isProduction ? 'Connection issue, retrying...' : errorMsg);
+            await new Promise(resolve => setTimeout(resolve, isProduction ? 3000 : 5000));
           }
         }
       };
@@ -194,21 +175,13 @@ export function useEventStream() {
       pollEvents();
     };
     
-    // Force polling in production, SSE for development
-    const isProduction = window.location.hostname !== 'localhost';
-    if (isProduction) {
-      console.log('🏭 Production detected, using polling mode');
-      setConnectionMethod('polling');
-      startPolling();
-    } else if (connectionMethod === 'sse') {
+    if (connectionMethod === 'sse') {
       connectSSE();
     } else {
       startPolling();
     }
     
     return () => {
-      console.log('🔌 Cleaning up connections');
-      
       isPollingActive = false;
       
       if (retryTimeout) {

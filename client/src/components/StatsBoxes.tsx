@@ -36,8 +36,8 @@ export function StatsBoxes() {
 
   if (error || !info) {
     return (
-      <div className="grid grid-cols-6 gap-0">
-        <div className="col-span-6 border border-gray-300 p-4 bg-red-50 text-red-600 text-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0">
+        <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-6 border border-gray-300 p-4 bg-red-50 text-red-600 text-center">
           Failed to load stats: {error}
         </div>
       </div>
@@ -48,41 +48,41 @@ export function StatsBoxes() {
   const shard2 = info.shardInfos.find(s => s.shardId === 2);
 
   return (
-    <div className="grid grid-cols-6 gap-0">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0">
       {/* Total Messages */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">TOTAL MESSAGES</div>
-        <div className="text-lg font-semibold">{formatNumber(info.dbStats.numMessages)}</div>
+        <div className="text-base sm:text-lg font-semibold">{formatNumber(info.dbStats.numMessages)}</div>
       </div>
 
       {/* Total FIDs */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">TOTAL FIDS</div>
-        <div className="text-lg font-semibold">{formatNumber(info.dbStats.numFidRegistrations)}</div>
+        <div className="text-base sm:text-lg font-semibold">{formatNumber(info.dbStats.numFidRegistrations)}</div>
       </div>
 
       {/* Database Size */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">DB SIZE</div>
-        <div className="text-lg font-semibold">{formatBytes(info.dbStats.approxSize)}</div>
+        <div className="text-base sm:text-lg font-semibold">{formatBytes(info.dbStats.approxSize)}</div>
       </div>
 
       {/* Shard 1 Height */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">SHARD 1 HEIGHT</div>
-        <div className="text-lg font-semibold">{formatNumber(shard1?.maxHeight || 0)}</div>
+        <div className="text-base sm:text-lg font-semibold">{formatNumber(shard1?.maxHeight || 0)}</div>
       </div>
 
       {/* Shard 2 Height */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">SHARD 2 HEIGHT</div>
-        <div className="text-lg font-semibold">{formatNumber(shard2?.maxHeight || 0)}</div>
+        <div className="text-base sm:text-lg font-semibold">{formatNumber(shard2?.maxHeight || 0)}</div>
       </div>
 
       {/* Version */}
-      <div className="border border-gray-300 p-4 bg-white">
+      <div className="border border-gray-300 p-3 sm:p-4 bg-white">
         <div className="text-xs text-gray-500 mb-1">VERSION</div>
-        <div className="text-lg font-semibold">v{info.version}</div>
+        <div className="text-base sm:text-lg font-semibold">v{info.version}</div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import { serveStatic } from 'hono/bun'
 import type { ApiResponse } from 'shared/dist'
 import { getSnapchainHttpUrl } from 'shared/dist'
 import { SnapchainClient, type SubscribeRequest } from './snapchain'
-import { getSSLHubRpcClient, HubEventType } from '@farcaster/hub-nodejs'
+import { getSSLHubRpcClient, getInsecureHubRpcClient, HubEventType } from '@farcaster/hub-nodejs'
 import { NeynarService } from './neynar'
 
 const app = new Hono()
@@ -32,13 +32,11 @@ app.get('/api/debug/stream', async (c) => {
   const startTime = Date.now();
   
   try {
-    console.log('🔍 Debug: Testing stream connection...');
     const eventStream = await snapchain.subscribe({
       eventTypes: [1, 2, 3],
       shardIndex: 1
     });
     
-    // Test if we can get the stream (don't wait for events)
     const streamTest = eventStream[Symbol.asyncIterator]();
     const connectionTime = Date.now() - startTime;
     
@@ -46,23 +44,73 @@ app.get('/api/debug/stream', async (c) => {
       status: 'stream_accessible',
       connectionTime,
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      platform: process.platform,
-      isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-      isFly: process.env.FLY_APP_NAME !== undefined
+      environment: {
+        NODE_ENV: process.env.NODE_ENV || 'development',
+        platform: process.platform,
+        isFly: !!process.env.FLY_APP_NAME,
+        hasNeynarKey: !!process.env.NEYNAR_API_KEY
+      }
     });
   } catch (error) {
     return c.json({
       status: 'stream_error',
       error: error instanceof Error ? error.message : 'Unknown error',
       connectionTime: Date.now() - startTime,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      platform: process.platform,
-      isRailway: process.env.RAILWAY_ENVIRONMENT !== undefined,
-      isFly: process.env.FLY_APP_NAME !== undefined
+      timestamp: new Date().toISOString()
     }, 500);
   }
+})
+
+// Connectivity test endpoint
+app.get('/api/debug/connectivity', async (c) => {
+  const results = {
+    timestamp: new Date().toISOString(),
+    tests: {} as Record<string, any>
+  };
+  
+  try {
+    const httpStart = Date.now();
+    const response = await fetch('https://snap.farcaster.xyz:3381/v1/info', {
+      signal: AbortSignal.timeout(10000)
+    });
+    results.tests.farcaster_http = {
+      success: response.ok,
+      status: response.status,
+      time: Date.now() - httpStart
+    };
+  } catch (error) {
+    results.tests.farcaster_http = {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+  
+  try {
+    const grpcStart = Date.now();
+    const client = getSSLHubRpcClient('snap.farcaster.xyz:3383', {
+      'grpc.keepalive_time_ms': 30000,
+      'grpc.keepalive_timeout_ms': 5000,
+      'grpc.keepalive_permit_without_calls': 1,
+      'grpc.http2.max_pings_without_data': 0,
+      'grpc.http2.min_time_between_pings_ms': 10000,
+      'grpc.http2.min_ping_interval_without_data_ms': 300000,
+      'grpc.max_receive_message_length': 1024 * 1024 * 16,
+      'grpc.max_send_message_length': 1024 * 1024 * 16,
+      'grpc.so_reuseport': 1,
+      'grpc.use_local_subchannel_pool': 1
+    });
+    results.tests.grpc_client_creation = {
+      success: true,
+      time: Date.now() - grpcStart
+    };
+  } catch (error) {
+    results.tests.grpc_client_creation = {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+  
+  return c.json(results);
 })
 
 app.get('/api/hello', async (c) => {
@@ -85,7 +133,6 @@ app.get('/api/info', async (c) => {
     const data = await response.json()
     return c.json(data as any)
   } catch (error) {
-    console.error('Failed to fetch Snapchain info:', error)
     return c.json({ error: 'Failed to fetch info' }, { status: 500 })
   }
 })
@@ -96,8 +143,32 @@ app.get('/api/fids/:fid', async (c) => {
     const user = await neynarService.getNeynarUser(fid)
     return c.json(user)
   } catch (error) {
-    console.error('Failed to fetch user:', error)
     return c.json({ error: 'Failed to fetch user' }, { status: 500 })
+  }
+})
+
+app.get('/api/fids/:fid/signers', async (c) => {
+  try {
+    const fid = c.req.param('fid')
+    const pageSize = c.req.query('pageSize') || '1000'
+    const pageToken = c.req.query('pageToken') || ''
+    const reverse = c.req.query('reverse') || 'false'
+    const signer = c.req.query('signer') || ''
+    
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    let url = `${nodeUrl}/v1/onChainSignersByFid?fid=${fid}&pageSize=${pageSize}&reverse=${reverse}`
+    if (pageToken) url += `&pageToken=${pageToken}`
+    if (signer) url += `&signer=${signer}`
+    
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const data = await response.json()
+    return c.json(data as any)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch signers' }, { status: 500 })
   }
 })
 
@@ -107,7 +178,6 @@ app.get('/api/casts/:hash', async (c) => {
     const cast = await neynarService.getNeynarCast(hash, 'hash')
     return c.json(cast)
   } catch (error) {
-    console.error('Failed to fetch cast:', error)
     return c.json({ error: 'Failed to fetch cast' }, { status: 500 })
   }
 })
@@ -127,277 +197,103 @@ app.get('/api/events/recent', async (c) => {
   const snapchain = new SnapchainClient();
   
   try {
-    // Get recent events from HTTP polling
     const events: any[] = [];
     const eventStream = await snapchain.subscribe({
-      eventTypes: [1, 2, 3], // MERGE_MESSAGE, PRUNE_MESSAGE, REVOKE_MESSAGE
-      shardIndex: 1
+      eventTypes: [HubEventType.MERGE_MESSAGE],
+      shardIndex: 1,
+      fromId: 0
     });
 
-    // Collect events for 2 seconds
-    const timeout = setTimeout(() => {}, 2000);
+    const startTime = Date.now();
+    const timeoutMs = 3000;
     let count = 0;
     
     for await (const event of eventStream) {
       events.push(event);
       count++;
       if (count >= limit) break;
-      if (Date.now() - parseInt(timeout.toString()) > 2000) break;
+      if (Date.now() - startTime > timeoutMs) break;
     }
     
     return c.json({ events, count: events.length });
   } catch (error) {
-    console.error('❌ Failed to get recent events:', error);
     return c.json({ error: 'Failed to get recent events', events: [], count: 0 }, 500);
   }
 });
 
 // Server-Sent Events stream for real-time events
 app.get('/api/events/stream', async (c) => {
-  const { searchParams } = new URL(c.req.url);
-  const isStream = searchParams.get('stream') === 'true';
-  const isProduction = process.env.NODE_ENV === 'production';
-  
-  // Force polling mode in production due to gRPC connection issues on Fly.io
-  if (!isStream || isProduction) {
-    console.log(isProduction ? '📡 Production polling mode (gRPC blocked)' : '📡 Fallback polling mode request received');
-    
-    const snapchain = new SnapchainClient();
-    const limit = parseInt(c.req.query('limit') || '5');
-    const maxWaitTime = parseInt(c.req.query('wait') || '3000');
-    
-    try {
-      const eventStream = await snapchain.subscribe({
-        eventTypes: [HubEventType.MERGE_MESSAGE, HubEventType.PRUNE_MESSAGE, HubEventType.REVOKE_MESSAGE],
-        shardIndex: 1
-      });
-
-      const events: any[] = [];
-      const startTime = Date.now();
-      
-      for await (const event of eventStream) {
-        // Process the event and format it properly
-        const formattedEvent = {
-          type: 'event',
-          data: {
-            type: 'cast',
-            id: event.id || `event-${Date.now()}-${Math.random()}`,
-            username: event.username || `fid${(event as any).fid || 'unknown'}`,
-            content: event.content || '',
-            timestamp: (event as any).timestamp || new Date().toISOString(),
-            embeds: event.embeds || '0',
-            link: event.link || `https://warpcast.com/~/conversations/${event.id}`,
-            time: (event as any).time || new Date().toLocaleString()
-          }
-        };
-        
-        events.push(formattedEvent);
-        
-        if (events.length >= limit || (Date.now() - startTime) > maxWaitTime) {
-          break;
-        }
-      }
-      
-      return c.json({
-        events,
-        count: events.length,
-        timestamp: new Date().toISOString(),
-        source: 'polling'
-      });
-      
-    } catch (error) {
-      console.error('❌ Polling fallback error:', error);
-      return c.json({ 
-        events: [], 
-        count: 0,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        source: 'polling_error'
-      }, 200);
-    }
-  }
-
-  console.log('📡 SSE stream request received');
-  
-  // Use native ReadableStream for better compatibility
   const encoder = new TextEncoder();
+  let snapchainClient: SnapchainClient | null = null;
   
   const customReadable = new ReadableStream({
     start(controller) {
-      let nodeClient: ReturnType<typeof getSSLHubRpcClient> | null = null;
-      let isStreamActive = true;
-      
-      const startStream = async () => {
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+        type: 'connected',
+        timestamp: new Date().toISOString()
+      })}\n\n`));
+
+      const startGrpcStream = async () => {
         try {
-          const hubRpcEndpoint = "snap.farcaster.xyz:3383";
-          console.log('📡 SSE connecting to Snapchain hub:', hubRpcEndpoint);
+          snapchainClient = new SnapchainClient();
           
-          // Try multiple connection approaches for production reliability
-          const isProduction = process.env.NODE_ENV === 'production';
-          if (isProduction) {
-            console.log('🏭 Production mode: Using enhanced gRPC connection settings');
-          }
-          
-          nodeClient = getSSLHubRpcClient(hubRpcEndpoint);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            type: 'ready',
+            timestamp: new Date().toISOString()
+          })}\n\n`));
 
-          // Wait for client to be ready - increase timeout for production
-          const timeout = isProduction ? 30000 : 10000; // 30s for prod, 10s for dev
-          nodeClient.$.waitForReady(Date.now() + timeout, async (e) => {
-            if (e) {
-              console.error(`❌ Failed to connect to ${hubRpcEndpoint}:`, e);
-              
-              // In production, send a fallback message and suggest polling
-              if (isProduction) {
-                console.log('🏭 Production gRPC failed, client should use polling fallback');
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'gRPC connection failed, use polling',
-                    fallback: true
-                  })}\n\n`));
-                } catch (e) {
-                  console.log('📡 Controller already closed');
-                }
-              } else {
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'Failed to connect to hub' 
-                  })}\n\n`));
-                } catch (e) {
-                  console.log('📡 Controller already closed');
-                }
-              }
-              return;
-            }
-
-            console.log(`✅ Connected to ${hubRpcEndpoint}`);
-            
-            // Send connection confirmation
-            try {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                type: 'connected', 
-                timestamp: new Date().toISOString(),
-                message: 'gRPC connection established'
-              })}\n\n`));
-            } catch (e) {
-              console.log('📡 Controller already closed during connection');
-              return;
-            }
-
-            try {
-              const subscribeResult = await nodeClient!.subscribe({
-                eventTypes: [HubEventType.MERGE_MESSAGE],
-              });
-
-              if (subscribeResult.isOk()) {
-                const eventStream = subscribeResult.value;
-                console.log('📡 SSE subscription established');
-
-                // Send heartbeat every 30 seconds
-                const heartbeatInterval = setInterval(() => {
-                  if (isStreamActive) {
-                    try {
-                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                        type: 'heartbeat', 
-                        timestamp: new Date().toISOString() 
-                      })}\n\n`));
-                    } catch (error) {
-                      console.log('📡 Heartbeat failed, controller closed');
-                      clearInterval(heartbeatInterval);
-                      isStreamActive = false;
-                    }
-                  } else {
-                    clearInterval(heartbeatInterval);
-                  }
-                }, 30000);
-
-                // Process events
-                for await (const event of eventStream) {
-                  if (!isStreamActive) break;
-
-                  try {
-                    // Filter for cast messages (type 1)
-                    if (event.mergeMessageBody?.message?.data?.type === 1) {
-                      const message = event.mergeMessageBody.message;
-                      const messageData = message.data;
-                      const castBody = messageData.castAddBody;
-
-                      if (castBody && message.hash) {
-                        const hash = Buffer.from(message.hash).toString('hex');
-                        const eventData = {
-                          type: 'cast',
-                          id: hash,
-                          fid: Number(messageData.fid),
-                          username: `fid${messageData.fid}`,
-                          content: castBody.text || '',
-                          timestamp: new Date(messageData.timestamp * 1000).toISOString(),
-                          embeds: castBody.embeds?.length.toString() || '',
-                          link: `https://warpcast.com/~/conversations/${hash}`,
-                          time: new Date(messageData.timestamp * 1000).toLocaleString()
-                        };
-
-                        console.log(`📡 SSE sending cast: ${hash.substring(0, 8)}... by fid${messageData.fid}`);
-                        try {
-                          controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
-                        } catch (controllerError) {
-                          console.log('📡 Controller closed, stopping stream');
-                          isStreamActive = false;
-                          break;
-                        }
-                      }
-                    }
-                  } catch (writeError) {
-                    console.error('📡 SSE write error:', writeError);
-                    break;
-                  }
-                }
-
-                clearInterval(heartbeatInterval);
-              } else {
-                console.error('❌ Failed to subscribe');
-                try {
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                    type: 'error', 
-                    error: 'Failed to subscribe' 
-                  })}\n\n`));
-                } catch (e) {
-                  console.log('📡 Controller already closed during error');
-                }
-              }
-            } catch (subscribeError) {
-              console.error('❌ Subscription error:', subscribeError);
-              try {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  type: 'error', 
-                  error: 'Subscription failed' 
-                })}\n\n`));
-              } catch (e) {
-                console.log('📡 Controller already closed during subscription error');
-              }
-            } finally {
-              if (nodeClient) {
-                nodeClient.close();
-              }
-            }
+          const eventStream = await snapchainClient.subscribe({
+            eventTypes: [HubEventType.MERGE_MESSAGE],
+            shardIndex: 1,
+            fromId: 0
           });
-        } catch (error) {
-          console.error('❌ Error starting stream:', error);
-          try {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-              type: 'error', 
-              error: 'Connection failed' 
-            })}\n\n`));
-          } catch (e) {
-            console.log('📡 Controller already closed during stream error');
+
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            type: 'streaming',
+            timestamp: new Date().toISOString()
+          })}\n\n`));
+
+          for await (const event of eventStream) {
+            try {
+              const eventData = {
+                type: event.type,
+                id: event.id,
+                username: event.username,
+                content: event.content,
+                timestamp: event.time,
+                embeds: event.embeds || '0',
+                link: event.link,
+                time: new Date(event.time).toLocaleString()
+              };
+
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
+            } catch (eventError) {
+              continue;
+            }
           }
+
+        } catch (error) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            type: 'error',
+            error: error instanceof Error ? error.message : 'Stream ended',
+            timestamp: new Date().toISOString()
+          })}\n\n`));
+          controller.close();
         }
       };
 
-      startStream();
+      startGrpcStream().catch((error) => {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+          type: 'error',
+          error: error instanceof Error ? error.message : 'Connection failed',
+          timestamp: new Date().toISOString()
+        })}\n\n`));
+        controller.close();
+      });
     },
     
     cancel() {
-      console.log('📡 SSE stream cancelled by client');
+      snapchainClient = null;
     }
   });
 
@@ -410,9 +306,6 @@ app.get('/api/events/stream', async (c) => {
       'Access-Control-Allow-Methods': 'GET',
       'Access-Control-Allow-Headers': 'Cache-Control',
       'X-Accel-Buffering': 'no',
-      // Production fixes for Fly.io
-      'X-Forwarded-Proto': 'https',
-      'Vary': 'Accept-Encoding',
     },
   });
 });
@@ -430,7 +323,6 @@ app.get('/api/events/:id', async (c) => {
     const event = await response.json()
     return c.json(event as any)
   } catch (error) {
-    console.error('Failed to fetch event:', error)
     return c.json({ error: 'Failed to fetch event' }, { status: 500 })
   }
 })
@@ -458,4 +350,4 @@ export default {
   fetch: app.fetch,
 }
 
-console.log(`🦫 bhvr server running on port ${port}`)
+// Server running on port ${port}

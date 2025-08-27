@@ -42,14 +42,14 @@ interface HubEvent {
 }
 
 async function fetchEvent(eventId: string): Promise<HubEvent> {
-  console.log('Fetching event:', eventId, 'from:', `${SERVER_URL}/api/events/${eventId}`)
+  //('Fetching event:', eventId, 'from:', `${SERVER_URL}/api/events/${eventId}`)
   const response = await fetch(`${SERVER_URL}/api/events/${eventId}`)
-  console.log('Response status:', response.status)
+  //('Response status:', response.status)
   if (!response.ok) {
     throw new Error(`Failed to fetch event: ${response.status}`)
   }
   const data = await response.json()
-  console.log('Event data:', data)
+  //('Event data:', data)
   return data
 }
 

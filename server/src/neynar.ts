@@ -7,9 +7,7 @@ export class NeynarService {
 
   constructor() {
     this.apiKey = process.env.NEYNAR_API_KEY || 'NEYNAR_API_DOCS';
-    if (!this.apiKey) {
-      console.warn('⚠️ NEYNAR_API_KEY not set - Neynar features will be limited');
-    }
+    // NEYNAR_API_KEY required for enhanced features
   }
 
   async getNeynarUser(fid: string): Promise<NeynarV2User> {
@@ -28,7 +26,6 @@ export class NeynarService {
       const data = await response.json() as any;
       return data.users[0];
     } catch (error) {
-      console.error('Error fetching Neynar user:', error);
       throw error;
     }
   }
@@ -49,7 +46,6 @@ export class NeynarService {
       const data = await response.json() as any;
       return data.cast;
     } catch (error) {
-      console.error('Error fetching Neynar cast:', error);
       throw error;
     }
   }
