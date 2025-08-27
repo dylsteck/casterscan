@@ -35,7 +35,7 @@ export function useEventStream() {
     
     const connectSSE = () => {
       try {
-        eventSource = new EventSource(`${SERVER_URL}/api/events/stream?stream=true`);
+        eventSource = new EventSource(`${SERVER_URL}/api/events/stream`);
         
         eventSource.onopen = () => {
           setIsConnected(true);
@@ -47,18 +47,16 @@ export function useEventStream() {
           try {
             const data = JSON.parse(event.data);
             
-            if (data.type === 'connected' || data.type === 'connecting' || data.type === 'heartbeat') {
+            if (data.type === 'connected' || data.type === 'ready' || data.type === 'heartbeat') {
+              return;
+            }
+            
+            if (data.type === 'streaming') {
               return;
             }
             
             if (data.type === 'error') {
               setError(data.error);
-              
-              if (data.fallback) {
-                setConnectionMethod('polling');
-                eventSource?.close();
-                startPolling();
-              }
               return;
             }
             

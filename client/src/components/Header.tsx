@@ -1,5 +1,5 @@
-import { SettingsDialog } from "./ResponsiveDialog";
 import { Search } from "./Search";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function Header() {
   return (
@@ -11,12 +11,9 @@ export function Header() {
             <span className="font-medium text-lg">CASTERSCAN</span> 
           </a>
           </div>
-          <nav className="flex items-center gap-6 text-sm">
-            <a href="https://github.com/dylsteck/casterscan" className="hover:underline" target="_blank">GITHUB</a>
-            <SettingsDialog>
-              <span className="hover:underline cursor-pointer">SETTINGS</span>
-            </SettingsDialog>
-          </nav>
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-mr-1" />
+          </div>
         </div>
       </div>
       <Search />

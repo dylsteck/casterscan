@@ -1,4 +1,5 @@
 import { useNeynarUser } from '@/hooks/useNeynarUser';
+import { useSigners } from '@/hooks/useSigners';
 import { CopyButton } from './CopyButton';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 
@@ -8,6 +9,7 @@ interface FidDetailProps {
 
 export function FidDetail({ fid }: FidDetailProps) {
   const { data: user, isLoading, error } = useNeynarUser(fid);
+  const { data: signersData, isLoading: signersLoading, error: signersError } = useSigners(fid);
 
   if (isLoading) {
     return (
@@ -185,7 +187,60 @@ export function FidDetail({ fid }: FidDetailProps) {
           
           <TabsContent value="signers" className="mt-4">
             <div className="p-2 border border-black">
-              <p className="text-gray-500 text-center py-8">Signers coming soon...</p>
+              {signersLoading ? (
+                <div className="animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                </div>
+              ) : signersError ? (
+                <p className="text-red-600">Failed to load signers data</p>
+              ) : signersData && signersData.events.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-300">
+                        <th className="text-left py-1 font-semibold">key</th>
+                        <th className="text-left py-1 font-semibold">type</th>
+                        <th className="text-left py-1 font-semibold">event</th>
+                        <th className="text-left py-1 font-semibold">block</th>
+                        <th className="text-left py-1 font-semibold">tx hash</th>
+                        <th className="w-8"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {signersData.events.map((signer, index) => (
+                        <tr key={index} className="border-b border-gray-100">
+                          <td className="py-1 font-mono text-xs break-all max-w-[200px]">
+                            {signer.signerEventBody.key}
+                          </td>
+                          <td className="py-1">
+                            <span className={`font-medium ${signer.signerEventBody.keyType === 1 ? 'text-blue-600' : 'text-gray-600'}`}>
+                              {signer.signerEventBody.keyType === 1 ? 'Ed25519' : `Type ${signer.signerEventBody.keyType}`}
+                            </span>
+                          </td>
+                          <td className="py-1">
+                            <span className={`font-medium ${signer.signerEventBody.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'text-green-600' : 'text-red-600'}`}>
+                              {signer.signerEventBody.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'ADD' : 'REMOVE'}
+                            </span>
+                          </td>
+                          <td className="py-1 font-mono text-sm">
+                            {signer.blockNumber.toLocaleString()}
+                          </td>
+                          <td className="py-1 font-mono text-xs break-all max-w-[150px]">
+                            {signer.transactionHash}
+                          </td>
+                          <td className="py-1">
+                            <CopyButton value={signer.signerEventBody.key} className="flex-shrink-0" />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-gray-500">No signers found for this FID.</p>
+              )}
             </div>
           </TabsContent>
           

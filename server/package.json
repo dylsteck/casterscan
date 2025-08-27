@@ -4,7 +4,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "dev:hot": "bun --hot src/index.ts",
     "build": "tsc",
     "start": "bun run dist/index.js"
   },
