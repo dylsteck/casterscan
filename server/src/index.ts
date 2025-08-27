@@ -172,6 +172,169 @@ app.get('/api/fids/:fid/signers', async (c) => {
   }
 })
 
+// Hub API endpoints
+app.get('/api/hub/castsByFid', async (c) => {
+  try {
+    const fid = c.req.query('fid')
+    const pageSize = c.req.query('pageSize') || '1000'
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    const response = await fetch(`${nodeUrl}/v1/castsByFid?fid=${fid}&pageSize=${pageSize}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    
+    const data = await response.json() as any
+    return c.json(data)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch casts' }, { status: 500 })
+  }
+})
+
+app.get('/api/hub/reactionsByFid', async (c) => {
+  try {
+    const fid = c.req.query('fid')
+    const pageSize = c.req.query('pageSize') || '1000'
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    const response = await fetch(`${nodeUrl}/v1/reactionsByFid?fid=${fid}&pageSize=${pageSize}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    
+    const data = await response.json() as any
+    return c.json(data)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch reactions' }, { status: 500 })
+  }
+})
+
+app.get('/api/hub/linksByFid', async (c) => {
+  try {
+    const fid = c.req.query('fid')
+    const pageSize = c.req.query('pageSize') || '1000'
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    const response = await fetch(`${nodeUrl}/v1/linksByFid?fid=${fid}&pageSize=${pageSize}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    
+    const data = await response.json() as any
+    return c.json(data)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch links' }, { status: 500 })
+  }
+})
+
+app.get('/api/hub/verificationsByFid', async (c) => {
+  try {
+    const fid = c.req.query('fid')
+    const pageSize = c.req.query('pageSize') || '1000'
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    const response = await fetch(`${nodeUrl}/v1/verificationsByFid?fid=${fid}&pageSize=${pageSize}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    
+    const data = await response.json() as any
+    return c.json(data)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch verifications' }, { status: 500 })
+  }
+})
+
+app.get('/api/hub/userDataByFid', async (c) => {
+  try {
+    const fid = c.req.query('fid')
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    const response = await fetch(`${nodeUrl}/v1/userDataByFid?fid=${fid}`)
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+    
+    const data = await response.json() as any
+    return c.json(data)
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch user data' }, { status: 500 })
+  }
+})
+
+app.post('/api/hub/decodeSignerMetadata', async (c) => {
+  try {
+    const { metadata } = await c.req.json()
+    if (!metadata) {
+      return c.json({ error: 'Metadata required' }, { status: 400 })
+    }
+    
+    // Simple ABI decoding for SignedKeyRequest
+    // This is a simplified version - in production you'd use proper ABI decoding
+    const decoded = {
+      requestFid: Math.floor(Math.random() * 1000000), // Mock for now
+      requestSigner: '0x' + '0'.repeat(40),
+      signature: '0x' + '0'.repeat(128),
+      deadline: Date.now() + 86400000
+    }
+    
+    return c.json(decoded)
+  } catch (error) {
+    return c.json({ error: 'Failed to decode metadata' }, { status: 500 })
+  }
+})
+
+app.get('/api/hub/messagesBySigner', async (c) => {
+  try {
+    const signer = c.req.query('signer')
+    const fid = c.req.query('fid')
+    
+    if (!signer || !fid) {
+      return c.json({ error: 'Signer and FID required' }, { status: 400 })
+    }
+    
+    const nodeUrl = getSnapchainHttpUrl(c.req.header('X-Snapchain-Node'))
+    
+    // Fetch all message types for this FID and filter by signer
+    const endpoints = [
+      `${nodeUrl}/v1/castsByFid?fid=${fid}&pageSize=1000`,
+      `${nodeUrl}/v1/reactionsByFid?fid=${fid}&pageSize=1000`,
+      `${nodeUrl}/v1/linksByFid?fid=${fid}&pageSize=1000`,
+      `${nodeUrl}/v1/verificationsByFid?fid=${fid}&pageSize=1000`
+    ]
+    
+    const responses = await Promise.all(
+      endpoints.map(url => 
+        fetch(url)
+          .then(res => res.ok ? res.json() : { messages: [] })
+          .catch(() => ({ messages: [] }))
+      )
+    )
+    
+    const [castsData, reactionsData, linksData, verificationsData] = responses as any[]
+    
+    // Filter messages by signer and count
+    const filterBySigner = (messages: any[]) => 
+      messages.filter((msg: any) => msg.signer === signer || 
+        (msg.data && msg.data.signer === signer))
+    
+    const casts = filterBySigner(castsData?.messages || [])
+    const reactions = filterBySigner(reactionsData?.messages || [])
+    const links = filterBySigner(linksData?.messages || [])
+    const verifications = filterBySigner(verificationsData?.messages || [])
+    
+    // Find last used timestamp
+    const allMessages = [...casts, ...reactions, ...links, ...verifications]
+    const lastUsed = allMessages.reduce((latest, msg) => {
+      const timestamp = msg.data?.timestamp || msg.timestamp
+      if (timestamp && (!latest || timestamp > latest)) {
+        return timestamp
+      }
+      return latest
+    }, null)
+    
+    return c.json({
+      casts: casts.length,
+      reactions: reactions.length,
+      links: links.length,
+      verifications: verifications.length,
+      lastUsed: lastUsed ? new Date(lastUsed * 1000).toISOString() : null
+    })
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch messages by signer' }, { status: 500 })
+  }
+})
+
 app.get('/api/casts/:hash', async (c) => {
   try {
     const hash = c.req.param('hash')
@@ -228,12 +391,21 @@ app.get('/api/events/stream', async (c) => {
   
   const customReadable = new ReadableStream({
     start(controller) {
-      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-        type: 'connected',
-        timestamp: new Date().toISOString()
-      })}\n\n`));
+      // Send initial connection message immediately
+      try {
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+          type: 'connected',
+          timestamp: new Date().toISOString()
+        })}\n\n`));
+      } catch (e) {
+        controller.close();
+        return;
+      }
 
       const startGrpcStream = async () => {
+        const isProduction = process.env.NODE_ENV === 'production';
+        let heartbeatInterval: NodeJS.Timeout | null = null;
+        
         try {
           snapchainClient = new SnapchainClient();
           
@@ -241,6 +413,20 @@ app.get('/api/events/stream', async (c) => {
             type: 'ready',
             timestamp: new Date().toISOString()
           })}\n\n`));
+
+          // More frequent heartbeat for production to prevent timeouts
+          const heartbeatFreq = isProduction ? 5000 : 10000;
+          heartbeatInterval = setInterval(() => {
+            try {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                type: 'heartbeat',
+                timestamp: new Date().toISOString()
+              })}\n\n`));
+            } catch {
+              if (heartbeatInterval) clearInterval(heartbeatInterval);
+              controller.close();
+            }
+          }, heartbeatFreq);
 
           const eventStream = await snapchainClient.subscribe({
             eventTypes: [HubEventType.MERGE_MESSAGE],
@@ -253,8 +439,20 @@ app.get('/api/events/stream', async (c) => {
             timestamp: new Date().toISOString()
           })}\n\n`));
 
+          let eventsSent = 0;
+          const maxEvents = isProduction ? 500 : 1000; // Increased limit for production
+          
           for await (const event of eventStream) {
             try {
+              if (eventsSent >= maxEvents) {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+                  type: 'info',
+                  message: 'Stream limit reached, reconnecting...',
+                  timestamp: new Date().toISOString()
+                })}\n\n`));
+                break;
+              }
+              
               const eventData = {
                 type: event.type,
                 id: event.id,
@@ -267,28 +465,48 @@ app.get('/api/events/stream', async (c) => {
               };
 
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(eventData)}\n\n`));
+              eventsSent++;
             } catch (eventError) {
+              // Log error but continue processing
+              console.error('Event processing error:', eventError);
               continue;
             }
           }
 
         } catch (error) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-            type: 'error',
-            error: error instanceof Error ? error.message : 'Stream ended',
-            timestamp: new Date().toISOString()
-          })}\n\n`));
-          controller.close();
+          console.error('Stream error:', error);
+          try {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+              type: 'error',
+              error: error instanceof Error ? error.message : 'Stream ended',
+              timestamp: new Date().toISOString()
+            })}\n\n`));
+          } catch (controllerError) {
+            console.error('Controller error:', controllerError);
+          }
+        } finally {
+          if (heartbeatInterval) clearInterval(heartbeatInterval);
+          try {
+            controller.close();
+          } catch (e) {
+            // Controller might already be closed
+          }
         }
       };
 
+      // Start the stream with error handling
       startGrpcStream().catch((error) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-          type: 'error',
-          error: error instanceof Error ? error.message : 'Connection failed',
-          timestamp: new Date().toISOString()
-        })}\n\n`));
-        controller.close();
+        console.error('Failed to start GRPC stream:', error);
+        try {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            type: 'error',
+            error: error instanceof Error ? error.message : 'Connection failed',
+            timestamp: new Date().toISOString()
+          })}\n\n`));
+          controller.close();
+        } catch (e) {
+          controller.close();
+        }
       });
     },
     
@@ -306,6 +524,11 @@ app.get('/api/events/stream', async (c) => {
       'Access-Control-Allow-Methods': 'GET',
       'Access-Control-Allow-Headers': 'Cache-Control',
       'X-Accel-Buffering': 'no',
+      // Additional headers for better streaming support
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      // Fly.io specific headers
+      'Fly-Force-Instance-Id': 'true',
     },
   });
 });

@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { useNeynarUser } from '@/hooks/useNeynarUser';
 import { useSigners } from '@/hooks/useSigners';
+import { useFidStats } from '@/hooks/useFidStats';
+import { useSignersEnriched } from '@/hooks/useSignersEnriched';
 import { CopyButton } from './CopyButton';
+import { SignerDetail } from './SignerDetail';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 
 interface FidDetailProps {
@@ -9,7 +13,24 @@ interface FidDetailProps {
 
 export function FidDetail({ fid }: FidDetailProps) {
   const { data: user, isLoading, error } = useNeynarUser(fid);
-  const { data: signersData, isLoading: signersLoading, error: signersError } = useSigners(fid);
+  const { error: signersError } = useSigners(fid);
+  const { stats, isLoading: statsLoading } = useFidStats(fid);
+  const { data: enrichedSigners, isLoading: enrichedLoading } = useSignersEnriched(fid);
+  const [selectedSigner, setSelectedSigner] = useState<string | null>(null);
+
+  if (selectedSigner) {
+    return (
+      <div className="w-screen h-screen flex justify-center items-start">
+        <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-2">
+          <SignerDetail 
+            signerKey={selectedSigner} 
+            fid={fid} 
+            onBack={() => setSelectedSigner(null)} 
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -43,10 +64,21 @@ export function FidDetail({ fid }: FidDetailProps) {
         {/* Header */}
         <div className="flex items-center gap-4 mt-6 mb-4">
           <img src={user.pfp_url} alt={`${user.username}'s PFP`} className="w-16 h-16 rounded-full" />
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold">{user.display_name}</h1>
             <p className="text-gray-600">@{user.username}</p>
             <p className="text-sm text-gray-500">{user.profile?.bio?.text}</p>
+            
+            {/* Stats */}
+            {statsLoading ? (
+              <div className="animate-pulse mt-2">
+                <div className="h-4 bg-gray-200 rounded w-64"></div>
+              </div>
+            ) : stats ? (
+              <div className="text-sm text-gray-600 mt-2">
+                {stats.casts.toLocaleString()} casts • {stats.reactions.toLocaleString()} reactions • {stats.links.toLocaleString()} links • {stats.verifications.toLocaleString()} verifications
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -187,7 +219,7 @@ export function FidDetail({ fid }: FidDetailProps) {
           
           <TabsContent value="signers" className="mt-4">
             <div className="p-2 border border-black">
-              {signersLoading ? (
+              {enrichedLoading ? (
                 <div className="animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
                   <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
@@ -195,48 +227,64 @@ export function FidDetail({ fid }: FidDetailProps) {
                 </div>
               ) : signersError ? (
                 <p className="text-red-600">Failed to load signers data</p>
-              ) : signersData && signersData.events.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-300">
-                        <th className="text-left py-1 font-semibold">key</th>
-                        <th className="text-left py-1 font-semibold">type</th>
-                        <th className="text-left py-1 font-semibold">event</th>
-                        <th className="text-left py-1 font-semibold">block</th>
-                        <th className="text-left py-1 font-semibold">tx hash</th>
-                        <th className="w-8"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {signersData.events.map((signer, index) => (
-                        <tr key={index} className="border-b border-gray-100">
-                          <td className="py-1 font-mono text-xs break-all max-w-[200px]">
-                            {signer.signerEventBody.key}
-                          </td>
-                          <td className="py-1">
-                            <span className={`font-medium ${signer.signerEventBody.keyType === 1 ? 'text-blue-600' : 'text-gray-600'}`}>
-                              {signer.signerEventBody.keyType === 1 ? 'Ed25519' : `Type ${signer.signerEventBody.keyType}`}
+              ) : enrichedSigners && enrichedSigners.events.length > 0 ? (
+                <div className="space-y-3">
+                  {enrichedSigners.events.map((signer, index) => (
+                    <div key={index} className="border border-gray-200 rounded p-3 hover:bg-gray-50 transition-colors">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          {signer.appProfile ? (
+                            <div className="flex items-center gap-2 mb-2">
+                              {signer.appProfile.pfp_url && (
+                                <img src={signer.appProfile.pfp_url} alt="App" className="w-6 h-6 rounded-full" />
+                              )}
+                              <div>
+                                <span className="font-semibold">{signer.appProfile.display_name || signer.appProfile.username}</span>
+                                <span className="text-gray-500 ml-1">@{signer.appProfile.username}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-sm mb-2">Unknown App</div>
+                          )}
+                          
+                          {signer.messageStats && (
+                            <div className="text-sm text-gray-600 mb-2">
+                              {signer.messageStats.casts} casts • {signer.messageStats.reactions} reactions • {signer.messageStats.links} links • {signer.messageStats.verifications} verifications
+                              {signer.messageStats.lastUsed && (
+                                <span className="ml-2">• Last used {new Date(signer.messageStats.lastUsed).toLocaleDateString()}</span>
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="font-mono text-xs text-gray-500 mb-1">
+                            {signer.key.slice(0, 32)}...
+                          </div>
+                          
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <span className={`font-medium ${signer.keyType === 1 ? 'text-blue-600' : 'text-gray-600'}`}>
+                              {signer.keyType === 1 ? 'Ed25519' : `Type ${signer.keyType}`}
                             </span>
-                          </td>
-                          <td className="py-1">
-                            <span className={`font-medium ${signer.signerEventBody.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'text-green-600' : 'text-red-600'}`}>
-                              {signer.signerEventBody.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'ADD' : 'REMOVE'}
+                            <span className={`font-medium ${signer.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'text-green-600' : 'text-red-600'}`}>
+                              {signer.eventType === 'SIGNER_EVENT_TYPE_ADD' ? 'ADD' : 'REMOVE'}
                             </span>
-                          </td>
-                          <td className="py-1 font-mono text-sm">
-                            {signer.blockNumber.toLocaleString()}
-                          </td>
-                          <td className="py-1 font-mono text-xs break-all max-w-[150px]">
-                            {signer.transactionHash}
-                          </td>
-                          <td className="py-1">
-                            <CopyButton value={signer.signerEventBody.key} className="flex-shrink-0" />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <span>Block {signer.blockNumber.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <CopyButton value={signer.key} className="flex-shrink-0" />
+                          {signer.messageStats && (signer.messageStats.casts + signer.messageStats.reactions + signer.messageStats.links + signer.messageStats.verifications) > 0 && (
+                            <button 
+                              onClick={() => setSelectedSigner(signer.key)}
+                              className="text-blue-600 hover:underline text-sm"
+                            >
+                              View messages
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <p className="text-gray-500">No signers found for this FID.</p>

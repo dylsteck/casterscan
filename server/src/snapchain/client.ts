@@ -16,21 +16,24 @@ export class SnapchainClient {
       const grpcHost = getSnapchainGrpcHost(nodeUrl);
       const isProduction = process.env.NODE_ENV === 'production';
       
+      // More aggressive settings for production to handle Fly.io environment
       SnapchainClient.clientInstance = getSSLHubRpcClient(grpcHost, {
-        'grpc.keepalive_time_ms': isProduction ? 30000 : 15000,
-        'grpc.keepalive_timeout_ms': isProduction ? 10000 : 3000,
+        'grpc.keepalive_time_ms': isProduction ? 20000 : 15000,
+        'grpc.keepalive_timeout_ms': isProduction ? 5000 : 3000,
         'grpc.keepalive_permit_without_calls': 1,
         'grpc.http2.max_pings_without_data': 0,
-        'grpc.http2.min_time_between_pings_ms': isProduction ? 15000 : 5000,
-        'grpc.http2.min_ping_interval_without_data_ms': isProduction ? 300000 : 150000,
-        'grpc.max_receive_message_length': 1024 * 1024 * 4,
-        'grpc.max_send_message_length': 1024 * 1024 * 4,
+        'grpc.http2.min_time_between_pings_ms': isProduction ? 10000 : 5000,
+        'grpc.http2.min_ping_interval_without_data_ms': isProduction ? 120000 : 150000,
+        'grpc.max_receive_message_length': 1024 * 1024 * 2,
+        'grpc.max_send_message_length': 1024 * 1024 * 2,
         'grpc.so_reuseport': 1,
-        'grpc.use_local_subchannel_pool': 1,
-        'grpc.max_connection_idle_ms': isProduction ? 60000 : 30000,
-        'grpc.max_connection_age_ms': isProduction ? 300000 : 120000,
-        'grpc.initial_reconnect_backoff_ms': 1000,
-        'grpc.max_reconnect_backoff_ms': isProduction ? 30000 : 10000
+        'grpc.use_local_subchannel_pool': 0, // Disable for production
+        'grpc.max_connection_idle_ms': isProduction ? 30000 : 30000,
+        'grpc.max_connection_age_ms': isProduction ? 120000 : 120000,
+        'grpc.initial_reconnect_backoff_ms': isProduction ? 2000 : 1000,
+        'grpc.max_reconnect_backoff_ms': isProduction ? 15000 : 10000,
+        'grpc.enable_retries': 1,
+        'grpc.per_rpc_retry_buffer_size': 1024 * 1024
       });
     }
     
@@ -53,11 +56,11 @@ export class SnapchainClient {
     
     async function* generator() {
       let retryCount = 0;
-      const maxRetries = isProduction ? 2 : 3;
+      const maxRetries = isProduction ? 1 : 3; // Reduce retries in production
       
       while (retryCount < maxRetries) {
         try {
-          // Add connection timeout
+          // Shorter timeout in production
           const subscribePromise = self.client.subscribe({
             eventTypes: request.eventTypes || [HubEventType.MERGE_MESSAGE],
             fromId: request.fromId || 0,
@@ -65,7 +68,7 @@ export class SnapchainClient {
           });
           
           const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Subscribe timeout')), isProduction ? 8000 : 5000);
+            setTimeout(() => reject(new Error('Subscribe timeout')), isProduction ? 3000 : 5000);
           });
           
           const subscribeResult = await Promise.race([subscribePromise, timeoutPromise]) as any;
@@ -76,11 +79,12 @@ export class SnapchainClient {
             
             let eventCount = 0;
             const startTime = Date.now();
+            const maxStreamTime = isProduction ? 120000 : 300000; // 2 minutes in prod, 5 in dev
             
             for await (const event of stream) {
               try {
-                // In production, limit processing time per event
-                if (isProduction && Date.now() - startTime > 300000) { // 5 minutes max
+                // Break connection after max time to prevent hanging
+                if (Date.now() - startTime > maxStreamTime) {
                   break;
                 }
                 
@@ -89,9 +93,9 @@ export class SnapchainClient {
                   yield enrichedEvent;
                   eventCount++;
                   
-                  // Add small delay in production to prevent overwhelming
-                  if (isProduction && eventCount % 10 === 0) {
-                    await delay(100);
+                  // Limit events per stream in production
+                  if (isProduction && eventCount >= 50) {
+                    break;
                   }
                 }
               } catch (enrichError) {
@@ -107,7 +111,7 @@ export class SnapchainClient {
             throw new Error(`Connection failed after ${maxRetries} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
           
-          const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), isProduction ? 10000 : 5000);
+          const backoffDelay = Math.min(1000 * retryCount, isProduction ? 3000 : 5000);
           await delay(backoffDelay);
         }
       }

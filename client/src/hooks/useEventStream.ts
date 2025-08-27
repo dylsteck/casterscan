@@ -96,10 +96,12 @@ export function useEventStream() {
               setError('Connection failed, using polling mode');
             }
           } else if (eventSource?.readyState === EventSource.CONNECTING) {
-            if (isProduction && retryCount < 2) {
+            // Give SSE more attempts in production since we improved the server
+            const maxConnectingRetries = isProduction ? 3 : 2;
+            if (retryCount < maxConnectingRetries) {
               retryCount++;
               const delay = getRetryDelay(retryCount - 1);
-              setError(`Connecting... (${retryCount}/2)`);
+              setError(`Connecting... (${retryCount}/${maxConnectingRetries})`);
               
               retryTimeout = setTimeout(() => {
                 if (eventSource?.readyState !== EventSource.OPEN) {
@@ -107,13 +109,15 @@ export function useEventStream() {
                   connectSSE();
                 }
               }, delay);
-            } else if (isProduction) {
-              // In production, switch to polling faster
+            } else {
+              // Fall back to polling after more attempts
               setConnectionMethod('polling');
               setError('Switched to polling mode');
             }
           } else {
-            if (retryCount >= 2 || isProduction) {
+            // Give SSE a better chance in production now that we've improved it
+            const shouldFallback = isProduction ? retryCount >= 3 : retryCount >= 2;
+            if (shouldFallback) {
               setConnectionMethod('polling');
               setError('Connection failed, using polling mode');
             }

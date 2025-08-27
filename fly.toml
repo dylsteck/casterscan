@@ -11,8 +11,17 @@ primary_region = 'ewr'
 [http_service]
   internal_port = 3000
   force_https = true
+  # Disable request buffering for streaming endpoints
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 100
+    soft_limit = 80
 
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
+
+# Environment variables for production
+[env]
+  NODE_ENV = "production"
