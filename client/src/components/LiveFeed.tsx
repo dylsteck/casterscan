@@ -1,4 +1,4 @@
-import { useEventStream } from '@/hooks/useEventStream';
+import { useEventStream, type StreamEvent } from '@/hooks/useEventStream';
 import { useState, useMemo } from 'react';
 import { StatsBoxes } from './StatsBoxes';
 import { Skeleton } from './Skeleton';
@@ -15,16 +15,6 @@ import {
   TableCell,
   TableRow,
 } from '@/components/ui/table';
-
-type StreamEvent = {
-  id: string;
-  username: string;
-  content: string;
-  link: string;
-  time: string;
-  type: string;
-  embeds?: string;
-};
 
 
 
