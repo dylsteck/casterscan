@@ -96,6 +96,30 @@ export async function getNeynarUser(fid: string) {
   }
 }
 
+export async function getNeynarUserByUsername(username: string) {
+  try {
+    const response = await fetch(
+      `${NEYNAR_API_URL}/v2/farcaster/user/by_username?username=${username}`,
+      {
+        headers: {
+          'x-api-key': process.env.NEYNAR_API_KEY || '',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Neynar user by username: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.user;
+  } catch (error) {
+    console.error('Error fetching Neynar user by username:', error);
+    throw error;
+  }
+}
+
 export async function getFarcasterKeys(fid: string): Promise<ProfileKeysPage> {
   try {
     const fidBigInt = BigInt(fid);

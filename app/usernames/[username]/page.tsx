@@ -1,50 +1,25 @@
-import ProfileDetails from '@/app/components/custom/profile-details';
-import { getNeynarUser, getFarcasterKeys } from '@/app/lib/server';
-import { BASE_URL, frame, SEO } from '@/app/lib/utils';
-import { Metadata } from 'next';
+import { getNeynarUserByUsername } from '@/app/lib/server';
+import { redirect, notFound } from 'next/navigation';
+import { Skeleton } from '@/app/components/custom/Skeleton';
 
-export async function generateMetadata(props: { params: Promise<{ fid: string }> }) {
+export default async function UsernamePage(props: { params: Promise<{ username: string }> }) {
   const params = await props.params;
-  const { fid } = params;
-  return {
-    metadataBase: new URL(SEO.url),
-    title: {
-      default: SEO.title,
-      template: `%s | ${SEO.title}`,
-    },
-    description: SEO.description,
-    openGraph: {
-      title: SEO.title,
-      description: SEO.description,
-      images: [SEO.ogImage],
-      url: SEO.url,
-      siteName: SEO.title,
-      locale: 'en_US',
-      type: 'website',
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
-    other: {
-      "fc:frame": JSON.stringify(frame('Inspect Profile', `${BASE_URL}/profiles/${fid}`)),
+  const { username } = params;
+  
+  try {
+    const user = await getNeynarUserByUsername(username);
+    
+    if (user?.fid) {
+      redirect(`/fids/${user.fid}`);
+    } else {
+      notFound();
     }
-  } as Metadata;
-}
-
-export default async function Profile(props: { params: Promise<{ fid: string }> }) {
-  const params = await props.params;
-  const { fid } = params;
-  const [neynarUser, keysData] = await Promise.all([
-    getNeynarUser(fid),
-    getFarcasterKeys(fid)
-  ]);
-  return <ProfileDetails fid={fid} neynarUser={neynarUser} keysData={keysData} />;
+  } catch (error) {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
+    notFound();
+  }
+  
+  return <Skeleton variant="card" rows={5} />;
 }
