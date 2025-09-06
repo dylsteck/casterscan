@@ -57,8 +57,10 @@ export default function RootLayout({
       <body className={GeistSans.className}>
         <Providers>
           <FrameProvider>
-            <Header />
-            {children}
+            <div className="min-h-screen">
+              <Header />
+              {children}
+            </div>
           </FrameProvider>
         </Providers>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />

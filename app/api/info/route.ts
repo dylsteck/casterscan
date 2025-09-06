@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server'
+import { SNAPCHAIN_NODE_URL } from '../../lib/utils';
 
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch('https://snap.farcaster.xyz:3381/v1/info')
+    const response = await fetch(`${SNAPCHAIN_NODE_URL}:3381/v1/info`)
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)

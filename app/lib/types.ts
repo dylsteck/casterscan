@@ -1,11 +1,3 @@
-export type Client = {
-  name: string;
-  username: string;
-  fid: number;
-  icon: React.FunctionComponentElement<{ className?: string }>;
-  castLink: string;
-};
-
 export type HubCast = {
   data: {
       author: {

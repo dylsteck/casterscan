@@ -1,15 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { sdk } from '@farcaster/miniapp-sdk';
+import { Github, Settings } from 'lucide-react';
 import CasterscanIcon from './icons/casterscan-icon';
 import Search from './search';
 import { FrameLink } from './frame-link';
 import { useFrameContext } from './frame-provider';
+import { ResponsiveDialog } from './responsive-dialog';
+import { SettingsForm } from './settings-form';
 
 export default function Header() {
   const { context } = useFrameContext();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleAddMiniApp = async () => {
     try {
@@ -34,12 +38,23 @@ export default function Header() {
               <p>ADD MINIAPP</p>
             </button>
           )}
-          <Link href="https://github.com/dylsteck/casterscan" target="_blank">
-            <p>GITHUB</p>
-          </Link>
+          <div className="flex flex-row gap-3 items-center">
+            <Link href="https://github.com/dylsteck/casterscan" target="_blank">
+              <Github className="w-5 h-5" />
+            </Link>
+            <Settings className="w-5 h-5 cursor-pointer" onClick={() => setSettingsOpen(true)} />
+          </div>
         </div>
       </div>
       <Search />
+      <ResponsiveDialog
+        isOpen={settingsOpen}
+        setIsOpen={setSettingsOpen}
+        title="settings"
+        maxWidth="max-w-md"
+      >
+        <SettingsForm onClose={() => setSettingsOpen(false)} />
+      </ResponsiveDialog>
     </>
   );
 };

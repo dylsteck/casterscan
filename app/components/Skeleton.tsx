@@ -7,7 +7,7 @@ interface SkeletonProps {
 export function Skeleton({ variant = 'custom', rows = 5, className = '' }: SkeletonProps) {
   if (variant === 'stats') {
     return (
-      <div className="flex md:grid md:grid-cols-6 gap-0 overflow-x-auto">
+      <div className="flex md:grid md:grid-cols-6 gap-0 overflow-x-auto scrollbar-hide">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="border border-gray-300 p-4 bg-gray-50 relative overflow-hidden flex-shrink-0 min-w-32 md:min-w-0">
             <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent"></div>

@@ -34,7 +34,7 @@ export const keyRegistryAbi = [
 
 const publicClient = createPublicClient({
   chain: optimism,
-  transport: http(process.env.OP_RPC_URL || 'https://mainnet.optimism.io'),
+  transport: http('https://mainnet.optimism.io'),
 });
 
 export async function fetchKeysForFid(

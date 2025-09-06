@@ -19,6 +19,7 @@ export function LiveFeed() {
   });
   const [lastEventCount, setLastEventCount] = useState(0);
   const [hasNewData, setHasNewData] = useState(false);
+  const [expandedStats, setExpandedStats] = useState<Record<string, boolean>>({});
 
   // Track when new events arrive and maintain current page
   useEffect(() => {
@@ -45,17 +46,14 @@ export function LiveFeed() {
   const columns = useMemo<ColumnDef<StreamEvent, any>[]>(
     () => [
       {
-        accessorKey: 'username',
-        header: 'username',
+        accessorKey: 'fid',
+        header: 'fid',
         cell: ({ getValue }) => {
-          const username = getValue() as string;
-          const displayUsername = username.startsWith('fid') && username !== 'fid' 
-            ? username.replace('fid', '') 
-            : username;
+          const fid = getValue() as number;
           return (
-            <span className="text-black cursor-pointer block truncate max-w-full">
-              {displayUsername}
-            </span>
+            <a href={`/fids/${fid}`} className="text-[#71579E] hover:underline cursor-pointer block truncate max-w-full" target="_blank">
+              {fid}
+            </a>
           );
         },
       },
@@ -67,18 +65,6 @@ export function LiveFeed() {
             {getValue() as string}
           </span>
         ),
-      },
-      {
-        accessorKey: 'embeds',
-        header: 'embeds',
-        cell: ({ getValue }) => {
-          const embeds = getValue() as string | undefined;
-          return embeds && parseInt(embeds) > 0 ? (
-            <div className="flex items-center justify-center bg-gray-400 w-10 h-10 ml-2">
-              <p className="text-center text-white text-sm">{embeds}</p>
-            </div>
-          ) : null;
-        },
       },
       {
         accessorKey: 'link',
@@ -154,32 +140,39 @@ export function LiveFeed() {
     return bytes + 'B'
   }
 
+  const toggleStat = (statKey: string) => {
+    setExpandedStats(prev => ({
+      ...prev,
+      [statKey]: !prev[statKey]
+    }));
+  }
+
   return (
     <div className="w-full">
       {/* Stats Section */}
       {infoLoading ? (
         <Skeleton variant="stats" />
       ) : info ? (
-        <div className="flex md:grid md:grid-cols-6 gap-0 overflow-x-auto">
-          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
+        <div className="flex md:grid md:grid-cols-6 gap-0 overflow-x-auto scrollbar-hide">
+          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0 cursor-pointer hover:bg-gray-50" onClick={() => toggleStat('totalMessages')}>
             <div className="text-sm text-gray-500 mb-1">TOTAL MESSAGES</div>
-            <div className="text-xl font-semibold text-gray-900">{formatNumber(info.dbStats.numMessages)}</div>
+            <div className="text-xl font-semibold text-gray-900">{expandedStats.totalMessages ? info.dbStats.numMessages.toLocaleString() : formatNumber(info.dbStats.numMessages)}</div>
           </div>
-          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
+          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0 cursor-pointer hover:bg-gray-50" onClick={() => toggleStat('totalFids')}>
             <div className="text-sm text-gray-500 mb-1">TOTAL FIDS</div>
-            <div className="text-xl font-semibold text-gray-900">{formatNumber(info.dbStats.numFidRegistrations)}</div>
+            <div className="text-xl font-semibold text-gray-900">{expandedStats.totalFids ? info.dbStats.numFidRegistrations.toLocaleString() : formatNumber(info.dbStats.numFidRegistrations)}</div>
           </div>
-          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
+          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0 cursor-pointer hover:bg-gray-50" onClick={() => toggleStat('dbSize')}>
             <div className="text-sm text-gray-500 mb-1">DB SIZE</div>
-            <div className="text-xl font-semibold text-gray-900">{formatBytes(info.dbStats.approxSize)}</div>
+            <div className="text-xl font-semibold text-gray-900">{expandedStats.dbSize ? `${(info.dbStats.approxSize / 1000000000).toLocaleString()} GB` : formatBytes(info.dbStats.approxSize)}</div>
           </div>
-          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
+          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0 cursor-pointer hover:bg-gray-50" onClick={() => toggleStat('shard1Height')}>
             <div className="text-sm text-gray-500 mb-1">SHARD 1 HEIGHT</div>
-            <div className="text-xl font-semibold text-gray-900">{formatNumber(info.shardInfos[1]?.maxHeight || 0)}</div>
+            <div className="text-xl font-semibold text-gray-900">{expandedStats.shard1Height ? (info.shardInfos[1]?.maxHeight || 0).toLocaleString() : formatNumber(info.shardInfos[1]?.maxHeight || 0)}</div>
           </div>
-          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
+          <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0 cursor-pointer hover:bg-gray-50" onClick={() => toggleStat('shard2Height')}>
             <div className="text-sm text-gray-500 mb-1">SHARD 2 HEIGHT</div>
-            <div className="text-xl font-semibold text-gray-900">{formatNumber(info.shardInfos[2]?.maxHeight || 0)}</div>
+            <div className="text-xl font-semibold text-gray-900">{expandedStats.shard2Height ? (info.shardInfos[2]?.maxHeight || 0).toLocaleString() : formatNumber(info.shardInfos[2]?.maxHeight || 0)}</div>
           </div>
           <div className="border border-gray-300 p-4 bg-white flex-shrink-0 min-w-32 md:min-w-0">
             <div className="text-sm text-gray-500 mb-1">VERSION</div>
@@ -215,45 +208,44 @@ export function LiveFeed() {
         </div>
       )}
 
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 py-3 text-sm font-medium text-gray-600 px-6 border-b bg-white">
-        <div className="col-span-2">username</div>
-        <div className="col-span-5">content</div>
-        <div className="col-span-1">embeds</div>
-        <div className="col-span-2">link</div>
-        <div className="col-span-2">type</div>
-      </div>
+      {/* Table Container - Scrollable on mobile */}
+      <div className="overflow-x-auto md:overflow-x-visible">
+        {/* Table Header */}
+        <div className="grid grid-cols-11 gap-4 py-3 text-sm font-medium text-gray-600 px-6 border-b bg-white min-w-[800px] md:min-w-0">
+          <div className="col-span-2">fid</div>
+          <div className="col-span-5">content</div>
+          <div className="col-span-2">link</div>
+          <div className="col-span-2">type</div>
+        </div>
 
-      {/* Table Content */}
-      <div className="bg-white border">
-        {events.length === 0 ? (
-          <Skeleton variant="table" rows={8} />
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {table.getRowModel().rows.map((row) => (
-              <div 
-                key={row.original.id}
-                className="grid grid-cols-12 gap-4 py-3 hover:bg-gray-50 px-6"
-              >
-                <div className="col-span-2 overflow-hidden">
-                  {flexRender(row.getVisibleCells()[0].column.columnDef.cell, row.getVisibleCells()[0].getContext())}
+        {/* Table Content */}
+        <div className="bg-white border min-w-[800px] md:min-w-0">
+          {events.length === 0 ? (
+            <Skeleton variant="table" rows={8} />
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {table.getRowModel().rows.map((row) => (
+                <div 
+                  key={row.original.id}
+                  className="grid grid-cols-11 gap-4 py-3 hover:bg-gray-50 px-6"
+                >
+                  <div className="col-span-2 overflow-hidden">
+                    {flexRender(row.getVisibleCells()[0].column.columnDef.cell, row.getVisibleCells()[0].getContext())}
+                  </div>
+                  <div className="col-span-5 overflow-hidden">
+                    {flexRender(row.getVisibleCells()[1].column.columnDef.cell, row.getVisibleCells()[1].getContext())}
+                  </div>
+                  <div className="col-span-2">
+                    {flexRender(row.getVisibleCells()[2].column.columnDef.cell, row.getVisibleCells()[2].getContext())}
+                  </div>
+                  <div className="col-span-2">
+                    {flexRender(row.getVisibleCells()[3].column.columnDef.cell, row.getVisibleCells()[3].getContext())}
+                  </div>
                 </div>
-                <div className="col-span-5 overflow-hidden">
-                  {flexRender(row.getVisibleCells()[1].column.columnDef.cell, row.getVisibleCells()[1].getContext())}
-                </div>
-                <div className="col-span-1">
-                  {flexRender(row.getVisibleCells()[2].column.columnDef.cell, row.getVisibleCells()[2].getContext())}
-                </div>
-                <div className="col-span-2">
-                  {flexRender(row.getVisibleCells()[3].column.columnDef.cell, row.getVisibleCells()[3].getContext())}
-                </div>
-                <div className="col-span-2">
-                  {flexRender(row.getVisibleCells()[4].column.columnDef.cell, row.getVisibleCells()[4].getContext())}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {totalPages > 1 && (
