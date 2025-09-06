@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import React from 'react';
-import CopyClipboardIcon from '@/app/components/copy-clipboard-icon';
+import CopyClipboardIcon from '@/app/components/custom/copy-clipboard-icon';
 import ShareCast from './share-cast';
-import { NeynarV2Cast, type Client } from '../lib/types';
-import { CLIENTS } from '../lib/utils';
+import { NeynarV2Cast, type Client } from '../../lib/types';
+import { CLIENTS } from '../../lib/utils';
 import ResponseData from './response-data';
 import NeynarApiResponseData from './response-data/neynar-api-response-data';
 import FarcasterApiResponseData from './response-data/farcaster-api-response-data';

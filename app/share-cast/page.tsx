@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFrameContext } from '@/app/components/frame-provider';
+import { useFrameContext } from '@/app/components/custom/frame-provider';
 
 export default function ShareCastPage() {
   const { context, ready } = useFrameContext();

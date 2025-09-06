@@ -1,159 +1,137 @@
-// Transform Snapchain event to displayable format
-function transformEvent(event: any) {
-  const eventType = event.type;
-  const eventId = event.id;
-  const shardIndex = event.shardIndex;
-  const timestamp = new Date().toISOString();
+import { NextRequest } from 'next/server'
+import {
+  getSSLHubRpcClient,
+  HubEventType,
+} from '@farcaster/hub-nodejs'
+import { bytesToHexString } from '@farcaster/hub-web'
 
-  // Handle different event types
-  if (eventType === 'HUB_EVENT_TYPE_MERGE_MESSAGE' && event.mergeMessageBody?.message) {
-    const message = event.mergeMessageBody.message;
-    const messageType = message.data?.type;
-
-    if (messageType === 'MESSAGE_TYPE_CAST_ADD') {
-      const castBody = message.data.castAddBody;
-      const hash = message.hash || `unknown-${eventId}`;
-      return {
-        type: 'CAST_ADD',
-        id: eventId,
-        hash,
-        text: castBody?.text || '',
-        embeds: castBody?.embeds || [],
-        mentions: castBody?.mentions || [],
-        parentCastId: castBody?.parentCastId || null,
-        parentUrl: castBody?.parentUrl || null,
-        fid: message.data?.fid || 0,
-        timestamp,
-        author: null,
-        link: !hash.startsWith('unknown-') ? `/casts/${hash}` : `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-      };
-    } else if (messageType === 'MESSAGE_TYPE_REACTION_ADD') {
-      const reactionBody = message.data.reactionBody;
-      return {
-        type: 'REACTION_ADD',
-        id: eventId,
-        hash: message.hash || `unknown-${eventId}`,
-        reactionType: reactionBody?.type || 'UNKNOWN',
-        targetCastId: reactionBody?.targetCastId || null,
-        fid: message.data?.fid || 0,
-        timestamp,
-        author: null,
-        link: `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-      };
-    } else if (messageType === 'MESSAGE_TYPE_LINK_ADD') {
-      const linkBody = message.data.linkBody;
-      return {
-        type: 'LINK_ADD',
-        id: eventId,
-        hash: message.hash || `unknown-${eventId}`,
-        linkType: linkBody?.type || 'unknown',
-        targetFid: linkBody?.targetFid || 0,
-        fid: message.data?.fid || 0,
-        timestamp,
-        author: null,
-        link: `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-      };
-    } else if (messageType === 'MESSAGE_TYPE_VERIFICATION_ADD_ETH_ADDRESS') {
-      return {
-        type: 'VERIFICATION_ADD',
-        id: eventId,
-        hash: message.hash || `unknown-${eventId}`,
-        address: message.data.verificationAddAddressBody?.address || '',
-        fid: message.data?.fid || 0,
-        timestamp,
-        author: null,
-        link: `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-      };
-    }
-  } else if (eventType === 'HUB_EVENT_TYPE_MERGE_ON_CHAIN_EVENT' && event.mergeOnChainEventBody?.onChainEvent) {
-    const onChainEvent = event.mergeOnChainEventBody.onChainEvent;
-    return {
-      type: 'ON_CHAIN_EVENT',
-      id: eventId,
-      hash: `onchain-${eventId}`,
-      chainEventType: onChainEvent.type || 'UNKNOWN',
-      chainId: onChainEvent.chainId || 0,
-      blockNumber: onChainEvent.blockNumber || 0,
-      fid: onChainEvent.fid || 0,
-      timestamp,
-      author: null,
-      link: `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-    };
-  }
-
-  // Fallback for other event types
-  return {
-    type: 'OTHER',
-    id: eventId,
-    hash: `other-${eventId}`,
-    eventType,
-    fid: 0,
-    timestamp,
-    author: null,
-    link: `https://snap.farcaster.xyz:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
-  };
+// Polyfill for server environment
+if (typeof global !== 'undefined' && !global.self) {
+  global.self = global as any
 }
 
-// Simple cache to avoid refetching on every request
-let cachedEvents: any[] = [];
-let lastFetchTime = 0;
-const CACHE_DURATION = 30000; // 30 seconds
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const stream = searchParams.get('stream')
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '0');
-    const limit = parseInt(searchParams.get('limit') || '50');
+  if (stream === 'true') {
+    // Set up Server-Sent Events
+    const encoder = new TextEncoder()
+    
+    const customReadable = new ReadableStream({
+      start(controller) {
+        let isClosed = false
+        
+        // Helper function to safely enqueue data
+        const safeEnqueue = (data: Uint8Array) => {
+          try {
+            if (!isClosed) {
+              controller.enqueue(data)
+            }
+          } catch (error) {
+            console.warn('Controller already closed, ignoring enqueue')
+            isClosed = true
+          }
+        }
 
-    const now = Date.now();
-    let allEvents = cachedEvents;
+        // Start the gRPC subscription on the server side
+        const startStream = async () => {
+          try {
+            const hubRpcEndpoint = "snap.farcaster.xyz:3383"
+            const nodeClient = getSSLHubRpcClient(hubRpcEndpoint)
 
-    // Fetch fresh data if cache is empty or expired
-    if (cachedEvents.length === 0 || now - lastFetchTime > CACHE_DURATION) {
-      const response = await fetch(`https://snap.farcaster.xyz:3381/v1/events?from_event_id=0`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+            console.log('Server connecting to Snapchain hub:', hubRpcEndpoint)
+
+            // Wait for client to be ready
+            nodeClient.$.waitForReady(Date.now() + 5000, async (e) => {
+              if (e) {
+                console.error(`Failed to connect to ${hubRpcEndpoint}:`, e)
+                safeEnqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Failed to connect' })}\n\n`))
+                return
+              }
+
+              console.log(`Connected to ${hubRpcEndpoint}`)
+
+              try {
+                const subscribeResult = await nodeClient.subscribe({
+                  eventTypes: [HubEventType.MERGE_MESSAGE],
+                })
+
+                if (subscribeResult.isOk()) {
+                  const stream = subscribeResult.value
+
+                  // Use async iteration to process events
+                  for await (const event of stream) {
+                    // Check if controller is still open before processing
+                    if (isClosed) break
+                    
+                    // Filter for cast messages (type 1)
+                    if (event.mergeMessageBody?.message?.data?.type === 1) {
+                      const message = event.mergeMessageBody.message
+                      const hash = message.hash
+                      const text = message.data.castAddBody?.text
+                      const fid = message.data.fid
+
+                      if (hash && text && !isClosed) {
+                        // Convert hash bytes to proper 0x hex string
+                        const hexHash = bytesToHexString(hash)._unsafeUnwrap()
+                        
+                        const castData = {
+                          hash: hexHash,
+                          fid: Number(fid),
+                          text: text,
+                        }
+                        
+                        safeEnqueue(
+                          encoder.encode(`data: ${JSON.stringify(castData)}\n\n`)
+                        )
+                      }
+                    }
+                  }
+                } else {
+                  console.error('Failed to subscribe')
+                  safeEnqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Failed to subscribe' })}\n\n`))
+                }
+              } catch (subscribeError) {
+                console.error('Subscription error:', subscribeError)
+                safeEnqueue(
+                  encoder.encode(`data: ${JSON.stringify({ error: 'Subscription failed' })}\n\n`)
+                )
+              } finally {
+                try {
+                  nodeClient.close()
+                } catch (closeError) {
+                  console.warn('Error closing node client:', closeError)
+                }
+              }
+            })
+          } catch (error) {
+            console.error('Error starting stream:', error)
+            safeEnqueue(
+              encoder.encode(`data: ${JSON.stringify({ error: 'Connection failed' })}\n\n`)
+            )
+          }
+        }
+
+        startStream()
+      },
+      cancel() {
+        // This is called when the client disconnects
+        console.log('Stream cancelled by client')
       }
-      
-      const data = await response.json();
-      allEvents = data.events || [];
-      
-      // Update cache
-      cachedEvents = allEvents;
-      lastFetchTime = now;
-    }
-    
-    // Transform all events
-    const transformedEvents = allEvents.map(transformEvent).filter(Boolean);
-    
-    // Apply pagination
-    const startIndex = page * limit;
-    const endIndex = startIndex + limit;
-    const paginatedEvents = transformedEvents.slice(startIndex, endIndex);
-    
-    // Calculate pagination metadata
-    const totalEvents = transformedEvents.length;
-    const totalPages = Math.ceil(totalEvents / limit);
-    const hasNextPage = page < totalPages - 1;
-    const hasPrevPage = page > 0;
-    
-    return Response.json({
-      events: paginatedEvents,
-      pagination: {
-        currentPage: page,
-        totalPages,
-        totalEvents,
-        hasNextPage,
-        hasPrevPage,
-        limit
-      }
-    });
-  } catch (error) {
-    console.error('Error in events API:', error);
-    return Response.json(
-      { error: 'Failed to fetch events' },
-      { status: 500 }
-    );
+    })
+
+    return new Response(customReadable, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Cache-Control',
+      },
+    })
   }
+
+  return new Response('Not found', { status: 404 })
 } 

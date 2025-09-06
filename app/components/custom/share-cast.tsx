@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { NeynarV2Cast } from '../lib/types';
+import { NeynarV2Cast } from '../../lib/types';
 import { FrameLink } from './frame-link';
 
 type ShareCastProps = {

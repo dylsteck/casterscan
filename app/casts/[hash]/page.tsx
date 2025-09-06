@@ -1,4 +1,4 @@
-import CastDetails from '@/app/components/cast-details';
+import CastDetails from '@/app/components/custom/cast-details';
 import { getNeynarCast } from '@/app/lib/server';
 import { BASE_URL, frame, SEO } from '@/app/lib/utils';
 import { Metadata } from 'next';

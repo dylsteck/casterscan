@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
-import CopyClipboardIcon from '@/app/components/copy-clipboard-icon';
-import { NeynarV2User, ProfileKeysPage } from '../lib/types';
+import CopyClipboardIcon from '@/app/components/custom/copy-clipboard-icon';
+import { NeynarV2User, ProfileKeysPage } from '../../lib/types';
 
 export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: string, neynarUser: NeynarV2User, keysData: ProfileKeysPage }) {
   return (

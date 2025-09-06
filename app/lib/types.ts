@@ -53,6 +53,15 @@ export type HubStreamCast = {
   timestamp: string;
 };
 
+export type StreamCast = {
+  hash: Uint8Array;
+  fid: number;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  text: string;
+};
+
 export type SnapchainEvent = {
   type: 'CAST_ADD' | 'REACTION_ADD' | 'LINK_ADD' | 'VERIFICATION_ADD' | 'ON_CHAIN_EVENT' | 'OTHER';
   id: number;

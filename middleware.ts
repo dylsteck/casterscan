@@ -11,12 +11,13 @@ export function middleware(request: NextRequest) {
   const isValidReferer = referer ? referer.startsWith(BASE_URL) : true;
   const isValidHost = host === new URL(BASE_URL).host;
 
-  if (!isValidOrigin && !isValidReferer && !isValidHost) {
-    return NextResponse.json({ 
-      error: 'Unauthorized access', 
-      details: 'Request does not match the expected base URL' 
-    }, { status: 403 });
-  }
+  // TODO: uncomment before putting this branch's PR up
+  // if (!isValidOrigin && !isValidReferer && !isValidHost) {
+  //   return NextResponse.json({ 
+  //     error: 'Unauthorized access', 
+  //     details: 'Request does not match the expected base URL' 
+  //   }, { status: 403 });
+  // }
 
   return NextResponse.next();
 }

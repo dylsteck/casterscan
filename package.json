@@ -10,11 +10,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@farcaster/miniapp-sdk": "^0.1.9",
     "@farcaster/hub-nodejs": "^0.15.5",
+    "@farcaster/hub-web": "^0.11.4",
+    "@farcaster/miniapp-sdk": "^0.1.9",
     "@heroicons/react": "^2.2.0",
     "@tanstack/react-query": "^5.84.2",
     "@tanstack/react-query-devtools": "^5.84.2",
+    "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.0",
     "cloudflare": "^4.5.0",
     "clsx": "^2.1.1",

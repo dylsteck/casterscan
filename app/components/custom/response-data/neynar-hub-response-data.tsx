@@ -1,7 +1,7 @@
 'use client';
 
 import ResponseData from ".";
-import { useNeynarHubCast } from "../../hooks/useApiData";
+import { useNeynarHubCast } from "../../../hooks/useApiData";
 
 export default function NeynarHubResponseData({ fid, hash }: { fid: number, hash: string }) {
     const { data, isLoading, error } = useNeynarHubCast(fid, hash);

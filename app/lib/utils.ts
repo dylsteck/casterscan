@@ -1,13 +1,13 @@
-import FarcasterIcon from "../components/icons/apps/farcaster-icon";
-import SuperIcon from "../components/icons/apps/super-icon";
-import RecasterIcon from "../components/icons/apps/recaster-icon";
+import FarcasterIcon from "../components/custom/icons/apps/farcaster-icon";
+import SuperIcon from "../components/custom/icons/apps/super-icon";
+import RecasterIcon from "../components/custom/icons/apps/recaster-icon";
 import React from "react";
 import { Client } from "./types";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import UnofficialIcon from "../components/icons/apps/unofficial-icon";
-import ZapperIcon from "../components/icons/apps/zapper-icon";
-import CoinbaseWalletIcon from "../components/icons/apps/coinbase-wallet-icon";
+import UnofficialIcon from "../components/custom/icons/apps/unofficial-icon";
+import ZapperIcon from "../components/custom/icons/apps/zapper-icon";
+import CoinbaseWalletIcon from "../components/custom/icons/apps/coinbase-wallet-icon";
 import { getCachedData, cacheData } from "./cloudflare-kv";
 
 export function cn(...inputs: ClassValue[]) {
@@ -29,7 +29,9 @@ const port = process.env.PORT || 3000;
 const localUrl = `http://localhost:${port}`;
 export const BASE_URL = isDev 
   ? localUrl 
-  : 'https://casterscan.com';
+  : process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}`
+    : 'https://casterscan.com';
 
 export const cachedRequest = async (url: string, revalidate: number, method = 'GET', headers?: Record<string, string>, cacheTag?: string) => {
     if (cacheTag) {

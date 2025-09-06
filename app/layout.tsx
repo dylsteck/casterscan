@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
-import Header from "./components/header";
+import Header from "./components/custom/header";
 import Script from "next/script";
 import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
-import FrameProvider from "./components/frame-provider";
+import FrameProvider from "./components/custom/frame-provider";
 import Providers from "./providers";
 
 const PAGE = {
