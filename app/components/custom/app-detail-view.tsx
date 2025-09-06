@@ -9,9 +9,13 @@ interface AppDetailViewProps {
   app: AppWithSigners;
   fid: string;
   onBack: () => void;
+  userProfile?: {
+    username?: string;
+    fid?: string;
+  };
 }
 
-export function AppDetailView({ app, fid, onBack }: AppDetailViewProps) {
+export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewProps) {
   const [selectedSigner, setSelectedSigner] = useState<string | null>(null);
 
   if (selectedSigner) {
@@ -19,7 +23,13 @@ export function AppDetailView({ app, fid, onBack }: AppDetailViewProps) {
       <SignerDetail 
         signerKey={selectedSigner} 
         fid={fid} 
-        onBack={() => setSelectedSigner(null)} 
+        onBack={() => setSelectedSigner(null)}
+        appInfo={{
+          name: app.profile?.display_name || app.profile?.username || `App ${app.fid}`,
+          username: app.profile?.username,
+          bio: app.profile?.profile?.bio?.text,
+          pfpUrl: app.profile?.pfp_url
+        }}
       />
     );
   }
@@ -28,7 +38,7 @@ export function AppDetailView({ app, fid, onBack }: AppDetailViewProps) {
     <div className="w-screen h-screen flex justify-center items-start">
       <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-2">
         <button onClick={onBack} className="text-blue-600 hover:underline mt-3 mb-2 text-left">
-          ← Back
+          ← Back to {userProfile?.username || `FID ${userProfile?.fid || fid}`}
         </button>
         
         <div className="flex items-center gap-4 mb-4">
@@ -45,13 +55,10 @@ export function AppDetailView({ app, fid, onBack }: AppDetailViewProps) {
             {app.profile?.profile?.bio?.text && (
               <p className="text-sm text-gray-500 mt-1">{app.profile.profile.bio.text}</p>
             )}
-          </div>
-        </div>
-
-        <div className="mb-4 p-2 border border-black">
-          <div className="text-sm text-gray-600">
-            {app.totalMessages.toLocaleString()} messages • {app.signers.length} signers
-            {app.lastUsed && ` • Last used ${timeAgo(app.lastUsed)} ago`}
+            <div className="text-sm text-gray-600 mt-2">
+              {app.totalMessages.toLocaleString()} messages • {app.signers.length} signers
+              {app.lastUsed && ` • Last used ${timeAgo(app.lastUsed)} ago`}
+            </div>
           </div>
         </div>
 

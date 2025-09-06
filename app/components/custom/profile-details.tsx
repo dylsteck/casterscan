@@ -36,7 +36,11 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
       <AppDetailView 
         app={selectedApp} 
         fid={fid} 
-        onBack={() => setSelectedApp(null)} 
+        onBack={() => setSelectedApp(null)}
+        userProfile={{
+          username: neynarUser.username,
+          fid: neynarUser.fid.toString()
+        }}
       />
     );
   }
@@ -126,6 +130,60 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                     <CopyClipboardIcon value={neynarUser.following_count.toString()} className="ml-1 flex-shrink-0" />
                   </span>
                 </li>
+                {neynarUser.url && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">url</span>
+                    <span className="flex items-center text-right">
+                      <a href={neynarUser.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" title={neynarUser.url}>
+                        {neynarUser.url.length > 40 ? neynarUser.url.slice(0, 40) : neynarUser.url}
+                      </a>
+                      <CopyClipboardIcon value={neynarUser.url} className="ml-1 flex-shrink-0" />
+                    </span>
+                  </li>
+                )}
+
+                <li className="flex justify-between items-center mb-1">
+                  <span className="font-semibold mr-1">pfp url</span>
+                  <span className="flex items-center text-right">
+                    <a href={neynarUser.pfp_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-mono text-sm" title={neynarUser.pfp_url}>
+                      {neynarUser.pfp_url.length > 40 ? neynarUser.pfp_url.slice(0, 40) : neynarUser.pfp_url}
+                    </a>
+                    <CopyClipboardIcon value={neynarUser.pfp_url} className="ml-1 flex-shrink-0" />
+                  </span>
+                </li>
+
+                {neynarUser.profile?.banner?.url && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">banner url</span>
+                    <span className="flex items-center text-right">
+                      <a href={neynarUser.profile.banner.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-mono text-sm" title={neynarUser.profile.banner.url}>
+                        {neynarUser.profile.banner.url.length > 40 ? neynarUser.profile.banner.url.slice(0, 40) : neynarUser.profile.banner.url}
+                      </a>
+                      <CopyClipboardIcon value={neynarUser.profile.banner.url} className="ml-1 flex-shrink-0" />
+                    </span>
+                  </li>
+                )}
+
+                {neynarUser.verified_addresses?.primary?.eth_address && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">primary eth address</span>
+                    <span className="flex items-center text-right">
+                      <span className="font-mono text-sm break-all">{neynarUser.verified_addresses.primary.eth_address}</span>
+                      <CopyClipboardIcon value={neynarUser.verified_addresses.primary.eth_address} className="ml-1 flex-shrink-0" />
+                    </span>
+                  </li>
+                )}
+
+                {neynarUser.verified_addresses?.primary?.sol_address && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">primary sol address</span>
+                    <span className="flex items-center text-right">
+                      <span className="font-mono text-sm break-all">{neynarUser.verified_addresses.primary.sol_address}</span>
+                      <CopyClipboardIcon value={neynarUser.verified_addresses.primary.sol_address} className="ml-1 flex-shrink-0" />
+                    </span>
+                  </li>
+                )}
+
                 <li className="flex justify-between items-center mb-1">
                   <span className="font-semibold mr-1">power badge</span>
                   <span className="flex items-center text-right">
@@ -134,18 +192,44 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                   </span>
                 </li>
 
-                {neynarUser.verified_accounts && neynarUser.verified_accounts.length > 0 && (
-                  <li className="flex justify-between items-start mb-1">
-                    <span className="font-semibold mr-1">verified accounts</span>
-                    <div className="flex flex-col items-end">
-                      {neynarUser.verified_accounts.map((account, index) => (
-                        <div key={index} className="flex items-center text-right mb-1">
-                          <span className="text-sm">{account.platform}: {account.username}</span>
-                          <CopyClipboardIcon value={`${account.platform}: ${account.username}`} className="ml-1 flex-shrink-0" />
-                        </div>
-                      ))}
-                    </div>
+                <li className="flex justify-between items-center mb-1">
+                  <span className="font-semibold mr-1">pro user</span>
+                  <span className="flex items-center text-right">
+                    {neynarUser.pro?.status === 'subscribed' ? 'Yes' : 'No'}
+                    <CopyClipboardIcon value={neynarUser.pro?.status === 'subscribed' ? 'Yes' : 'No'} className="ml-1 flex-shrink-0" />
+                  </span>
+                </li>
+
+                {neynarUser.profile?.location?.address && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">location</span>
+                    <span className="flex items-center text-right">
+                      {neynarUser.profile.location.address.city}, {neynarUser.profile.location.address.state}
+                      <CopyClipboardIcon value={`${neynarUser.profile.location.address.city}, ${neynarUser.profile.location.address.state}`} className="ml-1 flex-shrink-0" />
+                    </span>
                   </li>
+                )}
+
+                {(neynarUser.score !== undefined || neynarUser.experimental?.neynar_user_score !== undefined) && (
+                  <li className="flex justify-between items-center mb-1">
+                    <span className="font-semibold mr-1">neynar score</span>
+                    <span className="flex items-center text-right">
+                      {(neynarUser.score !== undefined ? neynarUser.score : neynarUser.experimental?.neynar_user_score)?.toFixed(2)}
+                      <CopyClipboardIcon value={(neynarUser.score !== undefined ? neynarUser.score : neynarUser.experimental?.neynar_user_score)?.toString() || ''} className="ml-1 flex-shrink-0" />
+                    </span>
+                  </li>
+                )}
+
+                {neynarUser.verified_accounts && neynarUser.verified_accounts.length > 0 && (
+                  neynarUser.verified_accounts.map((account, index) => (
+                    <li key={index} className="flex justify-between items-center mb-1">
+                      <span className="font-semibold mr-1">verified {account.platform} account</span>
+                      <span className="flex items-center text-right">
+                        {account.username}
+                        <CopyClipboardIcon value={account.username} className="ml-1 flex-shrink-0" />
+                      </span>
+                    </li>
+                  ))
                 )}
               </ul>
             </div>
@@ -153,56 +237,56 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
           
           {activeTab === 'addresses' && (
             <div className="p-2 border border-black">
-              {((keysData.authAddresses && keysData.authAddresses.length > 0) || (neynarUser.verified_addresses && neynarUser.verified_addresses.eth_addresses.length > 0) || (neynarUser.verified_addresses && neynarUser.verified_addresses.sol_addresses && neynarUser.verified_addresses.sol_addresses.length > 0)) ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-300">
-                        <th className="text-left py-1 font-semibold">address</th>
-                        <th className="text-left py-1 font-semibold">type</th>
-                        <th className="text-left py-1 font-semibold">state</th>
-                        <th className="w-8"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {neynarUser.verified_addresses?.eth_addresses?.map((address, index) => (
-                        <tr key={`verified-eth-${index}`} className="border-b border-gray-100">
-                          <td className="py-1 font-mono text-sm break-all">{address}</td>
-                          <td className="py-1">
-                            <span className="text-blue-600 font-medium">Verified</span>
-                          </td>
-                          <td className="py-1">Active</td>
-                          <td className="py-1">
-                            <CopyClipboardIcon value={address} className="flex-shrink-0" />
-                          </td>
-                        </tr>
-                      ))}
-                      {neynarUser.verified_addresses?.sol_addresses?.map((address, index) => (
-                        <tr key={`verified-sol-${index}`} className="border-b border-gray-100">
-                          <td className="py-1 font-mono text-sm break-all">{address}</td>
-                          <td className="py-1">
-                            <span className="text-blue-600 font-medium">Verified</span>
-                          </td>
-                          <td className="py-1">Active</td>
-                          <td className="py-1">
-                            <CopyClipboardIcon value={address} className="flex-shrink-0" />
-                          </td>
-                        </tr>
-                      ))}
-                      {keysData.authAddresses?.map((address, index) => (
-                        <tr key={`auth-${index}`} className="border-b border-gray-100">
-                          <td className="py-1 font-mono text-sm break-all">{address}</td>
-                          <td className="py-1">
-                            <span className="text-green-600 font-medium">Auth</span>
-                          </td>
-                          <td className="py-1">Active</td>
-                          <td className="py-1">
-                            <CopyClipboardIcon value={address} className="flex-shrink-0" />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {((neynarUser.verified_addresses && neynarUser.verified_addresses.eth_addresses.length > 0) || (neynarUser.verified_addresses && neynarUser.verified_addresses.sol_addresses && neynarUser.verified_addresses.sol_addresses.length > 0) || (neynarUser.auth_addresses && neynarUser.auth_addresses.length > 0)) ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {/* Verified ETH Addresses */}
+                  {neynarUser.verified_addresses?.eth_addresses?.map((address, index) => (
+                    <div key={`verified-eth-${index}`} className="p-3 border border-black bg-white">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-black font-medium text-xs">Verified ETH</span>
+                            <span className="text-gray-500 text-xs">Active</span>
+                          </div>
+                          <div className="font-mono text-sm break-all text-black">{address}</div>
+                        </div>
+                        <CopyClipboardIcon value={address} className="flex-shrink-0 ml-2" />
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Verified SOL Addresses */}
+                  {neynarUser.verified_addresses?.sol_addresses?.map((address, index) => (
+                    <div key={`verified-sol-${index}`} className="p-3 border border-black bg-white">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-black font-medium text-xs">Verified SOL</span>
+                            <span className="text-gray-500 text-xs">Active</span>
+                          </div>
+                          <div className="font-mono text-sm break-all text-black">{address}</div>
+                        </div>
+                        <CopyClipboardIcon value={address} className="flex-shrink-0 ml-2" />
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Auth Addresses with FID from neynarUser */}
+                  {neynarUser.auth_addresses?.map((authItem, index) => (
+                    <div key={`auth-${index}`} className="p-3 border border-black bg-white">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-black font-medium text-xs">Auth</span>
+                            <span className="text-gray-500 text-xs">Active</span>
+                            <span className="text-gray-500 font-medium text-xs">FID: {authItem.app?.fid}</span>
+                          </div>
+                          <div className="font-mono text-sm break-all text-black">{authItem.address}</div>
+                        </div>
+                        <CopyClipboardIcon value={authItem.address} className="flex-shrink-0 ml-2" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <p className="text-gray-500">No addresses found.</p>
@@ -287,9 +371,14 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
           
           {activeTab === 'raw' && (
             <div className="p-2 border border-black">
-              <pre className="text-xs overflow-auto max-h-96 bg-gray-50 p-2 font-mono whitespace-pre-wrap break-words">
-                <code>{JSON.stringify(neynarUser, null, 2)}</code>
-              </pre>
+              <div className="relative">
+                <pre className="text-xs overflow-auto max-h-96 bg-gray-50 p-2 font-mono whitespace-pre-wrap break-words">
+                  <code>{JSON.stringify(neynarUser, null, 2)}</code>
+                </pre>
+                <div className="absolute top-2 right-2">
+                  <CopyClipboardIcon value={JSON.stringify(neynarUser, null, 2)} className="flex-shrink-0" />
+                </div>
+              </div>
             </div>
           )}
         </div>
