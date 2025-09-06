@@ -42,6 +42,16 @@ Casterscan is a real-time block explorer for Farcaster built with Next.js, featu
 - Real-time data updates with proper error handling
 - Responsive design: mobile-first approach
 
+## Design System & Styling
+- Mix of Shadcn/ui components with custom styling to match app aesthetic
+- Boxy, minimal design with black borders (`border border-black`)
+- Custom tab implementation with black background for active state
+- Use Shadcn/ui components only when needed or when they can be customized
+- Prefer custom components that match the boxy, minimal style
+- Consistent spacing and typography throughout
+- Monospace fonts for technical data (hashes, addresses, keys)
+- Clean hover states and transitions
+
 ## State Management
 - React hooks for local state
 - TanStack Query for server state (when needed)
