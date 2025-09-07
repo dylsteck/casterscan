@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
+import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import CopyClipboardIcon from '@/app/components/custom/copy-clipboard-icon';
 import { SignerDetail } from './signer-detail';
 import { AppDetailView } from './app-detail-view';
@@ -9,10 +10,12 @@ import { useAppsWithSigners } from '../../hooks/use-apps-with-signers';
 import { formatSignerStats, timeAgo, AppWithSigners } from '../../lib/signer-helpers';
 
 export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: string, neynarUser: NeynarV2User, keysData: ProfileKeysPage }) {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [selectedSigner, setSelectedSigner] = useState<string | null>(null);
-  const [selectedApp, setSelectedApp] = useState<AppWithSigners | null>(null);
+  const [activeTab, setActiveTab] = useQueryState('tab', parseAsStringLiteral(['overview', 'addresses', 'signers', 'raw']).withDefault('overview'));
+  const [selectedSignerKey, setSelectedSignerKey] = useQueryState('signer');
+  const [selectedAppFid, setSelectedAppFid] = useQueryState('signer_fid');
   const { data: appsWithSigners, isLoading: appsLoading, error: appsError } = useAppsWithSigners(fid);
+
+  const selectedApp = appsWithSigners?.find(app => app.fid.toString() === selectedAppFid) || null;
 
   const totalStats = appsWithSigners ? {
     casts: appsWithSigners.reduce((sum, app) => sum + (app.appStats?.casts || 0), 0),
@@ -21,12 +24,18 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
     verifications: appsWithSigners.reduce((sum, app) => sum + (app.appStats?.verifications || 0), 0),
   } : null;
 
-  if (selectedSigner) {
+  if (selectedSignerKey && selectedApp) {
     return (
       <SignerDetail 
-        signerKey={selectedSigner} 
+        signerKey={selectedSignerKey} 
         fid={fid} 
-        onBack={() => setSelectedSigner(null)} 
+        onBack={() => setSelectedSignerKey(null)}
+        appInfo={{
+          name: selectedApp.profile?.display_name || selectedApp.profile?.username || `App ${selectedApp.fid}`,
+          username: selectedApp.profile?.username,
+          bio: selectedApp.profile?.profile?.bio?.text,
+          pfpUrl: selectedApp.profile?.pfp_url
+        }}
       />
     );
   }
@@ -36,7 +45,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
       <AppDetailView 
         app={selectedApp} 
         fid={fid} 
-        onBack={() => setSelectedApp(null)}
+        onBack={() => setSelectedAppFid(null)}
         userProfile={{
           username: neynarUser.username,
           fid: neynarUser.fid.toString()
@@ -45,16 +54,16 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
     );
   }
   const tabs = [
-    { id: 'overview', label: 'overview' },
-    { id: 'addresses', label: 'addresses' },
-    { id: 'signers', label: 'signers' },
-    { id: 'raw', label: 'raw data' }
+    { id: 'overview' as const, label: 'overview' },
+    { id: 'addresses' as const, label: 'addresses' },
+    { id: 'signers' as const, label: 'signers' },
+    { id: 'raw' as const, label: 'raw data' }
   ];
 
   return (
     <div className="w-screen h-screen flex justify-center items-start">
       <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-4">
-        <div className="flex items-center gap-4 mt-6 mb-4">
+        <div className="flex items-start gap-4 mt-6 mb-4">
           <img src={neynarUser.pfp_url} alt={`${neynarUser.username}'s PFP`} className="w-16 h-16 rounded-full" />
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{neynarUser.display_name}</h1>
@@ -131,33 +140,33 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                   </span>
                 </li>
                 {neynarUser.url && (
-                  <li className="flex justify-between items-center mb-1">
+                  <li className="flex justify-between items-start mb-1">
                     <span className="font-semibold mr-1">url</span>
-                    <span className="flex items-center text-right">
-                      <a href={neynarUser.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline" title={neynarUser.url}>
-                        {neynarUser.url.length > 40 ? neynarUser.url.slice(0, 40) : neynarUser.url}
+                    <span className="flex items-center text-right max-w-[70%]">
+                      <a href={neynarUser.url} target="_blank" rel="noopener noreferrer" className="text-black underline break-all" title={neynarUser.url}>
+                        {neynarUser.url}
                       </a>
                       <CopyClipboardIcon value={neynarUser.url} className="ml-1 flex-shrink-0" />
                     </span>
                   </li>
                 )}
 
-                <li className="flex justify-between items-center mb-1">
+                <li className="flex justify-between items-start mb-1">
                   <span className="font-semibold mr-1">pfp url</span>
-                  <span className="flex items-center text-right">
-                    <a href={neynarUser.pfp_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-mono text-sm" title={neynarUser.pfp_url}>
-                      {neynarUser.pfp_url.length > 40 ? neynarUser.pfp_url.slice(0, 40) : neynarUser.pfp_url}
+                  <span className="flex items-center text-right max-w-[70%]">
+                    <a href={neynarUser.pfp_url} target="_blank" rel="noopener noreferrer" className="text-black underline break-all font-mono text-sm" title={neynarUser.pfp_url}>
+                      {neynarUser.pfp_url}
                     </a>
                     <CopyClipboardIcon value={neynarUser.pfp_url} className="ml-1 flex-shrink-0" />
                   </span>
                 </li>
 
                 {neynarUser.profile?.banner?.url && (
-                  <li className="flex justify-between items-center mb-1">
+                  <li className="flex justify-between items-start mb-1">
                     <span className="font-semibold mr-1">banner url</span>
-                    <span className="flex items-center text-right">
-                      <a href={neynarUser.profile.banner.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-mono text-sm" title={neynarUser.profile.banner.url}>
-                        {neynarUser.profile.banner.url.length > 40 ? neynarUser.profile.banner.url.slice(0, 40) : neynarUser.profile.banner.url}
+                    <span className="flex items-center text-right max-w-[70%]">
+                      <a href={neynarUser.profile.banner.url} target="_blank" rel="noopener noreferrer" className="text-black underline break-all font-mono text-sm" title={neynarUser.profile.banner.url}>
+                        {neynarUser.profile.banner.url}
                       </a>
                       <CopyClipboardIcon value={neynarUser.profile.banner.url} className="ml-1 flex-shrink-0" />
                     </span>
@@ -193,7 +202,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                 </li>
 
                 <li className="flex justify-between items-center mb-1">
-                  <span className="font-semibold mr-1">pro user</span>
+                  <span className="font-semibold mr-1">pro subscriber</span>
                   <span className="flex items-center text-right">
                     {neynarUser.pro?.status === 'subscribed' ? 'Yes' : 'No'}
                     <CopyClipboardIcon value={neynarUser.pro?.status === 'subscribed' ? 'Yes' : 'No'} className="ml-1 flex-shrink-0" />
@@ -236,66 +245,62 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
           )}
           
           {activeTab === 'addresses' && (
-            <div className="p-2 border border-black">
-              {((neynarUser.verified_addresses && neynarUser.verified_addresses.eth_addresses.length > 0) || (neynarUser.verified_addresses && neynarUser.verified_addresses.sol_addresses && neynarUser.verified_addresses.sol_addresses.length > 0) || (neynarUser.auth_addresses && neynarUser.auth_addresses.length > 0)) ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="p-2 border border-black" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-all' }}>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-300">
+                    <th className="text-left py-2 px-1 font-semibold">address</th>
+                    <th className="text-left py-2 px-1 font-semibold">type</th>
+                    <th className="text-left py-2 px-1 font-semibold">fid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Custody Address */}
+                  <tr className="border-b border-gray-200">
+                    <td className="py-2 px-1 font-mono text-sm break-all">{neynarUser.custody_address}</td>
+                    <td className="py-2 px-1 text-sm">custody</td>
+                    <td className="py-2 px-1 text-sm"></td>
+                  </tr>
+                  
                   {/* Verified ETH Addresses */}
                   {neynarUser.verified_addresses?.eth_addresses?.map((address, index) => (
-                    <div key={`verified-eth-${index}`} className="p-3 border border-black bg-white">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-black font-medium text-xs">Verified ETH</span>
-                            <span className="text-gray-500 text-xs">Active</span>
-                          </div>
-                          <div className="font-mono text-sm break-all text-black">{address}</div>
-                        </div>
-                        <CopyClipboardIcon value={address} className="flex-shrink-0 ml-2" />
-                      </div>
-                    </div>
+                    <tr key={`verified-eth-${index}`} className="border-b border-gray-200">
+                      <td className="py-2 px-1 font-mono text-sm break-all">{address}</td>
+                      <td className="py-2 px-1 text-sm">verified eth</td>
+                      <td className="py-2 px-1 text-sm"></td>
+                    </tr>
                   ))}
 
                   {/* Verified SOL Addresses */}
                   {neynarUser.verified_addresses?.sol_addresses?.map((address, index) => (
-                    <div key={`verified-sol-${index}`} className="p-3 border border-black bg-white">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-black font-medium text-xs">Verified SOL</span>
-                            <span className="text-gray-500 text-xs">Active</span>
-                          </div>
-                          <div className="font-mono text-sm break-all text-black">{address}</div>
-                        </div>
-                        <CopyClipboardIcon value={address} className="flex-shrink-0 ml-2" />
-                      </div>
-                    </div>
+                    <tr key={`verified-sol-${index}`} className="border-b border-gray-200">
+                      <td className="py-2 px-1 font-mono text-sm break-all">{address}</td>
+                      <td className="py-2 px-1 text-sm">verified sol</td>
+                      <td className="py-2 px-1 text-sm"></td>
+                    </tr>
                   ))}
 
-                  {/* Auth Addresses with FID from neynarUser */}
+                  {/* Auth Addresses */}
                   {neynarUser.auth_addresses?.map((authItem, index) => (
-                    <div key={`auth-${index}`} className="p-3 border border-black bg-white">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-black font-medium text-xs">Auth</span>
-                            <span className="text-gray-500 text-xs">Active</span>
-                            <span className="text-gray-500 font-medium text-xs">FID: {authItem.app?.fid}</span>
-                          </div>
-                          <div className="font-mono text-sm break-all text-black">{authItem.address}</div>
-                        </div>
-                        <CopyClipboardIcon value={authItem.address} className="flex-shrink-0 ml-2" />
-                      </div>
-                    </div>
+                    <tr key={`auth-${index}`} className="border-b border-gray-200">
+                      <td className="py-2 px-1 font-mono text-sm break-all">{authItem.address}</td>
+                      <td className="py-2 px-1 text-sm">auth</td>
+                      <td className="py-2 px-1 text-sm">
+                        {authItem.app?.fid ? (
+                          <a href={`/fids/${authItem.app.fid}`} className="text-black underline">
+                            {authItem.app.fid}
+                          </a>
+                        ) : ''}
+                      </td>
+                    </tr>
                   ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">No addresses found.</p>
-              )}
+                </tbody>
+              </table>
             </div>
           )}
           
           {activeTab === 'signers' && (
-            <div className="p-2 border border-black">
+            <div>
               {appsLoading ? (
                 <div className="animate-pulse">
                   <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
@@ -309,7 +314,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                   {appsWithSigners.map((app, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedApp(app)}
+                      onClick={() => setSelectedAppFid(app.fid.toString())}
                       className="text-left p-2 border border-black hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-center gap-2 mb-2">
@@ -351,10 +356,10 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                       </div>
                       
                       <div className="w-full text-right mt-auto">
-                        <div>{app.signers.length} signers</div>
+                        <div>{app.signers.length} {app.signers.length === 1 ? 'signer' : 'signers'}</div>
                         <div className="text-gray-500">
                           {app.lastUsed ? (
-                            <div>Last used {timeAgo(app.lastUsed)} ago</div>
+                            <div>last used {timeAgo(app.lastUsed)} ago</div>
                           ) : (
                             <div>Never used</div>
                           )}

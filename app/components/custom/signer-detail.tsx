@@ -93,10 +93,10 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
     if (message.data?.castAddBody) {
       const castBody = message.data.castAddBody;
       return {
-        type: 'Cast',
+        type: 'cast',
         content: castBody.text || 'Empty cast',
         timeAgo: timeAgo(date),
-        details: castBody.parentCastId ? `Replying to 0x${castBody.parentCastId.hash.slice(0, 8)}... by @!${castBody.parentCastId.fid}` : null,
+        details: castBody.parentCastId ? `replying to 0x${castBody.parentCastId.hash.slice(0, 8)}... by @!${castBody.parentCastId.fid}` : null,
         embeds: castBody.embeds || [],
         mentions: castBody.mentions || [],
         hash: message.hash
@@ -104,16 +104,16 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
     } else if (message.data?.reactionBody) {
       const reactionBody = message.data.reactionBody;
       return {
-        type: 'Reaction',
+        type: 'reaction',
         content: reactionBody.type === 'REACTION_TYPE_LIKE' ? '👍 Like' : '🔄 Recast',
         timeAgo: timeAgo(date),
-        details: reactionBody.targetCastId ? `Replying to 0x${reactionBody.targetCastId.hash.slice(0, 8)}... by @!${reactionBody.targetCastId.fid}` : null,
+        details: reactionBody.targetCastId ? `replying to 0x${reactionBody.targetCastId.hash.slice(0, 8)}... by @!${reactionBody.targetCastId.fid}` : null,
         hash: message.hash
       };
     } else if (message.data?.linkBody) {
       const linkBody = message.data.linkBody;
       return {
-        type: 'Link',
+        type: 'link',
         content: linkBody.type === 'LINK_TYPE_FOLLOW' ? 'Follow' : 'Unfollow',
         timeAgo: timeAgo(date),
         details: linkBody.targetFid ? `Target FID: ${linkBody.targetFid}` : null,
@@ -121,7 +121,7 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
       };
     } else {
       return {
-        type: 'Other',
+        type: 'other',
         content: 'Unknown message type',
         timeAgo: timeAgo(date),
         details: null,
@@ -134,8 +134,8 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
     return (
       <div className="w-screen h-screen flex justify-center items-start">
         <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-2">
-          <button onClick={onBack} className="text-blue-600 hover:underline mt-3 mb-2 text-left">
-            ← Back to signers
+          <button onClick={onBack} className="text-black hover:underline mt-3 mb-2 text-left">
+            ← back
           </button>
           <div className="p-2 border border-black">
             <div className="animate-pulse">
@@ -156,8 +156,8 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
     return (
       <div className="w-screen h-screen flex justify-center items-start">
         <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-2">
-          <button onClick={onBack} className="text-blue-600 hover:underline mt-3 mb-2 text-left">
-            ← Back to signers
+          <button onClick={onBack} className="text-black hover:underline mt-3 mb-2 text-left">
+            ← back
           </button>
           <div className="p-2 border border-black">
             <p className="text-red-600">Error: {error instanceof Error ? error.message : 'Failed to load messages'}</p>
@@ -170,8 +170,8 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
   return (
     <div className="w-screen h-screen flex justify-center items-start">
       <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-2">
-        <button onClick={onBack} className="text-blue-600 hover:underline mt-3 mb-2 text-left">
-          ← Back to {appInfo?.username || appInfo?.name || `FID ${fid}`}
+        <button onClick={onBack} className="text-black hover:underline mt-3 mb-2 text-left">
+          ← back to {appInfo?.username || appInfo?.name || `FID ${fid}`}
         </button>
         
         {appInfo && (
@@ -189,16 +189,13 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
           </div>
         )}
         
-        <p className="text-xl font-semibold">signer messages</p>
-        <div className="p-2 border border-black">
-        <div className="mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-            <span className="font-mono bg-gray-100 px-2 py-1 break-all">{signerKey.slice(0, 20)}...</span>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xl font-semibold">signer messages</p>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="font-mono bg-gray-100 px-2 py-1 overflow-x-auto scrollbar-hide whitespace-nowrap max-w-xs">{signerKey}</span>
             <CopyClipboardIcon value={signerKey} />
           </div>
-          <p className="text-sm text-gray-500">{allMessages.length.toLocaleString()} messages found</p>
         </div>
-
         <div className="mb-4">
           <div className="flex border border-black">
             {filters.map((filterItem) => (
@@ -220,22 +217,18 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
           </div>
         </div>
 
+        <div>
           {messages.length === 0 ? (
             <p className="text-gray-500">No {filter === 'all' ? '' : filter} messages found for this signer.</p>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 {messages.map((message, index) => {
                   const formatted = formatMessage(message);
                   return (
                     <div key={index} className="border border-black p-2">
                       <div className="flex justify-between items-start mb-2">
-                        <span className={`px-1 py-1 text-xs font-medium border ${
-                          formatted.type === 'Cast' ? 'border-blue-600 text-blue-600' :
-                          formatted.type === 'Reaction' ? 'border-green-600 text-green-600' :
-                          formatted.type === 'Link' ? 'border-purple-600 text-purple-600' :
-                          'border-gray-600 text-gray-600'
-                        }`}>
+                        <span className="text-xs font-medium text-black border border-black px-1 py-0.5">
                           {formatted.type}
                         </span>
                         <span className="text-xs text-gray-500">{formatted.timeAgo} ago</span>
@@ -252,10 +245,10 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
                       {formatted.embeds && formatted.embeds.length > 0 && (
                         <div className="mb-2">
                           {formatted.embeds.map((embed: any, i: number) => (
-                            <div key={i} className="text-xs text-gray-500 italic">
+                            <div key={i} className="text-xs text-gray-500">
                               {embed.url && (
-                                <a href={embed.url} target="_blank" rel="noopener noreferrer" className="underline break-all">
-                                  {embed.url.length > 50 ? `${embed.url.slice(0, 50)}...` : embed.url}
+                                <a href={embed.url} target="_blank" rel="noopener noreferrer" className="text-black underline break-all">
+                                  {embed.url}
                                 </a>
                               )}
                               {embed.castId && (
@@ -266,11 +259,16 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
                         </div>
                       )}
                       
-                      <div className="flex justify-between items-center text-xs text-gray-400 mt-auto">
+                      <div className="flex justify-between items-center text-xs mt-auto">
                         <div className="flex items-center gap-1">
-                          <span className="font-mono">0x{formatted.hash?.slice(0, 6)}...</span>
+                          <span className="font-mono text-gray-400">0x{formatted.hash?.slice(0, 6)}...</span>
                           {formatted.hash && <CopyClipboardIcon value={formatted.hash} />}
                         </div>
+                        {formatted.hash && (
+                          <a href={`/casts/${formatted.hash}`} className="text-black underline text-xs">
+                            view
+                          </a>
+                        )}
                       </div>
                     </div>
                   );

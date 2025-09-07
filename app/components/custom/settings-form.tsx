@@ -93,7 +93,7 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
         </Select>
       </div>
       
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <label className="text-sm font-medium">snapchain node url</label>
         <Input
           value={snapchainUrl}
@@ -105,7 +105,7 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
           className="border border-black rounded-none bg-white hover:bg-gray-50"
         />
         {urlError && <p className="text-sm text-red-600">{urlError}</p>}
-      </div>
+      </div> */}
       
       <Button 
         onClick={handleSave}

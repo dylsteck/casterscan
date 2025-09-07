@@ -12,7 +12,7 @@ import {
 
 export function LiveFeed() {
   const { events } = useEventStream();
-  const { info, isLoading: infoLoading } = useInfo();
+  const { info, isLoading: infoLoading, error: infoError } = useInfo();
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,

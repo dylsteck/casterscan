@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { SNAPCHAIN_NODE_URL } from '../../lib/utils';
+import { SNAPCHAIN_NODE_URL } from '../../../lib/utils';
 
 export async function GET(request: NextRequest) {
   try {

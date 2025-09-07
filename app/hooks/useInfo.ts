@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 export type InfoData = {
   dbStats: {
@@ -24,34 +24,26 @@ export type InfoData = {
 }
 
 export function useInfo() {
-  const [info, setInfo] = useState<InfoData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchInfo = async () => {
-      try {
-        const response = await fetch('/api/info')
-        if (!response.ok) {
-          throw new Error('Failed to fetch info')
-        }
-        const data = await response.json()
-        setInfo(data)
-        setError(null)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error')
-      } finally {
-        setIsLoading(false)
+  const query = useQuery({
+    queryKey: ['snapchain-info'],
+    queryFn: async (): Promise<InfoData> => {
+      const response = await fetch('/api/snapchain/info')
+      if (!response.ok) {
+        throw new Error('Failed to fetch snapchain info')
       }
-    }
+      return response.json()
+    },
+    refetchInterval: 60000, // 1 minute
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 30000, // Consider data stale after 30 seconds
+    retry: 2,
+  })
 
-    fetchInfo()
-    
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchInfo, 30000)
-    
-    return () => clearInterval(interval)
-  }, [])
-
-  return { info, isLoading, error }
+  // Return backward compatible interface
+  return {
+    info: query.data,
+    isLoading: query.isLoading,
+    error: query.error
+  }
 }

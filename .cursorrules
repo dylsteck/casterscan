@@ -34,7 +34,7 @@ Casterscan is a real-time block explorer for Farcaster built with Next.js, featu
 ## API Routes
 - `/api/events?stream=true` - Server-sent events for live cast streaming
 - `/api/users/[fid]` - User data by FID with Neynar fallback
-- `/api/info` - Snapchain hub statistics
+- `/api/snapchain/info` - Snapchain hub statistics
 
 ## UI Patterns
 - Use CSS Grid for layouts (12-column system for tables)
