@@ -43,7 +43,10 @@ export default function MiniAppProvider({ children }: { children: React.ReactNod
             
             log.info('Mini app context', {
               isInMiniApp: true,
-              context: JSON.stringify(sdkContext)
+              username: sdkContext.user.username,
+              fid: sdkContext.user.fid,
+              clientFid: sdkContext.client.clientFid,
+              context: JSON.stringify(sdkContext),
             });
             
             setTimeout(() => {
