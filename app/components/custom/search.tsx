@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { getNeynarCast } from '@/app/lib/server';
 
 export default function Search(){
-  const [search, setSearch] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
+  const [search, setSearch] = React.useState<string>('');
+  const [loading, setLoading] = React.useState<boolean>(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const router = useRouter();
 
@@ -24,7 +24,7 @@ export default function Search(){
       const farcasterUrlMatch = search.match(/^https?:\/\/(www\.)?farcaster\.xyz\/[^\/]+\/0x[a-fA-F0-9]{40}$/);
       const baseAppUrlMatch = search.match(/^https?:\/\/(www\.)?base\.app\/post\/0x[a-fA-F0-9]{40}$/);
       const isNumber = /^\d+$/.test(search);
-      const isEventId = /^\d{6,}$/.test(search);
+      const isEventId = /^\d{10,}$/.test(search);
       const isUsername = /^[a-zA-Z][a-zA-Z0-9]*(\.(eth|base\.eth))?$/.test(search);
 
       if (isEventId) {
