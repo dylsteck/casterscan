@@ -3,6 +3,7 @@
 import { sdk } from "@farcaster/miniapp-sdk";
 import type { Context } from "@farcaster/miniapp-sdk";
 import React, { createContext, useState, useContext, useMemo } from "react";
+import { useLogger } from "@/app/lib/axiom/client";
 
 interface MiniAppContextType {
   context: Context.MiniAppContext | undefined;
@@ -27,15 +28,24 @@ export default function MiniAppProvider({ children }: { children: React.ReactNod
     const [ready, setReady] = useState<boolean>(false);
     const [canAddMiniApp, setCanAddMiniApp] = useState<boolean>(false);
     const [isInMiniApp, setIsInMiniApp] = useState<boolean>(false);
+    const log = useLogger();
 
     React.useEffect(() => {
         const init = async () => {
           const isMiniApp = await sdk.isInMiniApp();
           setIsInMiniApp(isMiniApp);
           
+          log.info('Mini app detection', { isInMiniApp: isMiniApp });
+          
           if (isMiniApp) {
             const sdkContext = await sdk.context;
             setContext(sdkContext);
+            
+            log.info('Mini app context', {
+              isInMiniApp: true,
+              context: JSON.stringify(sdkContext)
+            });
+            
             setTimeout(() => {
               sdk.actions.ready();
               setReady(true);
