@@ -8,11 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 const isDev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT || 3000;
 const localUrl = `http://localhost:${port}`;
-export const BASE_URL = isDev 
-  ? localUrl 
-  : process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://casterscan.com';
+export const BASE_URL = isDev
+  ? localUrl
+  : process.env.VERCEL_ENV === 'production'
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : `https://${process.env.VERCEL_URL}`;
 
 export const BANNER_IMG_URL = 'https://i.imgur.com/KJ7qfro.png';
 export const ICON_IMG_URL = 'https://i.imgur.com/PD1XTs5.jpeg';

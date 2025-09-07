@@ -5,14 +5,21 @@ import { useRouter } from 'next/navigation';
 import { useMiniAppContext } from '@/app/components/custom/mini-app-provider';
 
 export default function ShareCastPage() {
-  const { context, ready } = useMiniAppContext();
+  const { context, ready, isInMiniApp } = useMiniAppContext();
   const router = useRouter();
 
   useEffect(() => {
-    if (ready && context?.location?.type === 'cast_share' && context.location.cast?.hash) {
-      router.replace(`/casts/${context.location.cast.hash}`);
+    if (ready) {
+      if (!isInMiniApp) {
+        router.replace('/');
+        return;
+      }
+      
+      if (context?.location?.type === 'cast_share' && context.location.cast?.hash) {
+        router.replace(`/casts/${context.location.cast.hash}`);
+      }
     }
-  }, [ready, context?.location, router]);
+  }, [ready, isInMiniApp, context?.location, router]);
 
   return (
     <div className="container mx-auto px-4 py-8">

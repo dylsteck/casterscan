@@ -340,3 +340,5 @@ export type SnapchainEventsResponse = {
   events: SnapchainHubEvent[];
   nextPageToken?: string;
 };
+
+export type SnapchainErrorCode = 'NOT_FOUND' | 'BAD_REQUEST' | 'INTERNAL_ERROR' | 'NETWORK_ERROR' | 'TIMEOUT';

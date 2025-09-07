@@ -21,14 +21,15 @@ import {
   SnapchainVerificationsByFidOptions,
   SnapchainOnChainSignersByFidOptions,
   SnapchainCastByIdOptions,
-  SnapchainEventByIdOptions
+  SnapchainEventByIdOptions,
+  SnapchainErrorCode
 } from './types';
 
 export class SnapchainError extends Error {
-  public code: 'NOT_FOUND' | 'BAD_REQUEST' | 'INTERNAL_ERROR' | 'NETWORK_ERROR' | 'TIMEOUT';
+  public code: SnapchainErrorCode;
   public details?: any;
 
-  constructor(code: 'NOT_FOUND' | 'BAD_REQUEST' | 'INTERNAL_ERROR' | 'NETWORK_ERROR' | 'TIMEOUT', message: string, details?: any) {
+  constructor(code: SnapchainErrorCode, message: string, details?: any) {
     super(message);
     this.name = 'SnapchainError';
     this.code = code;
