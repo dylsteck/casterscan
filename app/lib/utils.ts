@@ -101,8 +101,3 @@ export const renderCastText = (text: string) => {
   }
   return text;
 }
-
-export const FARCASTER_HUB_URLS = [
-  `${SNAPCHAIN_NODE_BASE_URL}:3381`,
-  'https://hub.merv.fun:3381'
-];

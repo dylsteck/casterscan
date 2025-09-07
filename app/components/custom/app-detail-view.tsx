@@ -32,7 +32,7 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
           )}
           <div>
             <h2 className="text-xl font-bold">
-              {app.profile?.display_name || app.profile?.username || 'Unknown App'}
+              {app.profile?.display_name || app.profile?.username || `App ${app.fid}`}
             </h2>
             {app.profile?.username && (
               <p className="text-gray-600">

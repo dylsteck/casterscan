@@ -323,10 +323,10 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                         )}
                         <div>
                           <div className="font-semibold">
-                            {app.profile?.display_name || app.profile?.username || 'Unknown App'}
+                            {app.profile?.display_name || app.profile?.username || `App ${app.fid}`}
                           </div>
                           <div className="text-gray-500 text-sm">
-                            @{app.profile?.username || 'unknown'}
+                            @{app.profile?.username || `fid${app.fid}`}
                           </div>
                         </div>
                       </div>

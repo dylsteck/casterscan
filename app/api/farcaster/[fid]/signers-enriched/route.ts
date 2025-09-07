@@ -1,20 +1,8 @@
 import { NextRequest } from 'next/server'
 import { decodeAbiParameters, bytesToHex } from 'viem'
 import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../../lib/snapchain'
-import { cachedRequest, NEYNAR_API_URL, CACHE_TTLS } from '../../../../lib/utils'
-
-const signedKeyRequestAbi = [
-  {
-    components: [
-      { name: "requestFid", type: "uint256" },
-      { name: "requestSigner", type: "address" },
-      { name: "signature", type: "bytes" },
-      { name: "deadline", type: "uint256" },
-    ],
-    name: "SignedKeyRequest",
-    type: "tuple",
-  },
-] as const;
+import { NEYNAR_API_URL, CACHE_TTLS } from '../../../../lib/utils'
+import { signedKeyRequestAbi } from '../../../../lib/farcaster/abi/signed-key-request-abi'
 
 function decodeSignerMetadata(metadata: string) {
   try {
@@ -160,20 +148,30 @@ export async function GET(
 
     const appsWithProfiles = await Promise.all(
       Object.values(appsMap).map(async (app: any) => {
+        console.log(`Fetching profile for app FID ${app.fid}`)
         try {
-          const neynarData = await cachedRequest(
+          const response = await fetch(
             `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${app.fid}`,
-            CACHE_TTLS.LONG,
-            'GET',
             {
-              'x-api-key': process.env.NEYNAR_API_KEY || '',
-              'Content-Type': 'application/json'
-            },
-            `neynar:user:${app.fid}`
+              headers: {
+                'x-api-key': process.env.NEYNAR_API_KEY || '',
+                'Content-Type': 'application/json'
+              }
+            }
           )
           
-          if (neynarData.users && neynarData.users.length > 0) {
-            app.profile = neynarData.users[0]
+          if (response.ok) {
+            const neynarData = await response.json()
+            console.log(`Neynar response for FID ${app.fid}:`, JSON.stringify(neynarData, null, 2))
+            
+            if (neynarData.users && neynarData.users.length > 0) {
+              app.profile = neynarData.users[0]
+              console.log(`Set profile for FID ${app.fid}:`, app.profile.display_name, app.profile.username)
+            } else {
+              console.log(`No users found in Neynar response for FID ${app.fid}`)
+            }
+          } else {
+            console.log(`Neynar API error for FID ${app.fid}: ${response.status} ${response.statusText}`)
           }
         } catch (error) {
           console.warn(`Failed to fetch profile for FID ${app.fid}:`, error)
@@ -187,6 +185,13 @@ export async function GET(
       const bLastUsed = b.lastUsed ? new Date(b.lastUsed).getTime() : 0
       return bLastUsed - aLastUsed
     })
+
+    console.log(`Final sorted apps for FID ${fid}:`, sortedApps.map(app => ({
+      fid: app.fid,
+      hasProfile: !!app.profile,
+      profileDisplayName: app.profile?.display_name,
+      profileUsername: app.profile?.username
+    })))
 
     return Response.json(sortedApps)
   } catch (error) {

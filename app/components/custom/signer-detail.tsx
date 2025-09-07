@@ -240,8 +240,8 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
               <img src={appInfo.pfpUrl} alt={appInfo.name} className="w-16 h-16 rounded-full" />
             )}
             <div className="flex-1">
-              <div className="text-2xl font-bold">{appInfo.name || 'Unknown App'}</div>
-              <div className="text-gray-600">@{appInfo.username || 'unknown'}</div>
+              <div className="text-2xl font-bold">{appInfo.name || `App ${fid}`}</div>
+              <div className="text-gray-600">@{appInfo.username || `fid${fid}`}</div>
               {appInfo.bio && (
                 <div className="text-gray-500 mt-1">{appInfo.bio}</div>
               )}
