@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react';
+import Link from 'next/link';
 import CopyClipboardIcon from '@/app/components/custom/copy-clipboard-icon';
 
 interface EventData {

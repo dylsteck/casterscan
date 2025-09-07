@@ -36,7 +36,7 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
             </h2>
             {app.profile?.username && (
               <p className="text-gray-600">
-                @<a href={`/usernames/${app.profile.username}`} target="_blank" className="text-gray-600 no-underline hover:text-gray-800">
+                @<a href={`/usernames/${app.profile.username}`} target="_blank" className="text-black underline">
                   {app.profile.username}
                 </a>
               </p>
