@@ -2,8 +2,9 @@ import { CACHE_TTLS } from "@/app/lib/utils";
 import { neynar } from "@/app/lib/neynar";
 import { snapchain } from "@/app/lib/snapchain";
 import { NextRequest, NextResponse } from "next/server";
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
     const url = new URL(request.url);
     const fid = url.searchParams.get('fid');
     const hash = url.searchParams.get('hash');
@@ -29,4 +30,4 @@ export async function GET(request: NextRequest) {
             type: type 
         }, { status: 200 });
     }
-}
+});

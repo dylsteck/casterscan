@@ -1,8 +1,9 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
 import { farcaster } from "@/app/lib/farcaster";
 import { NextRequest, NextResponse } from "next/server";
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
     const url = new URL(request.url);
     const fid = url.searchParams.get('fid');
     if(!fid){
@@ -14,4 +15,4 @@ export async function GET(request: NextRequest) {
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
     }
-}
+});

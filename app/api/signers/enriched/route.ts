@@ -4,6 +4,7 @@ import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, Snapc
 import { CACHE_TTLS } from '../../../lib/utils'
 import { neynar } from '../../../lib/neynar'
 import { signedKeyRequestAbi } from '../../../lib/farcaster/abi/signed-key-request-abi'
+import { withAxiom } from '@/app/lib/axiom/server';
 
 function decodeSignerMetadata(metadata: string) {
   try {
@@ -23,9 +24,9 @@ function decodeSignerMetadata(metadata: string) {
 }
 
 
-export async function GET(
+export const GET = withAxiom(async (
   request: NextRequest
-) {
+) => {
   try {
     const fid = request.nextUrl.searchParams.get('fid')
     
@@ -179,4 +180,4 @@ export async function GET(
     console.error('Error fetching enriched signers:', error)
     return Response.json({ error: 'Failed to fetch enriched signers' }, { status: 500 })
   }
-}
+});

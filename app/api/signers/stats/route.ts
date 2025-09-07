@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
 import { snapchain, SnapchainCastsResponse, SnapchainReactionsResponse, SnapchainLinksResponse, SnapchainVerificationsResponse, SnapchainMessage } from '../../../lib/snapchain'
 import { CACHE_TTLS } from '../../../lib/utils'
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(
+export const GET = withAxiom(async (
   request: NextRequest
-) {
+) => {
   try {
     const fid = request.nextUrl.searchParams.get('fid')
     const signer = request.nextUrl.searchParams.get('signer')
@@ -58,4 +59,4 @@ export async function GET(
     console.error('Error fetching signer stats:', error)
     return Response.json({ error: 'Failed to fetch signer stats' }, { status: 500 })
   }
-}
+});

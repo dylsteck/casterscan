@@ -24,6 +24,7 @@ import {
   SnapchainEventByIdOptions,
   SnapchainErrorCode
 } from './types';
+import { universalLogger as logger } from '@/app/lib/axiom/universal';
 
 export class SnapchainError extends Error {
   public code: SnapchainErrorCode;
@@ -53,6 +54,7 @@ export class Snapchain {
   }
 
   private async makeRequest<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
+    const startTime = Date.now();
     const url = new URL(`${this.baseUrl}${endpoint}`);
     
     if (params) {
@@ -64,12 +66,20 @@ export class Snapchain {
     }
 
     try {
+      logger.info('Snapchain API request', { 
+        endpoint, 
+        url: url.toString(), 
+        params 
+      });
+
       const response = await fetch(url.toString(), {
         signal: AbortSignal.timeout(this.timeout),
         headers: {
           'Accept': 'application/json',
         }
       });
+      
+      const duration = Date.now() - startTime;
       
       if (!response.ok) {
         let errorCode: SnapchainError['code'];
@@ -90,6 +100,15 @@ export class Snapchain {
         }
         
         const errorText = await response.text().catch(() => 'Unknown error');
+        
+        logger.error('Snapchain API error', {
+          endpoint,
+          status: response.status,
+          statusText: response.statusText,
+          errorText,
+          duration
+        });
+        
         throw new SnapchainError(
           errorCode,
           `HTTP ${response.status}: ${errorText}`,
@@ -97,16 +116,36 @@ export class Snapchain {
         );
       }
       
+      logger.info('Snapchain API success', {
+        endpoint,
+        status: response.status,
+        duration
+      });
+      
       return response.json();
     } catch (error) {
+      const duration = Date.now() - startTime;
+      
       if (error instanceof SnapchainError) {
+        logger.error('Snapchain API error', {
+          endpoint,
+          error: error.code,
+          message: error.message,
+          duration
+        });
         throw error;
       }
       
       if ((error as any).name === 'TimeoutError' || (error as any).name === 'AbortError') {
+        logger.error('Snapchain API timeout', { endpoint, duration });
         throw new SnapchainError('TIMEOUT', `Request timeout after ${this.timeout}ms`, error);
       }
       
+      logger.error('Snapchain API network error', {
+        endpoint,
+        error: (error as any).message,
+        duration
+      });
       throw new SnapchainError('NETWORK_ERROR', `Network error: ${(error as any).message}`, error);
     }
   }

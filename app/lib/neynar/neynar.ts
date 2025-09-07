@@ -8,6 +8,7 @@ import {
   NeynarUserByUsernameOptions,
   NeynarCastByIdOptions
 } from './types';
+import { universalLogger as logger } from '@/app/lib/axiom/universal';
 
 export class NeynarError extends Error {
   public code: NeynarErrorCode;
@@ -40,14 +41,23 @@ export class Neynar {
   }
 
   private async makeRequest<T>(endpoint: string, params?: Record<string, string>, useHubUrl = false, cacheTime = 3600): Promise<T> {
+    const startTime = Date.now();
+    const baseUrl = useHubUrl ? this.hubUrl : this.baseUrl;
+    const url = new URL(`${baseUrl}${endpoint}`);
+    
     try {
-      const baseUrl = useHubUrl ? this.hubUrl : this.baseUrl;
-      const url = new URL(`${baseUrl}${endpoint}`);
       if (params) {
         Object.entries(params).forEach(([key, value]) => {
           url.searchParams.append(key, value);
         });
       }
+
+      logger.info('Neynar API request', { 
+        endpoint, 
+        url: url.toString(), 
+        useHubUrl,
+        params 
+      });
 
       const response = await fetch(url.toString(), {
         headers: {
@@ -58,7 +68,16 @@ export class Neynar {
         next: { revalidate: cacheTime }
       });
 
+      const duration = Date.now() - startTime;
+
       if (!response.ok) {
+        logger.error('Neynar API error', {
+          endpoint,
+          status: response.status,
+          statusText: response.statusText,
+          duration
+        });
+
         if (response.status === 404) {
           throw new NeynarError('NOT_FOUND', `Resource not found: ${endpoint}`);
         }
@@ -71,14 +90,35 @@ export class Neynar {
         throw new NeynarError('INTERNAL_ERROR', `HTTP ${response.status}: ${response.statusText}`);
       }
 
+      logger.info('Neynar API success', {
+        endpoint,
+        status: response.status,
+        duration
+      });
+
       return await response.json();
     } catch (error) {
+      const duration = Date.now() - startTime;
+      
       if (error instanceof NeynarError) {
+        logger.error('Neynar API error', {
+          endpoint,
+          error: error.code,
+          message: error.message,
+          duration
+        });
         throw error;
       }
       if (error instanceof Error && error.name === 'TimeoutError') {
+        logger.error('Neynar API timeout', { endpoint, duration });
         throw new NeynarError('TIMEOUT', `Request timeout: ${endpoint}`);
       }
+      
+      logger.error('Neynar API network error', {
+        endpoint,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        duration
+      });
       throw new NeynarError('NETWORK_ERROR', `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server'
 import { CACHE_TTLS } from '../../../lib/utils';
 import { snapchain, SnapchainError } from '../../../lib/snapchain';
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
   try {
     const data = await snapchain.getInfo()
     
@@ -34,4 +35,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+});
