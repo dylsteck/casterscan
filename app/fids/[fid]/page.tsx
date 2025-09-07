@@ -2,6 +2,7 @@ import ProfileDetails from '@/app/components/custom/profile-details';
 import { getNeynarUser, getFarcasterKeys } from '@/app/lib/server';
 import { BASE_URL, frame, SEO } from '@/app/lib/utils';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata(props: { params: Promise<{ fid: string }> }) {
   const params = await props.params;
@@ -46,5 +47,10 @@ export default async function Profile(props: { params: Promise<{ fid: string }> 
     getNeynarUser(fid),
     getFarcasterKeys(fid)
   ]);
+  
+  if (!neynarUser || !keysData) {
+    notFound();
+  }
+  
   return <ProfileDetails fid={fid} neynarUser={neynarUser} keysData={keysData} />;
 }

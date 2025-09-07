@@ -10,7 +10,7 @@ import { useAppsWithSigners } from '../../hooks/use-apps-with-signers';
 import { formatSignerStats, timeAgo, AppWithSigners } from '../../lib/signer-helpers';
 
 export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: string, neynarUser: NeynarV2User, keysData: ProfileKeysPage }) {
-  const [activeTab, setActiveTab] = useQueryState('tab', parseAsStringLiteral(['overview', 'addresses', 'signers', 'raw']).withDefault('overview'));
+  const [activeTab, setActiveTab] = useQueryState('tab', parseAsStringLiteral(['overview', 'addresses', 'signers', 'rawdata']).withDefault('overview'));
   const [selectedSignerKey, setSelectedSignerKey] = useQueryState('signer');
   const [selectedAppFid, setSelectedAppFid] = useQueryState('signer_fid');
   const { data: appsWithSigners, isLoading: appsLoading, error: appsError } = useAppsWithSigners(fid);
@@ -57,7 +57,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
     { id: 'overview' as const, label: 'overview' },
     { id: 'addresses' as const, label: 'addresses' },
     { id: 'signers' as const, label: 'signers' },
-    { id: 'raw' as const, label: 'raw data' }
+    { id: 'rawdata' as const, label: 'raw data' }
   ];
 
   return (
@@ -374,7 +374,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
             </div>
           )}
           
-          {activeTab === 'raw' && (
+          {activeTab === 'rawdata' && (
             <div className="p-2 border border-black">
               <div className="relative">
                 <pre className="text-xs overflow-auto max-h-96 bg-gray-50 p-2 font-mono whitespace-pre-wrap break-words">

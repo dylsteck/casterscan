@@ -89,7 +89,6 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
   const formatMessage = (message: any) => {
     const timestamp = message.data?.timestamp || 0;
     const date = farcasterTimeToDate(timestamp);
-    
     if (message.data?.castAddBody) {
       const castBody = message.data.castAddBody;
       return {
@@ -99,7 +98,8 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
         details: castBody.parentCastId ? `replying to 0x${castBody.parentCastId.hash.slice(0, 8)}... by @!${castBody.parentCastId.fid}` : null,
         embeds: castBody.embeds || [],
         mentions: castBody.mentions || [],
-        hash: message.hash
+        hash: message.hash,
+        isCast: true
       };
     } else if (message.data?.reactionBody) {
       const reactionBody = message.data.reactionBody;
@@ -108,7 +108,9 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
         content: reactionBody.type === 'REACTION_TYPE_LIKE' ? '👍 Like' : '🔄 Recast',
         timeAgo: timeAgo(date),
         details: reactionBody.targetCastId ? `replying to 0x${reactionBody.targetCastId.hash.slice(0, 8)}... by @!${reactionBody.targetCastId.fid}` : null,
-        hash: message.hash
+        hash: message.hash,
+        eventId: message.id,
+        isCast: false
       };
     } else if (message.data?.linkBody) {
       const linkBody = message.data.linkBody;
@@ -117,7 +119,31 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
         content: linkBody.type === 'LINK_TYPE_FOLLOW' ? 'Follow' : 'Unfollow',
         timeAgo: timeAgo(date),
         details: linkBody.targetFid ? `Target FID: ${linkBody.targetFid}` : null,
-        hash: message.hash
+        hash: message.hash,
+        eventId: message.id,
+        isCast: false
+      };
+    } else if (message.data?.verificationAddAddressBody) {
+      const verificationBody = message.data.verificationAddAddressBody;
+      return {
+        type: 'verification',
+        content: 'Add Address Verification',
+        timeAgo: timeAgo(date),
+        details: `Address: ${verificationBody.address?.slice(0, 10)}...`,
+        hash: message.hash,
+        eventId: message.id,
+        isCast: false
+      };
+    } else if (message.data?.verificationRemoveBody) {
+      const verificationBody = message.data.verificationRemoveBody;
+      return {
+        type: 'verification',
+        content: 'Remove Address Verification',
+        timeAgo: timeAgo(date),
+        details: `Address: ${verificationBody.address?.slice(0, 10)}...`,
+        hash: message.hash,
+        eventId: message.id,
+        isCast: false
       };
     } else {
       return {
@@ -125,7 +151,9 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
         content: 'Unknown message type',
         timeAgo: timeAgo(date),
         details: null,
-        hash: message.hash
+        hash: message.hash,
+        eventId: message.id,
+        isCast: false
       };
     }
   };
@@ -264,8 +292,11 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
                           <span className="font-mono text-gray-400">0x{formatted.hash?.slice(0, 6)}...</span>
                           {formatted.hash && <CopyClipboardIcon value={formatted.hash} />}
                         </div>
-                        {formatted.hash && (
-                          <a href={`/casts/${formatted.hash}`} className="text-black underline text-xs">
+                        {(formatted.hash || formatted.eventId) && (
+                          <a 
+                            href={formatted.isCast ? `/casts/${formatted.hash}` : `/events/${formatted.eventId}?shard_index=1`} 
+                            className="text-black underline text-xs"
+                          >
                             view
                           </a>
                         )}

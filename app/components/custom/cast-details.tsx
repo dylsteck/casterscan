@@ -91,7 +91,9 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
             <li className="flex justify-between items-center mb-1">
               <span className="font-semibold mr-1">app fid</span>
               <span className="flex items-center text-right">
-                {neynarCast.app.fid}
+                <a href={`/fids/${neynarCast.app.fid}`} className="underline">
+                  {neynarCast.app.fid}
+                </a>
                 <CopyClipboardIcon value={neynarCast.app.fid.toString()} className="ml-1 flex-shrink-0" />
               </span>
             </li>
