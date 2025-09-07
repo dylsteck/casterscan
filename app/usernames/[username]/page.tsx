@@ -1,6 +1,6 @@
 import { getNeynarUserByUsername } from '@/app/lib/server';
 import { redirect, notFound } from 'next/navigation';
-import { Skeleton } from '@/app/components/custom/Skeleton';
+import { Skeleton } from '@/app/components/custom/skeleton';
 
 export default async function UsernamePage(props: { params: Promise<{ username: string }> }) {
   const params = await props.params;

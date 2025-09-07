@@ -1,6 +1,6 @@
 'use client'
 
-import { LiveFeed } from './components/custom/LiveFeed'
+import { LiveFeed } from './components/custom/live-feed'
 import { Metadata } from "next"
 import { frame, SEO } from "./lib/utils"
 

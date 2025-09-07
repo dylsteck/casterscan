@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
   const stream = searchParams.get('stream')
 
   if (stream === 'true') {
-    // Set up Server-Sent Events
     const encoder = new TextEncoder()
     
     const customReadable = new ReadableStream({
@@ -60,12 +59,12 @@ export async function GET(request: NextRequest) {
                 if (subscribeResult.isOk()) {
                   const stream = subscribeResult.value
 
-                  // Use async iteration to process events
                   for await (const event of stream) {
                     // Check if controller is still open before processing
                     if (isClosed) break
                     
                     // Filter for cast messages (type 1)
+                    // TODO: Add filtering for more message types
                     if (event.mergeMessageBody?.message?.data?.type === 1) {
                       const message = event.mergeMessageBody.message
                       const hash = message.hash
@@ -116,7 +115,6 @@ export async function GET(request: NextRequest) {
         startStream()
       },
       cancel() {
-        // This is called when the client disconnects
         console.log('Stream cancelled by client')
       }
     })
