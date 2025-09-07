@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { snapchain } from '../../../../lib/snapchain'
+import { CACHE_TTLS } from '../../../../lib/utils'
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +20,11 @@ export async function GET(
       ...(pageToken && { pageToken }),
       ...(signer && { signer })
     })
-    return Response.json(data)
+    return Response.json(data, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
+    })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch signers' }, { status: 500 })
   }

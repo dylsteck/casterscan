@@ -30,7 +30,7 @@ export class Farcaster {
     this.timeout = options.timeout || 15000;
   }
 
-  private async makeRequest<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
+  private async makeRequest<T>(endpoint: string, params?: Record<string, string>, cacheTime = 3600): Promise<T> {
     try {
       const url = new URL(`${this.baseUrl}${endpoint}`);
       if (params) {
@@ -43,7 +43,8 @@ export class Farcaster {
         headers: {
           'Content-Type': 'application/json'
         },
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
+        next: { revalidate: cacheTime }
       });
 
       if (!response.ok) {

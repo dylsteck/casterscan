@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchKeysForFid } from '@/app/lib/farcaster/keys';
+import { CACHE_TTLS } from '@/app/lib/utils';
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +29,7 @@ export async function GET(
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 's-maxage=15, stale-while-revalidate=60',
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`,
       },
     });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { snapchain, SnapchainCastsResponse, SnapchainReactionsResponse, SnapchainLinksResponse, SnapchainVerificationsResponse, SnapchainMessage } from '../../../../lib/snapchain'
+import { CACHE_TTLS } from '../../../../lib/utils'
 
 export async function GET(
   request: NextRequest,
@@ -45,6 +46,10 @@ export async function GET(
       links: links.length,
       verifications: verifications.length,
       lastUsed: lastUsed ? new Date(lastUsed * 1000).toISOString() : null
+    }, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
     })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch signer stats' }, { status: 500 })

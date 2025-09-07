@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { SNAPCHAIN_NODE_BASE_URL } from '../../../lib/utils';
+import { SNAPCHAIN_NODE_BASE_URL, CACHE_TTLS } from '../../../lib/utils';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -24,7 +24,11 @@ export async function GET(request: NextRequest) {
     
     const data = await response.json();
     
-    return Response.json(data);
+    return Response.json(data, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
+    });
   } catch (error) {
     console.error('Error fetching event:', error);
     return Response.json(

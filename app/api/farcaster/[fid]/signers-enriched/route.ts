@@ -167,7 +167,11 @@ export async function GET(
     })
 
 
-    return Response.json(sortedApps)
+    return Response.json(sortedApps, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
+    })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch enriched signers' }, { status: 500 })
   }

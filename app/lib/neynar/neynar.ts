@@ -39,7 +39,7 @@ export class Neynar {
     this.timeout = options.timeout || 15000;
   }
 
-  private async makeRequest<T>(endpoint: string, params?: Record<string, string>, useHubUrl = false): Promise<T> {
+  private async makeRequest<T>(endpoint: string, params?: Record<string, string>, useHubUrl = false, cacheTime = 3600): Promise<T> {
     try {
       const baseUrl = useHubUrl ? this.hubUrl : this.baseUrl;
       const url = new URL(`${baseUrl}${endpoint}`);
@@ -54,7 +54,8 @@ export class Neynar {
           'x-api-key': this.apiKey,
           'Content-Type': 'application/json'
         },
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
+        next: { revalidate: cacheTime }
       });
 
       if (!response.ok) {
