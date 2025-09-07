@@ -51,7 +51,7 @@ export function LiveFeed() {
         cell: ({ getValue }) => {
           const fid = getValue() as number;
           return (
-            <a href={`/fids/${fid}`} className="text-[#71579E] hover:underline cursor-pointer block truncate max-w-full" target="_blank">
+            <a href={`/fids/${fid}`} className="text-[#71579E] hover:underline cursor-pointer block truncate max-w-full">
               {fid}
             </a>
           );
@@ -71,8 +71,7 @@ export function LiveFeed() {
         header: 'link',
         cell: ({ getValue }) => (
           <a 
-            href={getValue() as string} 
-            target="_blank" 
+            href={getValue() as string}
             rel="noopener noreferrer"
             className="text-[#71579E] hover:underline text-sm"
           >

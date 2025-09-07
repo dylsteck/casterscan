@@ -2,11 +2,11 @@
 
 import sdk from "@farcaster/miniapp-sdk";
 import { useEffect, useState } from "react";
-import { useFrameContext } from "./frame-provider";
+import { useMiniAppContext } from "./mini-app-provider";
 import Link from "next/link";
 
-export function FrameLink({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
-  const { context } = useFrameContext();
+export function MiniAppLink({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
+  const { context } = useMiniAppContext();
 
   if (context) {
     return (

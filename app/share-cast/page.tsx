@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFrameContext } from '@/app/components/custom/frame-provider';
+import { useMiniAppContext } from '@/app/components/custom/mini-app-provider';
 
 export default function ShareCastPage() {
-  const { context, ready } = useFrameContext();
+  const { context, ready } = useMiniAppContext();
   const router = useRouter();
 
   useEffect(() => {

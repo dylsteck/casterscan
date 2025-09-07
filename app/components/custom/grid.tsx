@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { type SnapchainEvent, type User } from '../../lib/types';
 import { renderCastText } from '../../lib/utils';
-import { FrameLink } from './frame-link';
+import { MiniAppLink } from './mini-app-link';
 
 const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: boolean; isNew?: boolean }) => {
   const getRelativeTime = (timestamp: string) => {

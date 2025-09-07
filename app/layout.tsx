@@ -3,14 +3,14 @@ import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
 import Header from "./components/custom/header";
 import Script from "next/script";
-import { BANNER_IMG_URL, frame, ICON_IMG_URL } from "./lib/utils";
-import FrameProvider from "./components/custom/frame-provider";
+import { BANNER_IMG_URL, BASE_URL, frame, ICON_IMG_URL } from "./lib/utils";
+import MiniAppProvider from "./components/custom/mini-app-provider";
 import Providers from "./providers";
 
 const PAGE = {
   title: "Casterscan",
   description: "A block explorer for Farcaster",
-  url: "https://casterscan.com",
+  url: BASE_URL,
 };
 
 export const metadata: Metadata = {
@@ -56,12 +56,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={GeistSans.className}>
         <Providers>
-          <FrameProvider>
+          <MiniAppProvider>
             <div className="min-h-screen">
               <Header />
               {children}
             </div>
-          </FrameProvider>
+          </MiniAppProvider>
         </Providers>
         <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}`} />
         <Script id="google-analytics">

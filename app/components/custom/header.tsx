@@ -6,13 +6,13 @@ import { sdk } from '@farcaster/miniapp-sdk';
 import { Github, Settings } from 'lucide-react';
 import CasterscanIcon from './icons/casterscan-icon';
 import Search from './search';
-import { FrameLink } from './frame-link';
-import { useFrameContext } from './frame-provider';
+import { MiniAppLink } from './mini-app-link';
+import { useMiniAppContext } from './mini-app-provider';
 import { ResponsiveDialog } from './responsive-dialog';
 import { SettingsForm } from './settings-form';
 
 export default function Header() {
-  const { context } = useFrameContext();
+  const { canAddMiniApp } = useMiniAppContext();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleAddMiniApp = async () => {
@@ -33,9 +33,9 @@ export default function Header() {
           </Link>
         </div>
         <div className="float-right flex flex-row gap-3 p-5">
-          {context && (
+          {canAddMiniApp && (
             <button onClick={handleAddMiniApp} className="cursor-pointer">
-              <p>ADD MINIAPP</p>
+              <p>ADD</p>
             </button>
           )}
           <div className="flex flex-row gap-3 items-center">
