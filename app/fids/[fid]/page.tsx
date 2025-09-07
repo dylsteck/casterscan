@@ -1,4 +1,4 @@
-import ProfileDetails from '@/app/components/custom/profile-details';
+import ProfileDetails from '@/app/components/custom/profile-details/index';
 import { getNeynarUser, getFarcasterKeys } from '@/app/lib/server';
 import { BASE_URL, frame, SEO } from '@/app/lib/utils';
 import { Metadata } from 'next';

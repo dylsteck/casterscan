@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server'
 import { decodeAbiParameters, bytesToHex } from 'viem'
-import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../../lib/snapchain'
-import { CACHE_TTLS } from '../../../../lib/utils'
-import { neynar } from '../../../../lib/neynar'
-import { signedKeyRequestAbi } from '../../../../lib/farcaster/abi/signed-key-request-abi'
+import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../lib/snapchain'
+import { CACHE_TTLS } from '../../../lib/utils'
+import { neynar } from '../../../lib/neynar'
+import { signedKeyRequestAbi } from '../../../lib/farcaster/abi/signed-key-request-abi'
 
 function decodeSignerMetadata(metadata: string) {
   try {
@@ -24,11 +24,14 @@ function decodeSignerMetadata(metadata: string) {
 
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
+  request: NextRequest
 ) {
   try {
-    const { fid } = await params
+    const fid = request.nextUrl.searchParams.get('fid')
+    
+    if (!fid) {
+      return Response.json({ error: 'FID parameter required' }, { status: 400 })
+    }
     
     const [signersData, userCasts, userReactions, userLinks, userVerifications] = await Promise.all([
       snapchain.getOnChainSignersByFid({ fid, pageSize: 1000 }).catch((): SnapchainOnChainSignersResponse => ({ events: [] })),
@@ -173,6 +176,7 @@ export async function GET(
       }
     })
   } catch (error) {
+    console.error('Error fetching enriched signers:', error)
     return Response.json({ error: 'Failed to fetch enriched signers' }, { status: 500 })
   }
 }
