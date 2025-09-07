@@ -1,7 +1,7 @@
 # Casterscan - Farcaster Block Explorer
 
 ## Project Overview
-Casterscan is a real-time block explorer for Farcaster built with Next.js, featuring live event streaming from Snapchain hub at `snap.farcaster.xyz:3383`.
+Casterscan is a real-time block explorer for Farcaster built with Next.js, featuring live event streaming from Snapchain node at `snap.farcaster.xyz:3383`.
 
 ## Package Manager
 - Use `bun` for all package management and script execution
@@ -24,7 +24,7 @@ Casterscan is a real-time block explorer for Farcaster built with Next.js, featu
 - Import paths: Use relative paths for local files
 
 ## Farcaster/Snapchain Specifics
-- Snapchain hub endpoint: `snap.farcaster.xyz:3383` (gRPC)
+- Snapchain node endpoint: `snap.farcaster.xyz:3383` (gRPC)
 - REST API endpoint: `snap.farcaster.xyz:3381/v1/`
 - Use `@farcaster/hub-nodejs` for gRPC connections
 - Use `@farcaster/hub-web` for client-side utilities
@@ -34,7 +34,7 @@ Casterscan is a real-time block explorer for Farcaster built with Next.js, featu
 ## API Routes
 - `/api/events?stream=true` - Server-sent events for live cast streaming
 - `/api/users/[fid]` - User data by FID with Neynar fallback
-- `/api/snapchain/info` - Snapchain hub statistics
+- `/api/snapchain/info` - Snapchain node statistics
 
 ## UI Patterns
 - Use CSS Grid for layouts (12-column system for tables)

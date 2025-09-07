@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   Select,
   SelectContent,
@@ -9,27 +8,21 @@ import {
   SelectValue,
 } from '@/app/components/ui/select';
 import { Button } from '@/app/components/ui/button';
-import { 
-  getDefaultClient, 
-  setDefaultClient, 
-  type DefaultClient 
-} from '../../lib/local-storage';
+import { LOCAL_STORAGE_KEYS, type DefaultClient } from '../../lib/local-storage';
+import { useLocalStorage } from '../../hooks/use-local-storage';
 
 interface SettingsFormProps {
   onClose?: () => void;
 }
 
 export function SettingsForm({ onClose }: SettingsFormProps) {
-  const [defaultClientState, setDefaultClientState] = useState<DefaultClient>('farcaster');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setDefaultClientState(getDefaultClient());
-  }, []);
+  const [defaultClientState, setDefaultClientState, mounted] = useLocalStorage<DefaultClient>(
+    LOCAL_STORAGE_KEYS.DEFAULT_CLIENT,
+    'farcaster'
+  );
 
   const handleSave = () => {
-    setDefaultClient(defaultClientState);
+    setDefaultClientState(defaultClientState);
     onClose?.();
   };
 

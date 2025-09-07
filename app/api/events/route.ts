@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383"
           const nodeClient = getSSLHubRpcClient(hubRpcEndpoint)
 
-          console.log('Server connecting to Snapchain hub:', hubRpcEndpoint)
+          console.log('Server connecting to Snapchain node:', hubRpcEndpoint)
 
           // Wait for client to be ready
           nodeClient.$.waitForReady(Date.now() + 5000, async (e) => {
@@ -125,4 +125,4 @@ export async function GET(request: NextRequest) {
       'Access-Control-Allow-Headers': 'Cache-Control',
     },
   })
-} 
+}
