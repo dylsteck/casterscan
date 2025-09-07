@@ -11,7 +11,7 @@
     "dev": "next dev --turbo",
     "build": "next build --turbo",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@farcaster/hub-nodejs": "^0.15.6",
@@ -39,11 +39,13 @@
     "viem": "^2.37.3"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^22.9.0",
     "@types/react": "19.1.12",
     "@types/react-dom": "19.1.9",
     "eslint": "^8",
     "eslint-config-next": "15.5.2",
+    "eslint-config-prettier": "^10.1.8",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

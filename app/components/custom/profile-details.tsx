@@ -64,6 +64,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
     <div className="w-screen h-screen flex justify-center items-start">
       <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-4">
         <div className="flex items-start gap-4 mt-6 mb-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={neynarUser.pfp_url} alt={`${neynarUser.username}'s PFP`} className="w-16 h-16 rounded-full" />
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{neynarUser.display_name}</h1>
@@ -319,6 +320,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
                     >
                       <div className="flex items-center gap-2 mb-2">
                         {app.profile?.pfp_url && (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={app.profile.pfp_url} alt="App" className="w-6 h-6 rounded-full" />
                         )}
                         <div>
