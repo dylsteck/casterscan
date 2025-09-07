@@ -1,9 +1,9 @@
 'use server';
 
-import { NeynarV2Cast, NeynarV2User, FarcasterCast, HubCast, ProfileKeysPage } from './types';
-import { fetchKeysForFid } from './farcaster/keys';
-import { BASE_URL, FARCASTER_API_URL } from './utils';
+import { NeynarV2Cast, NeynarV2User, ProfileKeysPage } from './types';
+import { BASE_URL } from './utils';
 import { neynar } from './neynar';
+import { fetchKeysForFid, type FarcasterCast, type HubCast } from './farcaster';
 
 export async function getNeynarCast(identifier: string, type: 'url' | 'hash') {
   try {

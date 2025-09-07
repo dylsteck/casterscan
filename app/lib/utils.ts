@@ -56,8 +56,10 @@ export const CACHE_TTLS = {
   }
 };
 
-export const FARCASTER_API_URL = 'https://api.farcaster.xyz';
 export const SNAPCHAIN_NODE_BASE_URL = 'https://snap.farcaster.xyz';
+
+export { neynar } from './neynar';
+export { farcaster } from './farcaster';
 
 export const renderCastText = (text: string) => {
   if(text.length > MAX_CAST_PREVIEW_CHARS){
