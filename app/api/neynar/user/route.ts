@@ -1,4 +1,4 @@
-import { cachedRequest, NEYNAR_API_URL } from "@/app/lib/utils";
+import { cachedRequest, NEYNAR_API_URL, CACHE_TTLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     try {
         const apiKey = process.env.NEYNAR_API_KEY ?? "";
         const responseData = await cachedRequest(
-            `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`, 3600, 'GET', 
+            `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`, CACHE_TTLS.LONG, 'GET', 
             {
                 'Content-Type': 'application/json',
                 'x-api-key': `${apiKey}`

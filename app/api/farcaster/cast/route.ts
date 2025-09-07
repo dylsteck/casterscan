@@ -1,4 +1,4 @@
-import { cachedRequest, FARCASTER_API_URL } from "@/app/lib/utils";
+import { cachedRequest, FARCASTER_API_URL, CACHE_TTLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const responseData = await cachedRequest(`${FARCASTER_API_URL}/v2/thread-casts?castHash=${hash}`, 3600, 'GET', undefined, `farcaster:cast:${hash}`);
+        const responseData = await cachedRequest(`${FARCASTER_API_URL}/v2/thread-casts?castHash=${hash}`, CACHE_TTLS.LONG, 'GET', undefined, `farcaster:cast:${hash}`);
         
         return NextResponse.json(responseData);
     } catch (err) {

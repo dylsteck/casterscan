@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { CACHE_TTLS } from '../lib/utils'
 
 export type InfoData = {
   dbStats: {
@@ -33,10 +34,10 @@ export function useInfo() {
       }
       return response.json()
     },
-    refetchInterval: 60000, // 1 minute
+    refetchInterval: CACHE_TTLS.REACT_QUERY.REFETCH_INTERVAL,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    staleTime: 30000, // Consider data stale after 30 seconds
+    staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     retry: 2,
   })
 

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { decodeAbiParameters, bytesToHex } from 'viem'
 import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../../lib/snapchain'
+import { cachedRequest, NEYNAR_API_URL, CACHE_TTLS } from '../../../../lib/utils'
 
 const signedKeyRequestAbi = [
   {
@@ -160,21 +161,19 @@ export async function GET(
     const appsWithProfiles = await Promise.all(
       Object.values(appsMap).map(async (app: any) => {
         try {
-          const neynarRes = await fetch(
-            `https://api.neynar.com/v2/farcaster/user/bulk?fids=${app.fid}`,
+          const neynarData = await cachedRequest(
+            `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${app.fid}`,
+            CACHE_TTLS.LONG,
+            'GET',
             {
-              headers: {
-                'x-api-key': process.env.NEYNAR_API_KEY || '',
-                'Content-Type': 'application/json'
-              }
-            }
+              'x-api-key': process.env.NEYNAR_API_KEY || '',
+              'Content-Type': 'application/json'
+            },
+            `neynar:user:${app.fid}`
           )
           
-          if (neynarRes.ok) {
-            const neynarData = await neynarRes.json()
-            if (neynarData.users && neynarData.users.length > 0) {
-              app.profile = neynarData.users[0]
-            }
+          if (neynarData.users && neynarData.users.length > 0) {
+            app.profile = neynarData.users[0]
           }
         } catch (error) {
           console.warn(`Failed to fetch profile for FID ${app.fid}:`, error)

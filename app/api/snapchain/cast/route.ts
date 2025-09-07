@@ -1,4 +1,4 @@
-import { cachedRequest, NEYNAR_HUB_API_URL, FARCASTER_HUB_URLS } from "@/app/lib/utils";
+import { cachedRequest, NEYNAR_HUB_API_URL, FARCASTER_HUB_URLS, CACHE_TTLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
             apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
         }
 
-        const responseData = await cachedRequest(apiUrl, 3600, 'GET', headers, `snapchain:${type}:cast:${fid}:${hash}`);
+        const responseData = await cachedRequest(apiUrl, CACHE_TTLS.LONG, 'GET', headers, `snapchain:${type}:cast:${fid}:${hash}`);
         return NextResponse.json(responseData);
     } catch (err) {
         console.error('Error fetching cast from API:', err);

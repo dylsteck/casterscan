@@ -1,5 +1,5 @@
-import { useEventStream, type StreamEvent } from '../../hooks/useEventStream';
-import { useInfo } from '../../hooks/useInfo';
+import { useEventStream, type StreamEvent } from '../../hooks/use-event-stream';
+import { useInfo } from '../../hooks/use-info';
 import { useState, useMemo, useEffect } from 'react';
 import { Skeleton } from '../Skeleton';
 import {

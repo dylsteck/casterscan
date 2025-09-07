@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { SnapchainEvent } from '../lib/types';
-import { BASE_URL } from '../lib/utils';
+import { BASE_URL, CACHE_TTLS } from '../lib/utils';
 
 interface EventsResponse {
   events: SnapchainEvent[];
@@ -28,10 +28,10 @@ export const useEvents = (page: number = 0, limit: number = 50) => {
       }
       return response.json();
     },
-    refetchInterval: 30000, // Refetch every 30 seconds for live updates
+    refetchInterval: 30000,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    staleTime: 10000, // Consider data stale after 10 seconds
+    staleTime: 10000
   });
 
   // Detect new events for animation purposes

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import List from './list';
 import Grid from './grid';
 import LiveIndicatorIcon from './icons/live-indicator-icon';
-import { useEvents } from '../../hooks/useEvents';
+import { useEvents } from '../../hooks/use-events';
 
 export default function Feed() {
   const [filter, setFilter] = React.useState('list');

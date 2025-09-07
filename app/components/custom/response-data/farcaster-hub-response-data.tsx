@@ -1,7 +1,7 @@
 'use client';
 
 import ResponseData from ".";
-import { useFarcasterHubCast } from "../../../hooks/useApiData";
+import { useFarcasterHubCast } from "../../../hooks/use-api-data";
 
 export default function FarcasterHubResponseData({ fid, hash }: { fid: number, hash: string }) {
     const { data, isLoading, error } = useFarcasterHubCast(fid, hash);

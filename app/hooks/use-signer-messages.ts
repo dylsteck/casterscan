@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { snapchain, SnapchainMessage } from '../lib/snapchain';
+import { CACHE_TTLS } from '../lib/utils';
 
 export function useSignerMessages(fid: string, signerKey: string) {
   return useQuery({
@@ -32,7 +33,7 @@ export function useSignerMessages(fid: string, signerKey: string) {
       return signerMessages;
     },
     enabled: !!fid && !!signerKey,
-    staleTime: 2 * 60 * 1000,
-    gcTime: 5 * 60 * 1000,
+    staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
+    gcTime: CACHE_TTLS.REACT_QUERY.GC_TIME,
   });
 }
