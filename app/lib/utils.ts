@@ -56,8 +56,6 @@ export const CACHE_TTLS = {
   }
 };
 
-export const NEYNAR_API_URL = 'https://api.neynar.com';
-export const NEYNAR_HUB_API_URL = 'https://snapchain-api.neynar.com';
 export const FARCASTER_API_URL = 'https://api.farcaster.xyz';
 export const SNAPCHAIN_NODE_BASE_URL = 'https://snap.farcaster.xyz';
 

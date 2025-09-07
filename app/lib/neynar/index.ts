@@ -1,3 +1,5 @@
+import { Neynar } from './neynar';
+
 export { Neynar, NeynarError } from './neynar';
 export type {
   NeynarV1Cast,
@@ -11,3 +13,4 @@ export type {
   NeynarUserByUsernameOptions,
   NeynarCastByIdOptions
 } from './types';
+export const neynar = new Neynar();
