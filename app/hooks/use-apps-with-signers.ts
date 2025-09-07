@@ -6,7 +6,7 @@ export function useAppsWithSigners(fid: string) {
   return useQuery({
     queryKey: ['apps-with-signers', fid],
     queryFn: async (): Promise<AppWithSigners[]> => {
-      const response = await fetch(`/api/farcaster/${fid}/signers-enriched`);
+      const response = await fetch(`/api/signers/enriched?fid=${fid}`);
       if (!response.ok) throw new Error('Failed to fetch enriched signers');
       
       const appsData = await response.json();

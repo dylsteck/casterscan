@@ -1,7 +1,8 @@
 # Casterscan
 
-## A block explorer for Farcaster
-You can [check it out here](https://casterscan.com)
+A block explorer for Farcaster | [casterscan.com](https://casterscan.com)
+<br/><br/>
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dylsteck/casterscan)
 
 ![Casterscan as of 9/7/25](https://i.imgur.com/ryRhP0P.png)
 

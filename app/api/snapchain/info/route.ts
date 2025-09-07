@@ -1,22 +1,38 @@
 import { NextRequest } from 'next/server'
-import { SNAPCHAIN_NODE_BASE_URL } from '../../../lib/utils';
+import { CACHE_TTLS } from '../../../lib/utils';
+import { snapchain, SnapchainError } from '../../../lib/snapchain';
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
   try {
-    const response = await fetch(`${SNAPCHAIN_NODE_BASE_URL}:3381/v1/info`)
+    const data = await snapchain.getInfo()
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    
-    const data = await response.json()
-    
-    return Response.json(data)
+    return Response.json(data, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
+    })
   } catch (error) {
     console.error('Error fetching info:', error)
+    
+    if (error instanceof SnapchainError) {
+      const statusMap = {
+        'NOT_FOUND': 404,
+        'BAD_REQUEST': 400,
+        'TIMEOUT': 408,
+        'INTERNAL_ERROR': 500,
+        'NETWORK_ERROR': 500
+      };
+      
+      return Response.json(
+        { error: error.message },
+        { status: statusMap[error.code] || 500 }
+      );
+    }
+    
     return Response.json(
       { error: 'Failed to fetch info' },
       { status: 500 }
     )
   }
-}
+});

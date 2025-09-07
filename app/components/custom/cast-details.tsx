@@ -19,6 +19,7 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
             <ShareCast neynarCast={neynarCast}/>
           </div>
           <div className="flex items-center mb-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={neynarCast.author.pfp_url} alt={`${neynarCast.author.username}'s PFP`} className="w-8 h-8 rounded-full mr-1" />
             <div>
               <p className="text-lg font-semibold">{neynarCast.author.display_name}</p>
@@ -80,6 +81,7 @@ export default function CastDetails({ hash, neynarCast }: { hash: string, neynar
               <span className="font-semibold mr-1">app name</span>
               <span className="flex items-center text-right">
                 <div className="flex flex-row gap-1.5 items-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={neynarCast.app.pfp_url} className="size-4 rounded-full" alt={`PFP for ${neynarCast.app.display_name}`} />
                   <span>
                     {neynarCast.app.display_name}

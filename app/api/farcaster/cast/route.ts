@@ -1,7 +1,9 @@
-import { FARCASTER_API_URL, CACHE_TTLS } from "@/app/lib/utils";
+import { CACHE_TTLS } from "@/app/lib/utils";
+import { farcaster } from "@/app/lib/farcaster";
 import { NextRequest, NextResponse } from "next/server";
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
     const url = new URL(request.url);
     const hash = url.searchParams.get('hash');
 
@@ -10,26 +12,14 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        const response = await fetch(`${FARCASTER_API_URL}/v2/thread-casts?castHash=${hash}`, {
-            method: 'GET',
-            signal: AbortSignal.timeout(15000),
-            next: { revalidate: CACHE_TTLS.LONG }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch cast (status: ${response.status})`);
-        }
-        
-        const responseData = await response.json();
-        
-        return NextResponse.json(responseData);
+        const responseData = await farcaster.getCast({ hash: hash! });
+        return NextResponse.json(responseData, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         console.error(`Error fetching cast ${hash}:`, err);
-        // Return a structured error response instead of 500
         return NextResponse.json({ 
             error: "Failed to fetch cast", 
             details: err instanceof Error ? err.message : "Unknown error",
             hash: hash 
-        }, { status: 200 }); // Return 200 with error data for client to handle
+        }, { status: 200 });
     }
-}
+});

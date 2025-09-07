@@ -1,8 +1,10 @@
 import { NextRequest } from 'next/server'
 import { decodeAbiParameters, bytesToHex } from 'viem'
-import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../../lib/snapchain'
-import { NEYNAR_API_URL, CACHE_TTLS } from '../../../../lib/utils'
-import { signedKeyRequestAbi } from '../../../../lib/farcaster/abi/signed-key-request-abi'
+import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../lib/snapchain'
+import { CACHE_TTLS } from '../../../lib/utils'
+import { neynar } from '../../../lib/neynar'
+import { signedKeyRequestAbi } from '../../../lib/farcaster/abi/signed-key-request-abi'
+import { withAxiom } from '@/app/lib/axiom/server';
 
 function decodeSignerMetadata(metadata: string) {
   try {
@@ -22,12 +24,15 @@ function decodeSignerMetadata(metadata: string) {
 }
 
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
-) {
+export const GET = withAxiom(async (
+  request: NextRequest
+) => {
   try {
-    const { fid } = await params
+    const fid = request.nextUrl.searchParams.get('fid')
+    
+    if (!fid) {
+      return Response.json({ error: 'FID parameter required' }, { status: 400 })
+    }
     
     const [signersData, userCasts, userReactions, userLinks, userVerifications] = await Promise.all([
       snapchain.getOnChainSignersByFid({ fid, pageSize: 1000 }).catch((): SnapchainOnChainSignersResponse => ({ events: [] })),
@@ -148,22 +153,9 @@ export async function GET(
     const appsWithProfiles = await Promise.all(
       Object.values(appsMap).map(async (app: any) => {
         try {
-          const response = await fetch(
-            `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${app.fid}`,
-            {
-              headers: {
-                'x-api-key': process.env.NEYNAR_API_KEY || '',
-                'Content-Type': 'application/json'
-              }
-            }
-          )
-          
-          if (response.ok) {
-            const neynarData = await response.json()
-            
-            if (neynarData.users && neynarData.users.length > 0) {
-              app.profile = neynarData.users[0]
-            }
+          const user = await neynar.getUser({ fid: app.fid.toString() });
+          if (user) {
+            app.profile = user;
           }
         } catch (error) {
           console.warn(`Failed to fetch profile for FID ${app.fid}:`, error)
@@ -179,8 +171,13 @@ export async function GET(
     })
 
 
-    return Response.json(sortedApps)
+    return Response.json(sortedApps, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
+    })
   } catch (error) {
+    console.error('Error fetching enriched signers:', error)
     return Response.json({ error: 'Failed to fetch enriched signers' }, { status: 500 })
   }
-}
+});

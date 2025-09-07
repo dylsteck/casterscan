@@ -6,6 +6,8 @@ import Script from "next/script";
 import { BANNER_IMG_URL, BASE_URL, frame, ICON_IMG_URL } from "./lib/utils";
 import MiniAppProvider from "./components/custom/mini-app-provider";
 import Providers from "./providers";
+import { WebVitals } from "@/app/lib/axiom/client";
+import { universalLogger } from "@/app/lib/axiom/universal";
 
 const PAGE = {
   title: "Casterscan",
@@ -54,6 +56,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <WebVitals />
       <body className={GeistSans.className}>
         <Providers>
           <MiniAppProvider>
@@ -71,6 +74,28 @@ export default function RootLayout({
             gtag('js', new Date());
 
             gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ?? ""}');
+          `}
+        </Script>
+        <Script id="error-handler">
+          {`
+            window.addEventListener('error', function(event) {
+              console.error('Runtime error:', {
+                message: event.error?.message || event.message,
+                stack: event.error?.stack,
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno,
+                url: window.location.href
+              });
+            });
+            
+            window.addEventListener('unhandledrejection', function(event) {
+              console.error('Unhandled promise rejection:', {
+                message: event.reason?.message || 'Unhandled promise rejection',
+                stack: event.reason?.stack,
+                url: window.location.href
+              });
+            });
           `}
         </Script>
       </body>

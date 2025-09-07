@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchKeysForFid } from '@/app/lib/farcaster/keys';
+import { CACHE_TTLS } from '@/app/lib/utils';
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(
+export const GET = withAxiom(async (
   request: NextRequest,
   { params }: { params: Promise<{ fid: string }> }
-) {
+) => {
   try {
     const resolvedParams = await params;
     const { fid } = resolvedParams;
@@ -28,7 +30,7 @@ export async function GET(
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 's-maxage=15, stale-while-revalidate=60',
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`,
       },
     });
   } catch (error) {
@@ -38,4 +40,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});

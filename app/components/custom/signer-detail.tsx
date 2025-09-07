@@ -237,6 +237,7 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
         {appInfo && (
           <div className="flex items-center gap-4 mt-6 mb-4">
             {appInfo.pfpUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img src={appInfo.pfpUrl} alt={appInfo.name} className="w-16 h-16 rounded-full" />
             )}
             <div className="flex-1">

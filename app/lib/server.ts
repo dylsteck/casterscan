@@ -1,27 +1,16 @@
 'use server';
 
-import { NeynarV2Cast, NeynarV2User, FarcasterCast, HubCast, ProfileKeysPage } from './types';
-import { fetchKeysForFid } from './farcaster/keys';
-import { BASE_URL, NEYNAR_API_URL, FARCASTER_API_URL } from './utils';
+import { NeynarV2Cast, NeynarV2User, ProfileKeysPage } from './types';
+import { BASE_URL } from './utils';
+import { neynar } from './neynar';
+import { fetchKeysForFid, type FarcasterCast, type HubCast } from './farcaster';
 
 export async function getNeynarCast(identifier: string, type: 'url' | 'hash') {
   try {
-    const response = await fetch(
-      `${NEYNAR_API_URL}/v2/farcaster/cast?identifier=${identifier}&type=${type}`,
-      {
-        headers: {
-          'x-api-key': process.env.NEYNAR_API_KEY || '',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (!response.ok) throw new Error('Failed to fetch Neynar cast');
-    const data = await response.json();
-    return data.cast;
+    return await neynar.getCast({ identifier, type });
   } catch (error) {
     console.error('Error fetching Neynar cast:', error);
-    throw error; // Keep throwing for critical path
+    throw error;
   }
 }
 
@@ -77,19 +66,7 @@ export async function getHubCast(fid: number, hash: string, type: 'neynar' | 'fa
 
 export async function getNeynarUser(fid: string) {
   try {
-    const response = await fetch(
-      `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`,
-      {
-        headers: {
-          'x-api-key': process.env.NEYNAR_API_KEY || '',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (!response.ok) throw new Error('Failed to fetch Neynar user');
-    const data = await response.json();
-    return data.users[0];
+    return await neynar.getUser({ fid });
   } catch (error) {
     console.error('Error fetching Neynar user:', error);
     throw error;
@@ -98,22 +75,7 @@ export async function getNeynarUser(fid: string) {
 
 export async function getNeynarUserByUsername(username: string) {
   try {
-    const response = await fetch(
-      `${NEYNAR_API_URL}/v2/farcaster/user/by_username?username=${username}`,
-      {
-        headers: {
-          'x-api-key': process.env.NEYNAR_API_KEY || '',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch Neynar user by username: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.user;
+    return await neynar.getUserByUsername({ username });
   } catch (error) {
     console.error('Error fetching Neynar user by username:', error);
     throw error;

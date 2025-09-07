@@ -1,13 +1,18 @@
 import { NextRequest } from 'next/server'
-import { snapchain, SnapchainCastsResponse, SnapchainReactionsResponse, SnapchainLinksResponse, SnapchainVerificationsResponse, SnapchainMessage } from '../../../../lib/snapchain'
+import { snapchain, SnapchainCastsResponse, SnapchainReactionsResponse, SnapchainLinksResponse, SnapchainVerificationsResponse, SnapchainMessage } from '../../../lib/snapchain'
+import { CACHE_TTLS } from '../../../lib/utils'
+import { withAxiom } from '@/app/lib/axiom/server';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fid: string }> }
-) {
+export const GET = withAxiom(async (
+  request: NextRequest
+) => {
   try {
-    const { fid } = await params
+    const fid = request.nextUrl.searchParams.get('fid')
     const signer = request.nextUrl.searchParams.get('signer')
+    
+    if (!fid) {
+      return Response.json({ error: 'FID parameter required' }, { status: 400 })
+    }
     
     if (!signer) {
       return Response.json({ error: 'Signer parameter required' }, { status: 400 })
@@ -45,8 +50,13 @@ export async function GET(
       links: links.length,
       verifications: verifications.length,
       lastUsed: lastUsed ? new Date(lastUsed * 1000).toISOString() : null
+    }, {
+      headers: {
+        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+      }
     })
   } catch (error) {
+    console.error('Error fetching signer stats:', error)
     return Response.json({ error: 'Failed to fetch signer stats' }, { status: 500 })
   }
-}
+});

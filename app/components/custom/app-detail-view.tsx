@@ -28,6 +28,7 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
         
         <div className="flex items-center gap-4 mb-4">
           {app.profile?.pfp_url && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={app.profile.pfp_url} alt="App" className="w-12 h-12 rounded-full" />
           )}
           <div>

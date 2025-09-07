@@ -4,13 +4,14 @@ import {
   HubEventType,
 } from '@farcaster/hub-nodejs'
 import { bytesToHexString } from '@farcaster/hub-web'
+import { withAxiom } from '@/app/lib/axiom/server';
 
 // Polyfill for server environment
 if (typeof global !== 'undefined' && !global.self) {
   global.self = global as any
 }
 
-export async function GET(request: NextRequest) {
+export const GET = withAxiom(async (request: NextRequest) => {
   const encoder = new TextEncoder()
 
   const customReadable = new ReadableStream({
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
           const hubRpcEndpoint = "snap.farcaster.xyz:3383"
           const nodeClient = getSSLHubRpcClient(hubRpcEndpoint)
 
-          console.log('Server connecting to Snapchain hub:', hubRpcEndpoint)
+          console.log('Server connecting to Snapchain node:', hubRpcEndpoint)
 
           // Wait for client to be ready
           nodeClient.$.waitForReady(Date.now() + 5000, async (e) => {
@@ -125,4 +126,4 @@ export async function GET(request: NextRequest) {
       'Access-Control-Allow-Headers': 'Cache-Control',
     },
   })
-} 
+});

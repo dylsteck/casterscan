@@ -7,6 +7,7 @@ export default function NotFound() {
         <h1 className="text-4xl font-bold">404</h1>
         <h2 className="text-2xl font-semibold">Page Not Found</h2>
         <p className="text-gray-600 max-w-md">
+          {/* eslint-disable-next-line react/no-unescaped-entities */}
           The page you're looking for doesn't exist or has been moved.
         </p>
       </div>

@@ -8,11 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 const isDev = process.env.NODE_ENV === 'development';
 const port = process.env.PORT || 3000;
 const localUrl = `http://localhost:${port}`;
-export const BASE_URL = isDev 
-  ? localUrl 
-  : process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://casterscan.com';
+export const BASE_URL = isDev
+  ? localUrl
+  : process.env.VERCEL_ENV === 'production'
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : `https://${process.env.VERCEL_URL}`;
 
 export const BANNER_IMG_URL = 'https://i.imgur.com/KJ7qfro.png';
 export const ICON_IMG_URL = 'https://i.imgur.com/PD1XTs5.jpeg';
@@ -45,21 +45,16 @@ export const frame = (title = 'Open Casterscan', url = BASE_URL) => {
 export const MAX_CAST_PREVIEW_CHARS = 280;
 
 export const CACHE_TTLS = {
-  SHORT: 300,
-  MEDIUM: 1800,
-  LONG: 3600,
-  VERY_LONG: 86400,
+  SHORT: 300, // 5 minutes
+  MEDIUM: 1800, // 30 minutes
+  LONG: 3600, // 1 hour
+  VERY_LONG: 86400, // 24 hours
   REACT_QUERY: {
-    STALE_TIME: 5 * 60 * 1000,
-    GC_TIME: 10 * 60 * 1000,
-    REFETCH_INTERVAL: 60 * 1000
+    STALE_TIME: 5 * 60 * 1000, // 5 minutes
+    GC_TIME: 10 * 60 * 1000, // 10 minutes
+    REFETCH_INTERVAL: 60 * 1000 // 1 minute
   }
 };
-
-export const NEYNAR_API_URL = 'https://api.neynar.com';
-export const NEYNAR_HUB_API_URL = 'https://snapchain-api.neynar.com';
-export const FARCASTER_API_URL = 'https://api.farcaster.xyz';
-export const SNAPCHAIN_NODE_BASE_URL = 'https://snap.farcaster.xyz';
 
 export const renderCastText = (text: string) => {
   if(text.length > MAX_CAST_PREVIEW_CHARS){
