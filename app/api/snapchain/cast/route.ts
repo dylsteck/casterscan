@@ -1,4 +1,5 @@
-import { cachedRequest, NEYNAR_HUB_API_URL, FARCASTER_HUB_URLS } from "@/app/lib/utils";
+import { NEYNAR_HUB_API_URL, CACHE_TTLS } from "@/app/lib/utils";
+import { snapchain } from "@/app/lib/snapchain";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -24,15 +25,23 @@ export async function GET(request: NextRequest) {
             }
             apiUrl = `${NEYNAR_HUB_API_URL}/v1/castById?fid=${fid}&hash=${hash}`;
             headers['x-api-key'] = apiKey;
-        } else if(type === 'farcaster') {
-            if (FARCASTER_HUB_URLS.length === 0) {
-                return NextResponse.json({ error: "No Farcaster hub URLs available" }, { status: 503 });
-            }
-            const randomUrl = FARCASTER_HUB_URLS[Math.floor(Math.random() * FARCASTER_HUB_URLS.length)];
-            apiUrl = `${randomUrl}/v1/castById?fid=${fid}&hash=${hash}`;
+        } else {
+            const responseData = await snapchain.getCastById({ fid, hash });
+            return NextResponse.json(responseData);
         }
 
-        const responseData = await cachedRequest(apiUrl, 3600, 'GET', headers, `snapchain:${type}:cast:${fid}:${hash}`);
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers,
+            signal: AbortSignal.timeout(15000),
+            next: { revalidate: CACHE_TTLS.LONG }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch from ${apiUrl} (status: ${response.status})`);
+        }
+        
+        const responseData = await response.json();
         return NextResponse.json(responseData);
     } catch (err) {
         console.error('Error fetching cast from API:', err);

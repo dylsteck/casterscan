@@ -1,11 +1,3 @@
-export type Client = {
-  name: string;
-  username: string;
-  fid: number;
-  icon: React.FunctionComponentElement<{ className?: string }>;
-  castLink: string;
-};
-
 export type HubCast = {
   data: {
       author: {
@@ -51,6 +43,15 @@ export type HubStreamCast = {
   hash: string;
   text: string;
   timestamp: string;
+};
+
+export type StreamCast = {
+  hash: Uint8Array;
+  fid: number;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  text: string;
 };
 
 export type SnapchainEvent = {
@@ -227,6 +228,11 @@ export type NeynarV2User = {
   display_name: string;
   pfp_url: string;
   custody_address: string;
+  pro?: {
+    status: string;
+    subscribed_at?: string;
+    expires_at?: string;
+  };
   profile: {
     bio: {
       text: string;
@@ -253,7 +259,7 @@ export type NeynarV2User = {
         end: number;
       }[];
     };
-    location: {
+    location?: {
       latitude: number;
       longitude: number;
       address: {
@@ -263,6 +269,9 @@ export type NeynarV2User = {
         country: string;
         country_code: string;
       };
+    };
+    banner?: {
+      url: string;
     };
   };
   follower_count: number;
@@ -281,6 +290,25 @@ export type NeynarV2User = {
     username: string;
   }[];
   power_badge: boolean;
+  url?: string;
+  score?: number;
+  auth_addresses?: {
+    address: string;
+    app?: {
+      object: "user_dehydrated";
+      fid: number;
+    };
+  }[];
+  experimental?: {
+    neynar_user_score?: number;
+  };
+  viewer_context?: {
+    following: boolean;
+    followed_by: boolean;
+    blocking: boolean;
+    blocked_by: boolean;
+  };
+  active_status?: "active" | "inactive";
 };
 
 export type User = {

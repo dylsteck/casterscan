@@ -1,4 +1,4 @@
-import { cachedRequest, NEYNAR_API_URL } from "@/app/lib/utils";
+import { NEYNAR_API_URL, CACHE_TTLS } from "@/app/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -11,14 +11,21 @@ export async function GET(request: NextRequest) {
 
     try {
         const apiKey = process.env.NEYNAR_API_KEY ?? "";
-        const responseData = await cachedRequest(
-            `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`, 3600, 'GET', 
-            {
+        const response = await fetch(`${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${fid}`, {
+            method: 'GET',
+            headers: {
                 'Content-Type': 'application/json',
                 'x-api-key': `${apiKey}`
             },
-            `neynar:user:${fid}`
-        );
+            signal: AbortSignal.timeout(15000),
+            next: { revalidate: CACHE_TTLS.LONG }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user (status: ${response.status})`);
+        }
+        
+        const responseData = await response.json();
         return NextResponse.json(responseData);
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });

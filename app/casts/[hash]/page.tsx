@@ -1,7 +1,8 @@
-import CastDetails from '@/app/components/cast-details';
+import CastDetails from '@/app/components/custom/cast-details';
 import { getNeynarCast } from '@/app/lib/server';
 import { BASE_URL, frame, SEO } from '@/app/lib/utils';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 export async function generateMetadata(props: { params: Promise<{ hash: string }> }) {
   const params = await props.params;
@@ -43,5 +44,10 @@ export default async function Hash(props: { params: Promise<{ hash: string }> })
   const params = await props.params;
   const { hash } = params;
   const neynarCast = await getNeynarCast(hash, 'hash');
+  
+  if (!neynarCast) {
+    notFound();
+  }
+  
   return <CastDetails hash={hash} neynarCast={neynarCast} />;
 }

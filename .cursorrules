@@ -1,0 +1,63 @@
+# Casterscan - Farcaster Block Explorer
+
+## Project Overview
+Casterscan is a real-time block explorer for Farcaster built with Next.js, featuring live event streaming from Snapchain hub at `snap.farcaster.xyz:3383`.
+
+## Package Manager
+- Use `bun` for all package management and script execution
+- Never use npm or yarn commands
+
+## File Naming Conventions
+- Use kebab-case for all file and directory names
+- Examples: `live-feed.tsx`, `use-event-stream.ts`, `cast-details.tsx`
+
+## Component Organization
+- `components/custom/` - Regular application components
+- `components/ui/` - Shadcn/ui components only
+- `hooks/` - Custom React hooks
+- `lib/` - Utility functions and configurations
+
+## Code Style
+- Use TypeScript for all files
+- Prefer named exports over default exports for components
+- Use 'use client' directive for client components
+- Import paths: Use relative paths for local files
+
+## Farcaster/Snapchain Specifics
+- Snapchain hub endpoint: `snap.farcaster.xyz:3383` (gRPC)
+- REST API endpoint: `snap.farcaster.xyz:3381/v1/`
+- Use `@farcaster/hub-nodejs` for gRPC connections
+- Use `@farcaster/hub-web` for client-side utilities
+- Cast messages are type 1 in the protocol
+- FIDs are Farcaster user IDs
+
+## API Routes
+- `/api/events?stream=true` - Server-sent events for live cast streaming
+- `/api/users/[fid]` - User data by FID with Neynar fallback
+- `/api/snapchain/info` - Snapchain hub statistics
+
+## UI Patterns
+- Use CSS Grid for layouts (12-column system for tables)
+- Skeleton loading with shimmer animations
+- Real-time data updates with proper error handling
+- Responsive design: mobile-first approach
+
+## Design System & Styling
+- Mix of Shadcn/ui components with custom styling to match app aesthetic
+- Boxy, minimal design with black borders (`border border-black`)
+- Custom tab implementation with black background for active state
+- Use Shadcn/ui components only when needed or when they can be customized
+- Prefer custom components that match the boxy, minimal style
+- Consistent spacing and typography throughout
+- Monospace fonts for technical data (hashes, addresses, keys)
+- Clean hover states and transitions
+
+## State Management
+- React hooks for local state
+- TanStack Query for server state (when needed)
+- Server-sent events for real-time updates
+
+## Performance
+- Keep live event streams to max 200 items
+- Auto-refresh intervals: 30 seconds for stats
+- Use proper cleanup for event listeners

@@ -1,40 +1,13 @@
 import { createPublicClient, http, getAddress } from 'viem';
 import { optimism } from 'viem/chains';
 import { ProfileKeysPage } from '../types';
+import { keyRegistryAbi } from './abi/key-registry-abi';
 
 export const KEY_REGISTRY = '0x00000000fc1237824fb747abde0ff18990e59b7e' as const;
 
-export const keyRegistryAbi = [
-  {
-    type: 'function',
-    name: 'keysOf',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'fid', type: 'uint256' },
-      { name: 'state', type: 'uint8' },
-      { name: 'startIdx', type: 'uint256' },
-      { name: 'batchSize', type: 'uint256' },
-    ],
-    outputs: [{ name: 'keys', type: 'bytes[]' }],
-  },
-  {
-    type: 'function',
-    name: 'keyDataOf',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'fid', type: 'uint256' },
-      { name: 'key', type: 'bytes' },
-    ],
-    outputs: [
-      { name: 'state', type: 'uint8' },
-      { name: 'keyType', type: 'uint32' },
-    ],
-  },
-] as const;
-
 const publicClient = createPublicClient({
   chain: optimism,
-  transport: http(process.env.OP_RPC_URL || 'https://mainnet.optimism.io'),
+  transport: http('https://mainnet.optimism.io'),
 });
 
 export async function fetchKeysForFid(
