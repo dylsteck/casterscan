@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { snapchain, SnapchainCastsResponse, SnapchainReactionsResponse, SnapchainLinksResponse, SnapchainVerificationsResponse, SnapchainMessage } from '../../../../lib/snapchain'
 
 export async function GET(
   request: NextRequest,
@@ -12,35 +13,26 @@ export async function GET(
       return Response.json({ error: 'Signer parameter required' }, { status: 400 })
     }
     
-    const endpoints = [
-      `https://snap.farcaster.xyz:3381/v1/castsByFid?fid=${fid}&pageSize=1000`,
-      `https://snap.farcaster.xyz:3381/v1/reactionsByFid?fid=${fid}&pageSize=1000`,
-      `https://snap.farcaster.xyz:3381/v1/linksByFid?fid=${fid}&pageSize=1000`,
-      `https://snap.farcaster.xyz:3381/v1/verificationsByFid?fid=${fid}&pageSize=1000`
-    ]
+    const responses = await Promise.all([
+      snapchain.getCastsByFid({ fid, pageSize: 1000 }).catch(() => ({ messages: [] })),
+      snapchain.getReactionsByFid({ fid, pageSize: 1000 }).catch(() => ({ messages: [] })),
+      snapchain.getLinksByFid({ fid, pageSize: 1000 }).catch(() => ({ messages: [] })),
+      snapchain.getVerificationsByFid({ fid, pageSize: 1000 }).catch(() => ({ messages: [] }))
+    ])
     
-    const responses = await Promise.all(
-      endpoints.map(url => 
-        fetch(url)
-          .then(res => res.ok ? res.json() : { messages: [] })
-          .catch(() => ({ messages: [] }))
-      )
-    )
+    const [castsData, reactionsData, linksData, verificationsData] = responses
     
-    const [castsData, reactionsData, linksData, verificationsData] = responses as any[]
+    const filterBySigner = (messages: SnapchainMessage[]) => 
+      messages.filter((msg: SnapchainMessage) => msg.signer === signer)
     
-    const filterBySigner = (messages: any[]) => 
-      messages.filter((msg: any) => msg.signer === signer || 
-        (msg.data && msg.data.signer === signer))
-    
-    const casts = filterBySigner(castsData?.messages || [])
-    const reactions = filterBySigner(reactionsData?.messages || [])
-    const links = filterBySigner(linksData?.messages || [])
-    const verifications = filterBySigner(verificationsData?.messages || [])
+    const casts = filterBySigner(castsData.messages || [])
+    const reactions = filterBySigner(reactionsData.messages || [])
+    const links = filterBySigner(linksData.messages || [])
+    const verifications = filterBySigner(verificationsData.messages || [])
     
     const allMessages = [...casts, ...reactions, ...links, ...verifications]
-    const lastUsed = allMessages.reduce((latest, msg) => {
-      const timestamp = msg.data?.timestamp || msg.timestamp
+    const lastUsed = allMessages.reduce((latest: number | null, msg) => {
+      const timestamp = msg.data.timestamp
       if (timestamp && (!latest || timestamp > latest)) {
         return timestamp
       }

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { decodeAbiParameters, bytesToHex } from 'viem'
+import { snapchain, SnapchainOnChainSignersResponse, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage, SnapchainOnChainEvent } from '../../../../lib/snapchain'
 
 const signedKeyRequestAbi = [
   {
@@ -31,37 +32,6 @@ function decodeSignerMetadata(metadata: string) {
   }
 }
 
-async function getAllMessages(endpoint: string, fid: string, otherParams: Record<string, string> = {}) {
-  const messages: any[] = []
-  let nextPageToken: string | undefined
-
-  while (true) {
-    const params = new URLSearchParams({
-      fid,
-      pageSize: '1000',
-      reverse: 'true',
-      ...otherParams
-    })
-
-    if (nextPageToken) {
-      params.append('pageToken', nextPageToken)
-    }
-
-    const response = await fetch(`https://snap.farcaster.xyz:3381${endpoint}?${params}`)
-    if (!response.ok) break
-
-    const data = await response.json()
-    messages.push(...(data.messages || []))
-
-    if (!data.nextPageToken || data.messages?.length < 1000) {
-      break
-    }
-
-    nextPageToken = data.nextPageToken
-  }
-
-  return messages
-}
 
 export async function GET(
   request: NextRequest,
@@ -71,15 +41,15 @@ export async function GET(
     const { fid } = await params
     
     const [signersData, userCasts, userReactions, userLinks, userVerifications] = await Promise.all([
-      fetch(`https://snap.farcaster.xyz:3381/v1/onChainSignersByFid?fid=${fid}&pageSize=1000`).then(res => res.ok ? res.json() : { events: [] }),
-      getAllMessages('/v1/castsByFid', fid),
-      getAllMessages('/v1/reactionsByFid', fid, { reaction_type: 'None' }),
-      getAllMessages('/v1/linksByFid', fid),
-      getAllMessages('/v1/verificationsByFid', fid)
+      snapchain.getOnChainSignersByFid({ fid, pageSize: 1000 }).catch((): SnapchainOnChainSignersResponse => ({ events: [] })),
+      snapchain.getAllCastsByFid(fid),
+      snapchain.getAllReactionsByFid(fid, 'None'),
+      snapchain.getAllLinksByFid(fid),
+      snapchain.getAllVerificationsByFid(fid)
     ])
 
     const addSigners = signersData.events?.filter(
-      (s: any) => s.signerEventBody?.eventType === 'SIGNER_EVENT_TYPE_ADD'
+      (s) => s.signerEventBody?.eventType === 'SIGNER_EVENT_TYPE_ADD'
     ) || []
 
     function farcasterTimeToDate(time: number): Date {
@@ -129,6 +99,8 @@ export async function GET(
     const appsMap: Record<string, any> = {}
 
     for (const signer of addSigners) {
+      if (!signer.signerEventBody) continue
+      
       const metadata = decodeSignerMetadata(signer.signerEventBody.metadata)
       if (!metadata || metadata.requestFid === 0) continue
 

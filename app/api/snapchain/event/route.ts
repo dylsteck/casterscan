@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { SNAPCHAIN_NODE_URL } from '../../../lib/utils';
+import { SNAPCHAIN_NODE_BASE_URL } from '../../../lib/utils';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const response = await fetch(
-      `${SNAPCHAIN_NODE_URL}:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
+      `${SNAPCHAIN_NODE_BASE_URL}:3381/v1/eventById?event_id=${eventId}&shard_index=${shardIndex}`
     );
     
     if (!response.ok) {

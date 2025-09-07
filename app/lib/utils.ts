@@ -82,7 +82,7 @@ export const MAX_CAST_PREVIEW_CHARS = 280;
 export const NEYNAR_API_URL = 'https://api.neynar.com';
 export const NEYNAR_HUB_API_URL = 'https://snapchain-api.neynar.com';
 export const FARCASTER_API_URL = 'https://api.farcaster.xyz';
-export const SNAPCHAIN_NODE_URL = 'https://snap.farcaster.xyz';
+export const SNAPCHAIN_NODE_BASE_URL = 'https://snap.farcaster.xyz';
 
 export const renderCastText = (text: string) => {
   if(text.length > MAX_CAST_PREVIEW_CHARS){
@@ -92,6 +92,6 @@ export const renderCastText = (text: string) => {
 }
 
 export const FARCASTER_HUB_URLS = [
-  `${SNAPCHAIN_NODE_URL}:3381`,
+  `${SNAPCHAIN_NODE_BASE_URL}:3381`,
   'https://hub.merv.fun:3381'
 ];

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import CopyClipboardIcon from './copy-clipboard-icon';
 import { useSignerMessages } from '../../hooks/use-signer-messages';
+import { SnapchainMessage, SnapchainCastMessage, SnapchainReactionMessage, SnapchainLinkMessage, SnapchainVerificationMessage } from '../../lib/snapchain';
 
 interface SignerDetailProps {
   signerKey: string;
@@ -25,10 +26,10 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
   const filteredMessages = filter === 'all' 
     ? allMessages 
     : allMessages.filter(msg => {
-        if (filter === 'casts') return msg.data?.castAddBody || msg.data?.castRemoveBody;
-        if (filter === 'reactions') return msg.data?.reactionBody;
-        if (filter === 'links') return msg.data?.linkBody;
-        if (filter === 'verifications') return msg.data?.verificationAddAddressBody || msg.data?.verificationRemoveBody;
+        if (filter === 'casts') return msg.data.type === 'MESSAGE_TYPE_CAST_ADD' || msg.data.type === 'MESSAGE_TYPE_CAST_REMOVE';
+        if (filter === 'reactions') return msg.data.type === 'MESSAGE_TYPE_REACTION_ADD' || msg.data.type === 'MESSAGE_TYPE_REACTION_REMOVE';
+        if (filter === 'links') return msg.data.type === 'MESSAGE_TYPE_LINK_ADD' || msg.data.type === 'MESSAGE_TYPE_LINK_REMOVE';
+        if (filter === 'verifications') return msg.data.type === 'MESSAGE_TYPE_VERIFICATION_ADD_ETH_ADDRESS' || msg.data.type === 'MESSAGE_TYPE_VERIFICATION_REMOVE';
         return true;
       });
 
@@ -38,10 +39,10 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
 
   const filters = [
     { id: 'all', label: 'all', count: allMessages.length },
-    { id: 'casts', label: 'casts', count: allMessages.filter(m => m.data?.castAddBody || m.data?.castRemoveBody).length },
-    { id: 'reactions', label: 'reactions', count: allMessages.filter(m => m.data?.reactionBody).length },
-    { id: 'links', label: 'links', count: allMessages.filter(m => m.data?.linkBody).length },
-    { id: 'verifications', label: 'verifications', count: allMessages.filter(m => m.data?.verificationAddAddressBody || m.data?.verificationRemoveBody).length }
+    { id: 'casts', label: 'casts', count: allMessages.filter(m => m.data.type === 'MESSAGE_TYPE_CAST_ADD' || m.data.type === 'MESSAGE_TYPE_CAST_REMOVE').length },
+    { id: 'reactions', label: 'reactions', count: allMessages.filter(m => m.data.type === 'MESSAGE_TYPE_REACTION_ADD' || m.data.type === 'MESSAGE_TYPE_REACTION_REMOVE').length },
+    { id: 'links', label: 'links', count: allMessages.filter(m => m.data.type === 'MESSAGE_TYPE_LINK_ADD' || m.data.type === 'MESSAGE_TYPE_LINK_REMOVE').length },
+    { id: 'verifications', label: 'verifications', count: allMessages.filter(m => m.data.type === 'MESSAGE_TYPE_VERIFICATION_ADD_ETH_ADDRESS' || m.data.type === 'MESSAGE_TYPE_VERIFICATION_REMOVE').length }
   ];
 
   function farcasterTimeToDate(time: number): Date {
@@ -86,76 +87,107 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
     return sec + " second" + (sec !== 1 ? "s" : "");
   }
 
-  const formatMessage = (message: any) => {
-    const timestamp = message.data?.timestamp || 0;
+  const formatMessage = (message: SnapchainMessage) => {
+    const timestamp = message.data.timestamp;
     const date = farcasterTimeToDate(timestamp);
-    if (message.data?.castAddBody) {
-      const castBody = message.data.castAddBody;
+    
+    if (message.data.type === 'MESSAGE_TYPE_CAST_ADD' || message.data.type === 'MESSAGE_TYPE_CAST_REMOVE') {
+      const castMessage = message as SnapchainCastMessage;
+      if (castMessage.data.castAddBody) {
+        const castBody = castMessage.data.castAddBody;
+        return {
+          type: 'cast',
+          content: castBody.text || 'Empty cast',
+          timeAgo: timeAgo(date),
+          details: castBody.parentCastId ? `replying to 0x${castBody.parentCastId.hash.slice(0, 8)}... by @!${castBody.parentCastId.fid}` : null,
+          embeds: castBody.embeds || [],
+          mentions: castBody.mentions || [],
+          hash: message.hash,
+          isCast: true
+        };
+      }
       return {
         type: 'cast',
-        content: castBody.text || 'Empty cast',
+        content: 'Cast removed',
         timeAgo: timeAgo(date),
-        details: castBody.parentCastId ? `replying to 0x${castBody.parentCastId.hash.slice(0, 8)}... by @!${castBody.parentCastId.fid}` : null,
-        embeds: castBody.embeds || [],
-        mentions: castBody.mentions || [],
+        details: null,
         hash: message.hash,
         isCast: true
       };
-    } else if (message.data?.reactionBody) {
-      const reactionBody = message.data.reactionBody;
+    } else if (message.data.type === 'MESSAGE_TYPE_REACTION_ADD' || message.data.type === 'MESSAGE_TYPE_REACTION_REMOVE') {
+      const reactionMessage = message as SnapchainReactionMessage;
+      const reactionBody = reactionMessage.data.reactionBody;
       return {
         type: 'reaction',
         content: reactionBody.type === 'REACTION_TYPE_LIKE' ? '👍 Like' : '🔄 Recast',
         timeAgo: timeAgo(date),
         details: reactionBody.targetCastId ? `replying to 0x${reactionBody.targetCastId.hash.slice(0, 8)}... by @!${reactionBody.targetCastId.fid}` : null,
         hash: message.hash,
-        eventId: message.id,
         isCast: false
       };
-    } else if (message.data?.linkBody) {
-      const linkBody = message.data.linkBody;
+    } else if (message.data.type === 'MESSAGE_TYPE_LINK_ADD' || message.data.type === 'MESSAGE_TYPE_LINK_REMOVE') {
+      const linkMessage = message as SnapchainLinkMessage;
+      const linkBody = linkMessage.data.linkBody;
       return {
         type: 'link',
-        content: linkBody.type === 'LINK_TYPE_FOLLOW' ? 'Follow' : 'Unfollow',
+        content: linkBody.type === 'follow' || linkBody.type === 'LINK_TYPE_FOLLOW' ? 'Follow' : 'Unfollow',
         timeAgo: timeAgo(date),
         details: linkBody.targetFid ? `Target FID: ${linkBody.targetFid}` : null,
         hash: message.hash,
-        eventId: message.id,
         isCast: false
       };
-    } else if (message.data?.verificationAddAddressBody) {
-      const verificationBody = message.data.verificationAddAddressBody;
+    } else if (message.data.type === 'MESSAGE_TYPE_VERIFICATION_ADD_ETH_ADDRESS') {
+      const verificationMessage = message as SnapchainVerificationMessage;
+      if (verificationMessage.data.verificationAddAddressBody) {
+        const verificationBody = verificationMessage.data.verificationAddAddressBody;
+        return {
+          type: 'verification',
+          content: 'Add Address Verification',
+          timeAgo: timeAgo(date),
+          details: `Address: ${verificationBody.address.slice(0, 10)}...`,
+          hash: message.hash,
+          isCast: false
+        };
+      }
       return {
         type: 'verification',
         content: 'Add Address Verification',
         timeAgo: timeAgo(date),
-        details: `Address: ${verificationBody.address?.slice(0, 10)}...`,
+        details: 'No address data',
         hash: message.hash,
-        eventId: message.id,
         isCast: false
       };
-    } else if (message.data?.verificationRemoveBody) {
-      const verificationBody = message.data.verificationRemoveBody;
+    } else if (message.data.type === 'MESSAGE_TYPE_VERIFICATION_REMOVE') {
+      const verificationMessage = message as SnapchainVerificationMessage;
+      if (verificationMessage.data.verificationRemoveBody) {
+        const verificationBody = verificationMessage.data.verificationRemoveBody;
+        return {
+          type: 'verification',
+          content: 'Remove Address Verification',
+          timeAgo: timeAgo(date),
+          details: `Address: ${verificationBody.address.slice(0, 10)}...`,
+          hash: message.hash,
+          isCast: false
+        };
+      }
       return {
         type: 'verification',
         content: 'Remove Address Verification',
         timeAgo: timeAgo(date),
-        details: `Address: ${verificationBody.address?.slice(0, 10)}...`,
+        details: 'No address data',
         hash: message.hash,
-        eventId: message.id,
-        isCast: false
-      };
-    } else {
-      return {
-        type: 'other',
-        content: 'Unknown message type',
-        timeAgo: timeAgo(date),
-        details: null,
-        hash: message.hash,
-        eventId: message.id,
         isCast: false
       };
     }
+    
+    return {
+      type: 'other',
+      content: 'Unknown message type',
+      timeAgo: timeAgo(date),
+      details: null,
+      hash: message.hash,
+      isCast: false
+    };
   };
 
   if (isLoading) {
@@ -292,9 +324,9 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
                           <span className="font-mono text-gray-400">0x{formatted.hash?.slice(0, 6)}...</span>
                           {formatted.hash && <CopyClipboardIcon value={formatted.hash} />}
                         </div>
-                        {(formatted.hash || formatted.eventId) && (
+                        {formatted.hash && (
                           <a 
-                            href={formatted.isCast ? `/casts/${formatted.hash}` : `/events/${formatted.eventId}?shard_index=1`} 
+                            href={`/casts/${formatted.hash}`} 
                             className="text-black underline text-xs"
                           >
                             view

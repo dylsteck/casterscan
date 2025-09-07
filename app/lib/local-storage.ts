@@ -1,10 +1,10 @@
 'use client';
 
-import { SNAPCHAIN_NODE_URL } from './utils';
+import { SNAPCHAIN_NODE_BASE_URL } from './utils';
 
 export const LOCAL_STORAGE_KEYS = {
   DEFAULT_CLIENT: 'default_client',
-  SNAPCHAIN_NODE_URL: 'snapchain_node_url',
+  SNAPCHAIN_NODE_BASE_URL: 'SNAPCHAIN_NODE_BASE_URL',
 } as const;
 
 export type DefaultClient = 'farcaster' | 'baseapp';
@@ -22,13 +22,13 @@ export const setDefaultClient = (client: DefaultClient): void => {
 };
 
 export const getSnapchainNodeUrl = (): string => {
-  if (typeof window === 'undefined') return SNAPCHAIN_NODE_URL;
-  return localStorage.getItem(LOCAL_STORAGE_KEYS.SNAPCHAIN_NODE_URL) || SNAPCHAIN_NODE_URL;
+  if (typeof window === 'undefined') return SNAPCHAIN_NODE_BASE_URL;
+  return localStorage.getItem(LOCAL_STORAGE_KEYS.SNAPCHAIN_NODE_BASE_URL) || SNAPCHAIN_NODE_BASE_URL;
 };
 
 export const setSnapchainNodeUrl = (url: string): void => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(LOCAL_STORAGE_KEYS.SNAPCHAIN_NODE_URL, url);
+  localStorage.setItem(LOCAL_STORAGE_KEYS.SNAPCHAIN_NODE_BASE_URL, url);
   window.dispatchEvent(new Event('localStorageChange'));
 };
 
@@ -41,7 +41,7 @@ export const validateSnapchainUrl = async (url: string): Promise<boolean> => {
 
   try {
     let snapchainHttpUrl = url;
-    if (snapchainHttpUrl === SNAPCHAIN_NODE_URL) {
+    if (snapchainHttpUrl === SNAPCHAIN_NODE_BASE_URL) {
       snapchainHttpUrl += ':3381';
     }
     const response = await fetch(`${snapchainHttpUrl}/v1/info`, { 

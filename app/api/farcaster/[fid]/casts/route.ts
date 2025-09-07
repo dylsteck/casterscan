@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { snapchain } from '../../../../lib/snapchain'
 
 export async function GET(
   request: NextRequest,
@@ -8,10 +9,10 @@ export async function GET(
     const { fid } = await params
     const pageSize = request.nextUrl.searchParams.get('pageSize') || '1000'
     
-    const response = await fetch(`https://snap.farcaster.xyz:3381/v1/castsByFid?fid=${fid}&pageSize=${pageSize}`)
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-    
-    const data = await response.json()
+    const data = await snapchain.getCastsByFid({ 
+      fid, 
+      pageSize: parseInt(pageSize) 
+    })
     return Response.json(data)
   } catch (error) {
     return Response.json({ error: 'Failed to fetch casts' }, { status: 500 })

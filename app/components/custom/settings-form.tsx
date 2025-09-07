@@ -18,7 +18,7 @@ import {
   validateSnapchainUrl,
   type DefaultClient 
 } from '../../lib/local-storage';
-import { SNAPCHAIN_NODE_URL } from '../../lib/utils';
+import { SNAPCHAIN_NODE_BASE_URL } from '../../lib/utils';
 
 interface SettingsFormProps {
   onClose?: () => void;
@@ -26,7 +26,7 @@ interface SettingsFormProps {
 
 export function SettingsForm({ onClose }: SettingsFormProps) {
   const [defaultClientState, setDefaultClientState] = useState<DefaultClient>('farcaster');
-  const [snapchainUrl, setSnapchainUrl] = useState(SNAPCHAIN_NODE_URL);
+  const [snapchainUrl, setSnapchainUrl] = useState(SNAPCHAIN_NODE_BASE_URL);
   const [urlError, setUrlError] = useState('');
   const [isValidating, setIsValidating] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -101,7 +101,7 @@ export function SettingsForm({ onClose }: SettingsFormProps) {
             setSnapchainUrl(e.target.value);
             setUrlError('');
           }}
-          placeholder={SNAPCHAIN_NODE_URL}
+          placeholder={SNAPCHAIN_NODE_BASE_URL}
           className="border border-black rounded-none bg-white hover:bg-gray-50"
         />
         {urlError && <p className="text-sm text-red-600">{urlError}</p>}

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server'
+import { snapchain } from '../../../../lib/snapchain'
 
 export async function GET(
   request: NextRequest,
@@ -11,15 +12,13 @@ export async function GET(
     const reverse = request.nextUrl.searchParams.get('reverse') || 'false'
     const signer = request.nextUrl.searchParams.get('signer') || ''
     
-    let url = `https://snap.farcaster.xyz:3381/v1/onChainSignersByFid?fid=${fid}&pageSize=${pageSize}&reverse=${reverse}`
-    if (pageToken) url += `&pageToken=${pageToken}`
-    if (signer) url += `&signer=${signer}`
-    
-    const response = await fetch(url)
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    const data = await response.json()
+    const data = await snapchain.getOnChainSignersByFid({
+      fid,
+      pageSize: parseInt(pageSize),
+      reverse: reverse === 'true',
+      ...(pageToken && { pageToken }),
+      ...(signer && { signer })
+    })
     return Response.json(data)
   } catch (error) {
     return Response.json({ error: 'Failed to fetch signers' }, { status: 500 })
