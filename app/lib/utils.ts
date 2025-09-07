@@ -1,8 +1,6 @@
 import React from "react";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { getCachedData, cacheData } from "./cloudflare-kv";
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -24,38 +22,6 @@ export const SEO = {
   description: 'A block explorer for Farcaster',
   ogImage: BANNER_IMG_URL,
   url: BASE_URL,
-};
-
-export const cachedRequest = async (url: string, revalidate: number, method = 'GET', headers?: Record<string, string>, cacheTag?: string) => {
-    if (cacheTag) {
-        const cachedData = await getCachedData(cacheTag);
-        if (cachedData) {
-            return cachedData;
-        }
-    }
-
-    const response = await fetch(url, {
-        method: method,
-        headers: headers,
-        // Add timeout to prevent hanging requests
-        signal: AbortSignal.timeout(15000)
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch from ${url} (status: ${response.status})`);
-    }
-
-    const data = await response.json();
-    
-    if (cacheTag) {
-        try {
-            await cacheData(cacheTag, data, revalidate);
-        } catch (cacheError) {
-            console.warn('Failed to cache data:', cacheError);
-        }
-    }
-
-    return data;
 };
 
 

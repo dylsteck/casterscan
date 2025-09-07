@@ -46,7 +46,6 @@ export async function GET(
       return new Date((FARCASTER_EPOCH + time) * 1000);
     }
 
-    console.log(`User ${fid} total messages: ${userCasts.length} casts, ${userReactions.length} reactions, ${userLinks.length} links, ${userVerifications.length} verifications`)
 
     const messagesBySigner: Record<string, any> = {}
     const allUserMessages = [
@@ -148,7 +147,6 @@ export async function GET(
 
     const appsWithProfiles = await Promise.all(
       Object.values(appsMap).map(async (app: any) => {
-        console.log(`Fetching profile for app FID ${app.fid}`)
         try {
           const response = await fetch(
             `${NEYNAR_API_URL}/v2/farcaster/user/bulk?fids=${app.fid}`,
@@ -162,16 +160,10 @@ export async function GET(
           
           if (response.ok) {
             const neynarData = await response.json()
-            console.log(`Neynar response for FID ${app.fid}:`, JSON.stringify(neynarData, null, 2))
             
             if (neynarData.users && neynarData.users.length > 0) {
               app.profile = neynarData.users[0]
-              console.log(`Set profile for FID ${app.fid}:`, app.profile.display_name, app.profile.username)
-            } else {
-              console.log(`No users found in Neynar response for FID ${app.fid}`)
             }
-          } else {
-            console.log(`Neynar API error for FID ${app.fid}: ${response.status} ${response.statusText}`)
           }
         } catch (error) {
           console.warn(`Failed to fetch profile for FID ${app.fid}:`, error)
@@ -186,12 +178,6 @@ export async function GET(
       return bLastUsed - aLastUsed
     })
 
-    console.log(`Final sorted apps for FID ${fid}:`, sortedApps.map(app => ({
-      fid: app.fid,
-      hasProfile: !!app.profile,
-      profileDisplayName: app.profile?.display_name,
-      profileUsername: app.profile?.username
-    })))
 
     return Response.json(sortedApps)
   } catch (error) {

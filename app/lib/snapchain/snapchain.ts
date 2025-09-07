@@ -110,6 +110,54 @@ export class Snapchain {
     }
   }
 
+  private async makeCachedRequest<T>(endpoint: string, params?: Record<string, string | number | boolean>): Promise<T> {
+    const url = new URL(`${this.baseUrl}${endpoint}`);
+    
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(url.toString(), {
+      signal: AbortSignal.timeout(this.timeout),
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 3600 } // 1 hour cache
+    });
+    
+    if (!response.ok) {
+      let errorCode: SnapchainError['code'];
+      switch (response.status) {
+        case 404:
+          errorCode = 'NOT_FOUND';
+          break;
+        case 400:
+          errorCode = 'BAD_REQUEST';
+          break;
+        case 500:
+        case 502:
+        case 503:
+          errorCode = 'INTERNAL_ERROR';
+          break;
+        default:
+          errorCode = 'NETWORK_ERROR';
+      }
+      
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new SnapchainError(
+        errorCode,
+        `HTTP ${response.status}: ${errorText}`,
+        { status: response.status, statusText: response.statusText }
+      );
+    }
+    
+    return response.json();
+  }
+
   private buildPaginationParams(options: SnapchainPaginationOptions): Record<string, string | number | boolean> {
     const params: Record<string, string | number | boolean> = {
       pageSize: options.pageSize || this.defaultPageSize
@@ -127,7 +175,7 @@ export class Snapchain {
       ...this.buildPaginationParams(options)
     };
 
-    return this.makeRequest<SnapchainCastsResponse>('/v1/castsByFid', params);
+    return this.makeCachedRequest<SnapchainCastsResponse>('/v1/castsByFid', params);
   }
 
   async getReactionsByFid(options: SnapchainReactionsByFidOptions): Promise<SnapchainReactionsResponse> {
@@ -137,7 +185,7 @@ export class Snapchain {
       ...this.buildPaginationParams(options)
     };
 
-    return this.makeRequest<SnapchainReactionsResponse>('/v1/reactionsByFid', params);
+    return this.makeCachedRequest<SnapchainReactionsResponse>('/v1/reactionsByFid', params);
   }
 
   async getLinksByFid(options: SnapchainLinksByFidOptions): Promise<SnapchainLinksResponse> {
@@ -146,7 +194,7 @@ export class Snapchain {
       ...this.buildPaginationParams(options)
     };
 
-    return this.makeRequest<SnapchainLinksResponse>('/v1/linksByFid', params);
+    return this.makeCachedRequest<SnapchainLinksResponse>('/v1/linksByFid', params);
   }
 
   async getVerificationsByFid(options: SnapchainVerificationsByFidOptions): Promise<SnapchainVerificationsResponse> {
@@ -155,7 +203,7 @@ export class Snapchain {
       ...this.buildPaginationParams(options)
     };
 
-    return this.makeRequest<SnapchainVerificationsResponse>('/v1/verificationsByFid', params);
+    return this.makeCachedRequest<SnapchainVerificationsResponse>('/v1/verificationsByFid', params);
   }
 
   async getOnChainSignersByFid(options: SnapchainOnChainSignersByFidOptions): Promise<SnapchainOnChainSignersResponse> {
@@ -166,7 +214,7 @@ export class Snapchain {
 
     if (options.signer) params.signer = options.signer;
 
-    return this.makeRequest<SnapchainOnChainSignersResponse>('/v1/onChainSignersByFid', params);
+    return this.makeCachedRequest<SnapchainOnChainSignersResponse>('/v1/onChainSignersByFid', params);
   }
 
   async getCastById(options: SnapchainCastByIdOptions): Promise<SnapchainCastByIdResponse> {
@@ -175,7 +223,7 @@ export class Snapchain {
       hash: options.hash
     };
 
-    return this.makeRequest<SnapchainCastByIdResponse>('/v1/castById', params);
+    return this.makeCachedRequest<SnapchainCastByIdResponse>('/v1/castById', params);
   }
 
   async getInfo(): Promise<SnapchainInfoResponse> {
@@ -188,7 +236,7 @@ export class Snapchain {
       shard_index: options.shard_index
     };
 
-    return this.makeRequest<SnapchainEventResponse>('/v1/eventById', params);
+    return this.makeCachedRequest<SnapchainEventResponse>('/v1/eventById', params);
   }
 
   async getAllMessagesByFid(fid: string, endpoint: string, otherParams: Record<string, string | number | boolean> = {}): Promise<any[]> {
@@ -207,7 +255,7 @@ export class Snapchain {
         params.pageToken = nextPageToken;
       }
 
-      const data = await this.makeRequest<any>(endpoint, params);
+      const data = await this.makeCachedRequest<any>(endpoint, params);
       messages.push(...(data.messages || []));
 
       if (!data.nextPageToken || data.messages?.length < this.defaultPageSize) {
@@ -239,15 +287,6 @@ export class Snapchain {
 
   async getAllUserDataByFid(fid: string): Promise<SnapchainUserDataMessage[]> {
     return this.getAllMessagesByFid(fid, '/v1/userDataByFid');
-  }
-
-  async getEvents(options?: { pageSize?: number; pageToken?: string }): Promise<SnapchainEventsResponse> {
-    const params: Record<string, string | number | boolean> = {};
-    
-    if (options?.pageSize) params.pageSize = options.pageSize;
-    if (options?.pageToken) params.pageToken = options.pageToken;
-
-    return this.makeRequest<SnapchainEventsResponse>('/v1/events', params);
   }
 
   async getSignerStats(fid: string, signer: string): Promise<{

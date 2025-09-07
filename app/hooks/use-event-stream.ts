@@ -19,7 +19,7 @@ export function useEventStream() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/events?stream=true')
+    const eventSource = new EventSource('/api/events')
     
     eventSource.onopen = () => {
       setIsConnected(true)
