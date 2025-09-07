@@ -2,6 +2,10 @@
   "name": "casterscan",
   "version": "0.1.0",
   "author": "dylsteck",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dylsteck/casterscan"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",

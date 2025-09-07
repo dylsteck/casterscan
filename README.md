@@ -3,7 +3,7 @@
 ## A block explorer for Farcaster
 You can [check it out here](https://casterscan.com)
 
-![Casterscan as of 4/12/25](https://i.imgur.com/rqKPvAR.png)
+![Casterscan as of 9/7/25](https://i.imgur.com/ryRhP0P.png)
 
 ## What is Casterscan?
 
@@ -11,9 +11,11 @@ Casterscan is a block explorer for Farcaster. It currently lets you view:
 - a firehose of the latest casts, either as a list or grid
 - the details of any cast(text, embeds, responses per API/Snapchain provider)
 
+![Casterscan user signer data on /fids/[fid] as of 9/7/25](https://i.imgur.com/6zFB2dK.png)
+
 There are two goals for Casterscan's utility:
 - make it easy to access Farcaster data
-- give each atomic unit of data available on [Snapchain](https://snapchain.farcaster.xyz) its own URL, starting with casts
+- give each atomic unit of data available on [Snapchain](https://snapchain.farcaster.xyz) its own URL
 
 
 ## How to run locally
@@ -22,5 +24,5 @@ There are two goals for Casterscan's utility:
 3. Run the development server: `bun run dev`
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 
-- [Message on Farcaster](https://farcaster.xyz/dylsteck.eth)
-- [Create an issue](https://github.com/dylsteck/casterscan/issues)
+- [Message me on Farcaster](https://farcaster.xyz/dylsteck.eth)
+- [Create an issue](https://github.com/dylsteck/casterscan/issues/new)
