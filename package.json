@@ -33,10 +33,10 @@
     "framer-motion": "^12.23.22",
     "geist": "^1.5.1",
     "lucide-react": "^0.544.0",
-    "next": "16.0.0",
+    "next": "16.0.7",
     "nuqs": "^2.6.0",
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
@@ -45,17 +45,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^22.9.0",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
     "eslint": "^8",
-    "eslint-config-next": "16.0.0",
+    "eslint-config-next": "16.0.7",
     "eslint-config-prettier": "^10.1.8",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
-  "overrides": {
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2"
-  }
+  "packageManager": "bun@1.3.3"
 }
