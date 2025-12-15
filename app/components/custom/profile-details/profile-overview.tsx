@@ -105,7 +105,7 @@ export function ProfileOverview({ neynarUser }: ProfileOverviewProps) {
           <span className="font-semibold mr-1">power badge</span>
           <span className="flex items-center text-right">
             {neynarUser.power_badge ? 'Yes' : 'No'}
-            <CopyClipboardIcon value={neynarUser.power_badge.toString()} className="ml-1 flex-shrink-0" />
+            <CopyClipboardIcon value={(neynarUser.power_badge ?? false) ? 'Yes' : 'No'} className="ml-1 flex-shrink-0" />
           </span>
         </li>
 

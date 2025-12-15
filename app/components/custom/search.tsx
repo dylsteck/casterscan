@@ -21,7 +21,7 @@ export default function Search(){
 
     try {
       const isHash = /^0x[a-fA-F0-9]{40}$/.test(search);
-      const farcasterUrlMatch = search.match(/^https?:\/\/(www\.)?farcaster\.xyz\/[^\/]+\/0x[a-fA-F0-9]{40}$/);
+      const farcasterUrlMatch = search.match(/^https?:\/\/(www\.)?farcaster\.xyz\/[^\/]+\/0x[a-fA-F0-9]{8,40}$/);
       const baseAppUrlMatch = search.match(/^https?:\/\/(www\.)?base\.app\/post\/0x[a-fA-F0-9]{40}$/);
       const isNumber = /^\d+$/.test(search);
       const isEventId = /^\d{10,}$/.test(search);
@@ -58,6 +58,7 @@ export default function Search(){
       if (isHash) {
         cast = await getNeynarCast(search, 'hash');
       } else if (farcasterUrlMatch) {
+        // Call Neynar API with URL to get full cast hash and data
         cast = await getNeynarCast(search, 'url');
       } else {
         clearLocalState();
