@@ -150,19 +150,30 @@ export const GET = withAxiom(async (
       }
     }
 
-    const appsWithProfiles = await Promise.all(
-      Object.values(appsMap).map(async (app: any) => {
-        try {
-          const user = await neynar.getUser({ fid: app.fid.toString() });
-          if (user) {
-            app.profile = user;
-          }
-        } catch (error) {
-          console.warn(`Failed to fetch profile for FID ${app.fid}:`, error)
+    const apps = Object.values(appsMap);
+    const profileByFid: Record<string, any> = {};
+
+    if (apps.length > 0) {
+      try {
+        const users = await neynar.getUsers({
+          fids: apps.map((app: any) => app.fid.toString())
+        });
+
+        for (const user of users) {
+          profileByFid[user.fid.toString()] = user;
         }
-        return app
-      })
-    )
+      } catch (error) {
+        console.warn('Failed to fetch profiles for apps:', error);
+      }
+    }
+
+    const appsWithProfiles = apps.map((app: any) => {
+      const profile = profileByFid[app.fid.toString()];
+      if (profile) {
+        app.profile = profile;
+      }
+      return app;
+    });
 
     const sortedApps = appsWithProfiles.filter(app => app.totalMessages > 0).sort((a, b) => {
       const aLastUsed = a.lastUsed ? new Date(a.lastUsed).getTime() : 0

@@ -1,18 +1,26 @@
 'use client';
 
+import { useState } from "react";
 import ResponseData from ".";
 import { useFarcasterCast } from "../../../hooks/use-api-data";
 
 export default function FarcasterApiResponseData({ hash }: { hash: string }) {
-    const { data, isLoading, error } = useFarcasterCast(hash);
+    const [enabled, setEnabled] = useState(false);
+    const { data, isLoading, error } = useFarcasterCast(hash, { enabled });
 
-    if (isLoading) {
-        return <ResponseData data={{ loading: true }} title="farcaster api" />;
-    }
+    const responseData = !enabled
+        ? { idle: true }
+        : isLoading
+          ? { loading: true }
+          : error
+            ? { error: error.message }
+            : data;
 
-    if (error) {
-        return <ResponseData data={{ error: error.message }} title="farcaster api" />;
-    }
-
-    return <ResponseData data={data} title="farcaster api" />;
+    return (
+        <ResponseData
+            data={responseData}
+            title="farcaster api"
+            onOpen={() => setEnabled(true)}
+        />
+    );
 } 

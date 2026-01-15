@@ -19,5 +19,6 @@ export function useAppsWithSigners(fid: string) {
     enabled: !!fid,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     gcTime: CACHE_TTLS.REACT_QUERY.GC_TIME,
+    refetchOnWindowFocus: false,
   });
 }

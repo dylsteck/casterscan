@@ -1,6 +1,6 @@
-import { getNeynarUserByUsername } from '@/app/lib/server';
-import { redirect, notFound } from 'next/navigation';
-import { Skeleton } from '@/app/components/custom/Skeleton';
+import ProfileDetails from '@/app/components/custom/profile-details/index';
+import { getNeynarUserByUsername, getFarcasterKeys } from '@/app/lib/server';
+import { notFound } from 'next/navigation';
 
 export default async function UsernamePage(props: { params: Promise<{ username: string }> }) {
   const params = await props.params;
@@ -8,18 +8,19 @@ export default async function UsernamePage(props: { params: Promise<{ username: 
   
   try {
     const user = await getNeynarUserByUsername(username);
-    
-    if (user?.fid) {
-      redirect(`/fids/${user.fid}`);
-    } else {
+
+    if (!user?.fid) {
       notFound();
     }
-  } catch (error) {
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-      throw error;
+
+    const keysData = await getFarcasterKeys(user.fid.toString());
+
+    if (!keysData) {
+      notFound();
     }
+
+    return <ProfileDetails fid={user.fid.toString()} neynarUser={user} keysData={keysData} />;
+  } catch (error) {
     notFound();
   }
-  
-  return <Skeleton variant="card" rows={5} />;
 }

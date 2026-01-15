@@ -1,18 +1,26 @@
 'use client';
 
+import { useState } from "react";
 import ResponseData from ".";
 import { useFarcasterHubCast } from "../../../hooks/use-api-data";
 
 export default function FarcasterHubResponseData({ fid, hash }: { fid: number, hash: string }) {
-    const { data, isLoading, error } = useFarcasterHubCast(fid, hash);
+    const [enabled, setEnabled] = useState(false);
+    const { data, isLoading, error } = useFarcasterHubCast(fid, hash, { enabled });
 
-    if (isLoading) {
-        return <ResponseData data={{ loading: true }} title="farcaster hub" />;
-    }
+    const responseData = !enabled
+        ? { idle: true }
+        : isLoading
+          ? { loading: true }
+          : error
+            ? { error: error.message }
+            : data;
 
-    if (error) {
-        return <ResponseData data={{ error: error.message }} title="farcaster hub" />;
-    }
-
-    return <ResponseData data={data} title="farcaster hub" />;
+    return (
+        <ResponseData
+            data={responseData}
+            title="farcaster hub"
+            onOpen={() => setEnabled(true)}
+        />
+    );
 } 

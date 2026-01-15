@@ -6,9 +6,12 @@ import {
   NeynarCastOptions,
   NeynarUserOptions,
   NeynarUserByUsernameOptions,
-  NeynarCastByIdOptions
+  NeynarCastByIdOptions,
+  NeynarUsersOptions
 } from './types';
 import { universalLogger as logger } from '@/app/lib/axiom/universal';
+
+const BULK_FID_LIMIT = 100;
 
 export class NeynarError extends Error {
   public code: NeynarErrorCode;
@@ -136,6 +139,29 @@ export class Neynar {
       fids: options.fid
     });
     return response.users[0];
+  }
+
+  async getUsers(options: NeynarUsersOptions): Promise<NeynarV2User[]> {
+    const uniqueFids = Array.from(new Set(options.fids.filter(Boolean)));
+
+    if (uniqueFids.length === 0) {
+      return [];
+    }
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < uniqueFids.length; i += BULK_FID_LIMIT) {
+      chunks.push(uniqueFids.slice(i, i + BULK_FID_LIMIT));
+    }
+
+    const responses = await Promise.all(
+      chunks.map((fids) =>
+        this.makeRequest<{ users: NeynarV2User[] }>('/v2/farcaster/user/bulk', {
+          fids: fids.join(',')
+        })
+      )
+    );
+
+    return responses.flatMap((response) => response.users ?? []);
   }
 
   async getUserByUsername(options: NeynarUserByUsernameOptions): Promise<NeynarV2User> {

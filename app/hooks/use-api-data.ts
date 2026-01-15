@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { BASE_URL, CACHE_TTLS } from '../lib/utils';
 
-export const useFarcasterCast = (hash: string) => {
+export const useFarcasterCast = (hash: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['farcaster-cast', hash],
     queryFn: async () => {
@@ -11,13 +11,14 @@ export const useFarcasterCast = (hash: string) => {
       }
       return response.json();
     },
+    enabled: options?.enabled ?? true,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     refetchOnWindowFocus: false,
     retry: 2,
   });
 };
 
-export const useNeynarHubCast = (fid: number, hash: string) => {
+export const useNeynarHubCast = (fid: number, hash: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['neynar-hub-cast', fid, hash],
     queryFn: async () => {
@@ -27,13 +28,14 @@ export const useNeynarHubCast = (fid: number, hash: string) => {
       }
       return response.json();
     },
+    enabled: options?.enabled ?? true,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     refetchOnWindowFocus: false,
     retry: 2,
   });
 };
 
-export const useFarcasterHubCast = (fid: number, hash: string) => {
+export const useFarcasterHubCast = (fid: number, hash: string, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ['farcaster-hub-cast', fid, hash],
     queryFn: async () => {
@@ -43,6 +45,7 @@ export const useFarcasterHubCast = (fid: number, hash: string) => {
       }
       return response.json();
     },
+    enabled: options?.enabled ?? true,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     refetchOnWindowFocus: false,
     retry: 2,

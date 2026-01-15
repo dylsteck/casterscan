@@ -10,6 +10,7 @@ export type {
   NeynarErrorCode,
   NeynarCastOptions,
   NeynarUserOptions,
+  NeynarUsersOptions,
   NeynarUserByUsernameOptions,
   NeynarCastByIdOptions
 } from './types';

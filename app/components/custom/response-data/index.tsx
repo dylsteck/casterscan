@@ -4,16 +4,29 @@ import { useState } from "react";
 import CopyClipboardIcon from "../copy-clipboard-icon";
 import { ResponsiveDialog } from "../responsive-dialog";
 
-export default function ResponseData({ data, title }: { data: any, title: string }) {
+export default function ResponseData({ data, title, onOpen, onClose }: { data: any, title: string, onOpen?: () => void, onClose?: () => void }) {
     const [showModal, setShowModal] = useState(false);
+
+    const handleOpen = () => {
+        onOpen?.();
+        setShowModal(true);
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            onClose?.();
+        }
+        setShowModal(open);
+    };
+
     return (
         <>
-            <button className="p-2 text-black border border-black" onClick={() => setShowModal(true)}>
+            <button className="p-2 text-black border border-black" onClick={handleOpen}>
                 {title}
             </button>
             <ResponsiveDialog
                 isOpen={showModal}
-                setIsOpen={setShowModal}
+                setIsOpen={handleOpenChange}
                 title={`${title} response`}
             >
                 <div className="flex flex-col space-y-4 max-h-full">
