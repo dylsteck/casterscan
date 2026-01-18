@@ -239,6 +239,10 @@ export type NeynarUserOptions = {
   fid: string;
 };
 
+export type NeynarUsersOptions = {
+  fids: string[];
+};
+
 export type NeynarUserByUsernameOptions = {
   username: string;
 };

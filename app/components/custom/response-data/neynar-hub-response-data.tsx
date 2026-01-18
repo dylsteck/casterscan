@@ -1,18 +1,26 @@
 'use client';
 
+import { useState } from "react";
 import ResponseData from ".";
 import { useNeynarHubCast } from "../../../hooks/use-api-data";
 
 export default function NeynarHubResponseData({ fid, hash }: { fid: number, hash: string }) {
-    const { data, isLoading, error } = useNeynarHubCast(fid, hash);
+    const [enabled, setEnabled] = useState(false);
+    const { data, isLoading, error } = useNeynarHubCast(fid, hash, { enabled });
 
-    if (isLoading) {
-        return <ResponseData data={{ loading: true }} title="neynar hub" />;
-    }
+    const responseData = !enabled
+        ? { idle: true }
+        : isLoading
+          ? { loading: true }
+          : error
+            ? { error: error.message }
+            : data;
 
-    if (error) {
-        return <ResponseData data={{ error: error.message }} title="neynar hub" />;
-    }
-
-    return <ResponseData data={data} title="neynar hub" />;
+    return (
+        <ResponseData
+            data={responseData}
+            title="neynar hub"
+            onOpen={() => setEnabled(true)}
+        />
+    );
 }

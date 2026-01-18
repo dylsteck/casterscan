@@ -1,7 +1,6 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { getNeynarCast } from '@/app/lib/server';
 
 export default function Search(){
   const [search, setSearch] = React.useState<string>('');
@@ -54,25 +53,23 @@ export default function Search(){
         return;
       }
 
-      let cast;
       if (isHash) {
-        cast = await getNeynarCast(search, 'hash');
-      } else if (farcasterUrlMatch) {
-        // Call Neynar API with URL to get full cast hash and data
-        cast = await getNeynarCast(search, 'url');
-      } else {
         clearLocalState();
-        router.push('/not-found');
+        router.push(`/casts/${search}`);
         return;
       }
 
-      if (cast && cast.hash) {
-        clearLocalState();
-        router.push(`/casts/${cast.hash}`);
-      } else {
-        clearLocalState();
-        router.push('/not-found');
+      if (farcasterUrlMatch) {
+        const hashMatch = farcasterUrlMatch[0].match(/0x[a-fA-F0-9]{8,40}/);
+        if (hashMatch) {
+          clearLocalState();
+          router.push(`/casts/${hashMatch[0]}`);
+          return;
+        }
       }
+
+      clearLocalState();
+      router.push('/not-found');
     } catch (err) {
       clearLocalState();
       router.push('/not-found');
