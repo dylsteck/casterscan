@@ -1,20 +1,19 @@
-# Casterscan Data Layer
+# Casterscan API
 
 Unified Farcaster data layer with Redis cache and request coalescing. Consolidates Neynar, Snapchain, Farcaster API, and Optimism RPC into a single REST API.
 
 ## Setup
 
-1. Copy env vars from root `.env.example` and set:
+1. Set env vars (from root `.env.example`):
    - `NEYNAR_API_KEY` (required for user/cast lookups)
    - `REDIS_URL` (optional; cache disabled if unset)
-   - `DATA_LAYER_URL` (for Next.js; default `http://localhost:4000`)
 
 2. Run locally:
    ```bash
-   bun run dev:data-layer
+   bun run dev:api
    ```
 
-3. Or run both Next.js and data layer:
+3. Or run both web and API:
    ```bash
    bun run dev:all
    ```
