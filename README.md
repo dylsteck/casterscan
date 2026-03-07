@@ -22,7 +22,7 @@ There are two goals for Casterscan's utility:
 ## How to run locally
 
 1. Install dependencies: `bun install`
-2. Copy `.env.example` to `.env.local` and add your `NEYNAR_API_KEY` and `DATA_LAYER_URL` (default `http://localhost:4000`)
+2. Copy `.env.example` to `.env.local` and add your `NEYNAR_API_KEY` and `API_URL` (default `http://localhost:4000`)
 3. Run the development server:
    - Web only: `bun run dev`
    - API only: `bun run dev:api`
@@ -31,7 +31,7 @@ There are two goals for Casterscan's utility:
 ## Monorepo structure
 
 - `apps/web` — Casterscan Next.js app
-- `apps/api` — Farcaster data layer (Elysia + Redis)
+- `apps/api` — Farcaster API (Elysia + Redis)
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 
 - [Message me on Farcaster](https://farcaster.xyz/dylsteck.eth)

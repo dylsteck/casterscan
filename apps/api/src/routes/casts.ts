@@ -19,15 +19,15 @@ export const castsRoutes = new Elysia()
     const { format, fid } = query;
 
     if (format) {
-      if (!fid) {
+      if ((format === "neynar-hub" || format === "farcaster-hub") && !fid) {
         throw new UpstreamError(
           "casts",
-          "fid is required when format is specified",
+          "fid is required when format is neynar-hub or farcaster-hub",
           400
         );
       }
       const data = await getCastFormat(
-        fid,
+        fid || "0",
         params.hash,
         format as CastFormat
       );

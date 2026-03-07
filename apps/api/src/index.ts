@@ -9,7 +9,7 @@ async function main() {
   initUpstream(config);
 
   app.listen(config.PORT);
-  console.log(`Data layer listening on :${config.PORT}`);
+  console.log(`API listening on :${config.PORT}`);
 }
 
 main().catch((err) => {

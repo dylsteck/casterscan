@@ -1,16 +1,16 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { farcaster } from "@/app/lib/farcaster";
+import { apiFetch } from "@/app/lib/api";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
 export const GET = withAxiom(async (request: NextRequest) => {
     const url = new URL(request.url);
     const fid = url.searchParams.get('fid');
-    if(!fid){
+    if (!fid) {
         return NextResponse.json({ error: "Missing fid" }, { status: 400 });
     }
     try {
-        const responseData = await farcaster.getUser({ fid: fid! });
+        const responseData = await apiFetch(`/v1/users/${fid}`);
         return NextResponse.json(responseData, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });

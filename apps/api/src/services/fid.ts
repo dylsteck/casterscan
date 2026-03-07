@@ -52,3 +52,21 @@ export async function getFidMessages(fid: string) {
     }
   );
 }
+
+export async function getFidSigners(fid: string, options?: { pageSize?: number; pageToken?: string; reverse?: boolean; signer?: string }) {
+  const up = getUpstream();
+  if (!up) throw new Error("Upstream not initialized");
+
+  return getCached(
+    cacheKeys.fidSigners(fid),
+    cacheTTL.fidSigners,
+    () =>
+      up.snapchain.getOnChainSignersByFid({
+        fid,
+        pageSize: options?.pageSize ?? 1000,
+        pageToken: options?.pageToken,
+        reverse: options?.reverse,
+        signer: options?.signer,
+      })
+  );
+}

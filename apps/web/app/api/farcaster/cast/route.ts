@@ -1,5 +1,5 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { farcaster } from "@/app/lib/farcaster";
+import { apiFetch } from "@/app/lib/api";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -12,7 +12,7 @@ export const GET = withAxiom(async (request: NextRequest) => {
     }
 
     try {
-        const responseData = await farcaster.getCast({ hash: hash! });
+        const responseData = await apiFetch(`/v1/casts/${hash}?format=farcaster-api`);
         return NextResponse.json(responseData, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         console.error(`Error fetching cast ${hash}:`, err);

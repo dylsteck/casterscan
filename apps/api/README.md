@@ -1,6 +1,6 @@
 # Casterscan API
 
-Unified Farcaster data layer with Redis cache and request coalescing. Consolidates Neynar, Snapchain, Farcaster API, and Optimism RPC into a single REST API.
+Unified Farcaster API with Redis cache and request coalescing. Consolidates Neynar, Snapchain, Farcaster API, and Optimism RPC into a single REST API.
 
 ## Setup
 

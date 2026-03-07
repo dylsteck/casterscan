@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { dataLayerFetch } from "@/app/lib/data-layer";
+import { apiFetch } from "@/app/lib/api";
 import { CACHE_TTLS } from "@/app/lib/utils";
 import { withAxiom } from "@/app/lib/axiom/server";
 
@@ -14,7 +14,7 @@ export const GET = withAxiom(async (request: NextRequest) => {
     );
   }
 
-  const data = await dataLayerFetch(
+  const data = await apiFetch(
     `/v1/fids/${fid}/signers/${encodeURIComponent(signer)}/messages`
   );
   return Response.json(data, {

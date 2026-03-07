@@ -1,5 +1,5 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { dataLayerFetch } from "@/app/lib/data-layer";
+import { apiFetch } from "@/app/lib/api";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -17,7 +17,7 @@ export const GET = withAxiom(async (request: NextRequest) => {
         if (!hash) {
             return NextResponse.json({ error: "Could not extract hash from identifier" }, { status: 400 });
         }
-        const cast = await dataLayerFetch(`/v1/casts/${hash}`);
+        const cast = await apiFetch(`/v1/casts/${hash}`);
         return NextResponse.json({ cast }, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });

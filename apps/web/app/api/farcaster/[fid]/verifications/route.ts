@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { snapchain } from '../../../../lib/snapchain'
+import { apiFetch } from '@/app/lib/api';
 import { CACHE_TTLS } from '../../../../lib/utils'
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -9,16 +9,9 @@ export const GET = withAxiom(async (
 ) => {
   try {
     const { fid } = await params
-    const pageSize = request.nextUrl.searchParams.get('pageSize') || '1000'
-    
-    const data = await snapchain.getVerificationsByFid({ 
-      fid, 
-      pageSize: parseInt(pageSize) 
-    })
-    return Response.json(data, {
-      headers: {
-        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
-      }
+    const data = await apiFetch<{ verifications: unknown[] }>(`/v1/fids/${fid}/messages`)
+    return Response.json({ messages: data.verifications }, {
+      headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` }
     })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch verifications' }, { status: 500 })

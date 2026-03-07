@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { dataLayerFetch } from "@/app/lib/data-layer";
+import { apiFetch } from "@/app/lib/api";
 import { CACHE_TTLS } from "@/app/lib/utils";
 import { withAxiom } from "@/app/lib/axiom/server";
 
@@ -8,7 +8,7 @@ export const GET = withAxiom(async (
   { params }: { params: Promise<{ fid: string }> }
 ) => {
   const { fid } = await params;
-  const data = await dataLayerFetch<{
+  const data = await apiFetch<{
     casts: number;
     reactions: number;
     links: number;
