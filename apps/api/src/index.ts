@@ -1,16 +1,11 @@
-// Dynamic import breaks circular deps that cause "module not instantiated" on Vercel/Bun.
-// Export a fetch wrapper so the entry module stays minimal and app loads on first request.
-let appPromise: Promise<{ app: { handle: (req: Request) => Promise<Response> } }> | null = null;
+/**
+ * Elysia entrypoint for Vercel.
+ * We use Node.js runtime instead of Bun (no bunVersion in vercel.json) because
+ * Bun has a known bug on Vercel: "Requested module is not instantiated yet"
+ * when loading complex dependency graphs. See:
+ * https://community.vercel.com/t/bun-runtime-requested-module-is-not-instantiated-yet/26380
+ * Elysia supports both runtimes: https://elysiajs.com/integrations/vercel
+ */
+import { app } from "./app";
 
-async function getApp() {
-  if (!appPromise) appPromise = import("./app");
-  const mod = await appPromise;
-  return mod.app;
-}
-
-export default {
-  async fetch(request: Request) {
-    const app = await getApp();
-    return app.handle(request);
-  },
-};
+export default app;
