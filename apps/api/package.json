@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "dev": "bun run --watch src/server.ts",
     "start": "bun run src/server.ts",
     "test": "bun test"

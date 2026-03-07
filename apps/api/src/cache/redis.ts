@@ -8,6 +8,6 @@ export async function initRedis(url?: string): Promise<void> {
     return;
   }
   redis = new Redis(url);
-  redis.on("error", (err) => console.error("Redis error:", err));
+  redis.on("error", (err: Error) => console.error("Redis error:", err));
   redis.on("connect", () => console.log("Redis connected"));
 }
