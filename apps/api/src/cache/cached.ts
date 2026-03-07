@@ -1,5 +1,5 @@
-import { redis } from "./redis";
-import { coalesce } from "./coalesce";
+import { redis } from "./redis.js";
+import { coalesce } from "./coalesce.js";
 
 export async function getCached<T>(
   key: string,

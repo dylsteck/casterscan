@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { getFidStats, getFidMessages, getFidSigners } from "../services/fid";
-import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
+import { getFidStats, getFidMessages, getFidSigners } from "../services/fid.js";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
 const paramsSchema = z.object({ fid: z.string() });

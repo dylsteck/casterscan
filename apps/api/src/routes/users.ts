@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { getUser, getUserByUsername, getUsersBulk } from "../services/user";
-import { validateParams, validateBody, asyncHandler } from "../lib/validate";
+import { getUser, getUserByUsername, getUsersBulk } from "../services/user.js";
+import { validateParams, validateBody, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
 const fidParamsSchema = z.object({ fid: z.string() });

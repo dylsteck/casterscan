@@ -1,6 +1,6 @@
-import { getCached } from "../cache/cached";
-import { cacheKeys, cacheTTL } from "../cache/keys";
-import { getUpstream } from "../upstream-instance";
+import { getCached } from "../cache/cached.js";
+import { cacheKeys, cacheTTL } from "../cache/keys.js";
+import { getUpstream } from "../upstream-instance.js";
 
 export async function getFidStats(fid: string) {
   const up = getUpstream();

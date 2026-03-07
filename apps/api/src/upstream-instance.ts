@@ -1,6 +1,6 @@
-import { createUpstream } from "./upstream";
-import type { Config } from "./config";
-import type { UpstreamConfig } from "./upstream";
+import { createUpstream } from "./upstream/index.js";
+import type { Config } from "./config.js";
+import type { UpstreamConfig } from "./upstream/index.js";
 
 export let upstream: ReturnType<typeof createUpstream> | null = null;
 

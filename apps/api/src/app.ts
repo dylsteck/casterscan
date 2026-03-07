@@ -1,21 +1,29 @@
 import express from "express";
 import cors from "cors";
-import { ensureInitialized } from "./bootstrap";
-import { NotFoundError, UpstreamError } from "./lib/errors";
-import healthRouter from "./routes/health";
-import snapchainRouter from "./routes/snapchain";
-import fidsRouter from "./routes/fids";
-import signersRouter from "./routes/signers";
-import keysRouter from "./routes/keys";
-import usersRouter from "./routes/users";
-import castsRouter from "./routes/casts";
+import { ensureInitialized } from "./bootstrap.js";
+import { NotFoundError, UpstreamError } from "./lib/errors.js";
+import healthRouter from "./routes/health.js";
+import snapchainRouter from "./routes/snapchain.js";
+import fidsRouter from "./routes/fids.js";
+import signersRouter from "./routes/signers.js";
+import keysRouter from "./routes/keys.js";
+import usersRouter from "./routes/users.js";
+import castsRouter from "./routes/casts.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Minimal ping route before init (for Vercel health checks)
+app.get("/ping", (_req, res) => res.json({ ok: true }));
+
 app.use(async (_req, _res, next) => {
-  await ensureInitialized();
-  next();
+  try {
+    await ensureInitialized();
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use("/", healthRouter);

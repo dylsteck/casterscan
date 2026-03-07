@@ -1,7 +1,7 @@
 import { createPublicClient, http, getAddress } from "viem";
 import { optimism } from "viem/chains";
-import { ProfileKeysPage } from "./types";
-import { UpstreamError } from "../lib/errors";
+import { ProfileKeysPage } from "./types.js";
+import { UpstreamError } from "../lib/errors.js";
 
 export const keyRegistryAbi = [
   {

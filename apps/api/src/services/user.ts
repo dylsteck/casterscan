@@ -1,7 +1,7 @@
-import { getCached } from "../cache/cached";
-import { cacheKeys, cacheTTL } from "../cache/keys";
-import { getUpstream } from "../upstream-instance";
-import type { NeynarV2User } from "../upstream/types";
+import { getCached } from "../cache/cached.js";
+import { cacheKeys, cacheTTL } from "../cache/keys.js";
+import { getUpstream } from "../upstream-instance.js";
+import type { NeynarV2User } from "../upstream/types.js";
 
 export async function getUser(fid: string): Promise<NeynarV2User> {
   const up = getUpstream();

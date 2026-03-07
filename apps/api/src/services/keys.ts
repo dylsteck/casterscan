@@ -1,7 +1,7 @@
-import { getCached } from "../cache/cached";
-import { cacheKeys, cacheTTL } from "../cache/keys";
-import { getUpstream } from "../upstream-instance";
-import type { ProfileKeysPage } from "../upstream/types";
+import { getCached } from "../cache/cached.js";
+import { cacheKeys, cacheTTL } from "../cache/keys.js";
+import { getUpstream } from "../upstream-instance.js";
+import type { ProfileKeysPage } from "../upstream/types.js";
 
 export async function getKeys(fid: string): Promise<ProfileKeysPage> {
   const up = getUpstream();

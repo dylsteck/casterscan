@@ -1,16 +1,16 @@
 import { decodeAbiParameters } from "viem";
-import { getCached } from "../cache/cached";
-import { cacheKeys, cacheTTL } from "../cache/keys";
-import { getUpstream } from "../upstream-instance";
-import { getFidMessages } from "./fid";
-import { signedKeyRequestAbi } from "../upstream/signed-key-request-abi";
+import { getCached } from "../cache/cached.js";
+import { cacheKeys, cacheTTL } from "../cache/keys.js";
+import { getUpstream } from "../upstream-instance.js";
+import { getFidMessages } from "./fid.js";
+import { signedKeyRequestAbi } from "../upstream/signed-key-request-abi.js";
 import type {
   SnapchainCastMessage,
   SnapchainReactionMessage,
   SnapchainLinkMessage,
   SnapchainVerificationMessage,
   SnapchainOnChainEvent,
-} from "../upstream/types";
+} from "../upstream/types.js";
 
 const FARCASTER_EPOCH = 1609459200;
 

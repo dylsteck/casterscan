@@ -4,8 +4,8 @@ import {
   getSignersEnriched,
   getSignerMessages,
   getSignerStats,
-} from "../services/signer";
-import { validateParams, asyncHandler } from "../lib/validate";
+} from "../services/signer.js";
+import { validateParams, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
 const fidParamsSchema = z.object({ fid: z.string() });

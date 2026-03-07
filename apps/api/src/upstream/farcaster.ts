@@ -1,5 +1,5 @@
-import { FarcasterUserOptions, FarcasterCastOptions } from "./types";
-import { UpstreamError } from "../lib/errors";
+import { FarcasterUserOptions, FarcasterCastOptions } from "./types.js";
+import { UpstreamError } from "../lib/errors.js";
 
 export type FarcasterConfig = {
   baseUrl?: string;

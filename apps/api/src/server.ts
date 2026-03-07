@@ -1,5 +1,5 @@
-import app from "./app";
-import { ensureInitialized, getConfig } from "./bootstrap";
+import app from "./app.js";
+import { ensureInitialized, getConfig } from "./bootstrap.js";
 
 const config = getConfig();
 

@@ -19,8 +19,8 @@ import {
   SnapchainOnChainSignersByFidOptions,
   SnapchainCastByIdOptions,
   SnapchainEventByIdOptions,
-} from "./types";
-import { UpstreamError } from "../lib/errors";
+} from "./types.js";
+import { UpstreamError } from "../lib/errors.js";
 
 export type SnapchainConfig = {
   baseUrl?: string;

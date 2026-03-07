@@ -1,8 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { getCast, getCastFormat, type CastFormat } from "../services/cast";
-import { UpstreamError } from "../lib/errors";
-import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
+import { getCast, getCastFormat, type CastFormat } from "../services/cast.js";
+import { UpstreamError } from "../lib/errors.js";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
 const hashParamsSchema = z.object({ hash: z.string() });
@@ -29,7 +29,8 @@ router.get(
         );
       }
       const data = await getCastFormat(fid ?? "0", hash, format);
-      return res.json(data);
+      res.json(data);
+      return;
     }
 
     const data = await getCast(hash);

@@ -1,6 +1,6 @@
-import { initRedis } from "./cache/redis";
-import { loadConfig, type Config } from "./config";
-import { initUpstream } from "./upstream-instance";
+import { initRedis } from "./cache/redis.js";
+import { loadConfig, type Config } from "./config.js";
+import { initUpstream } from "./upstream-instance.js";
 
 let config: Config | null = null;
 let initPromise: Promise<Config> | null = null;

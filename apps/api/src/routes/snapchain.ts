@@ -1,7 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { getInfo, getEvent } from "../services/snapchain";
-import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
+import { getInfo, getEvent } from "../services/snapchain.js";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
 const eventParamsSchema = z.object({ eventId: z.string() });

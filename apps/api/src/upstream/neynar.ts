@@ -7,8 +7,8 @@ import {
   NeynarUsersOptions,
   NeynarUserByUsernameOptions,
   NeynarCastByIdOptions,
-} from "./types";
-import { UpstreamError } from "../lib/errors";
+} from "./types.js";
+import { UpstreamError } from "../lib/errors.js";
 
 const BULK_FID_LIMIT = 100;
 

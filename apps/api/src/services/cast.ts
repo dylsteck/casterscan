@@ -1,11 +1,11 @@
-import { getCached } from "../cache/cached";
-import { cacheKeys, cacheTTL } from "../cache/keys";
-import { getUpstream } from "../upstream-instance";
+import { getCached } from "../cache/cached.js";
+import { cacheKeys, cacheTTL } from "../cache/keys.js";
+import { getUpstream } from "../upstream-instance.js";
 import type {
   NeynarV2Cast,
   NeynarHubCast,
   SnapchainCastByIdResponse,
-} from "../upstream/types";
+} from "../upstream/types.js";
 
 export type CastFormat = "neynar-hub" | "farcaster-hub" | "farcaster-api";
 
