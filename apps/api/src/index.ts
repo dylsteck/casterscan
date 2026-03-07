@@ -1,15 +1,14 @@
 import { loadConfig } from "./config";
 import { initRedis } from "./cache/redis";
 import { initUpstream } from "./upstream-instance";
-import { app } from "./app";
 
 const config = loadConfig();
-// Don't await — avoids "module not instantiated" with top-level await on Vercel.
-// Redis connects in background; cache works once connected.
 void initRedis(config.REDIS_URL);
 initUpstream(config);
 
-// Vercel uses the default export as the serverless handler; no app.listen()
+// Dynamic import breaks circular deps that cause "module not instantiated" on Vercel/Bun
+const { app } = await import("./app");
+
 if (!process.env.VERCEL) {
   app.listen(config.PORT);
   console.log(`API listening on :${config.PORT}`);
