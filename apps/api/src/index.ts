@@ -4,7 +4,9 @@ import { initUpstream } from "./upstream-instance";
 import { app } from "./app";
 
 const config = loadConfig();
-await initRedis(config.REDIS_URL);
+// Don't await — avoids "module not instantiated" with top-level await on Vercel.
+// Redis connects in background; cache works once connected.
+void initRedis(config.REDIS_URL);
 initUpstream(config);
 
 // Vercel uses the default export as the serverless handler; no app.listen()
