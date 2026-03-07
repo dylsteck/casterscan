@@ -7,9 +7,13 @@
     "url": "https://github.com/dylsteck/casterscan"
   },
   "private": true,
+  "workspaces": ["packages/*"],
   "scripts": {
     "dev": "next dev",
+    "dev:data-layer": "bun run --cwd packages/data-layer dev",
+    "dev:all": "concurrently \"bun run dev\" \"bun run dev:data-layer\"",
     "build": "next build",
+    "build:data-layer": "bun run --cwd packages/data-layer build",
     "start": "next start",
     "lint": "eslint ."
   },
@@ -43,6 +47,7 @@
     "viem": "^2.37.9"
   },
   "devDependencies": {
+    "concurrently": "^9.0.0",
     "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^22.9.0",
     "@types/react": "19.2.7",

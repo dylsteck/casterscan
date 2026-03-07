@@ -1,36 +1,23 @@
-import { useQuery } from '@tanstack/react-query';
-import { snapchain, SnapchainMessage } from '../lib/snapchain';
-import { CACHE_TTLS } from '../lib/utils';
+import { useQuery } from "@tanstack/react-query";
+import { CACHE_TTLS } from "../lib/utils";
+
+export type SignerMessage = {
+  signer: string;
+  data?: { timestamp?: number; type?: string };
+  timestamp?: number;
+  messageType: string;
+  [key: string]: unknown;
+};
 
 export function useSignerMessages(fid: string, signerKey: string) {
   return useQuery({
-    queryKey: ['signer-messages', fid, signerKey],
-    queryFn: async (): Promise<SnapchainMessage[]> => {
-      const [casts, reactions, links, verifications] = await Promise.all([
-        snapchain.getAllCastsByFid(fid),
-        snapchain.getAllReactionsByFid(fid, 'None'),
-        snapchain.getAllLinksByFid(fid),
-        snapchain.getAllVerificationsByFid(fid)
-      ]);
-
-      const allMessages = [
-        ...casts.map((m: SnapchainMessage) => ({ ...m, messageType: 'cast' })),
-        ...reactions.map((m: SnapchainMessage) => ({ ...m, messageType: 'reaction' })),
-        ...links.map((m: SnapchainMessage) => ({ ...m, messageType: 'link' })),
-        ...verifications.map((m: SnapchainMessage) => ({ ...m, messageType: 'verification' }))
-      ];
-
-      const signerMessages = allMessages.filter(msg => 
-        msg.signer === signerKey
+    queryKey: ["signer-messages", fid, signerKey],
+    queryFn: async (): Promise<SignerMessage[]> => {
+      const res = await fetch(
+        `/api/signers/messages?fid=${encodeURIComponent(fid)}&signer=${encodeURIComponent(signerKey)}`
       );
-
-      signerMessages.sort((a, b) => {
-        const aTime = a.data?.timestamp || 0;
-        const bTime = b.data?.timestamp || 0;
-        return bTime - aTime;
-      });
-
-      return signerMessages;
+      if (!res.ok) throw new Error("Failed to fetch signer messages");
+      return res.json();
     },
     enabled: !!fid && !!signerKey,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
