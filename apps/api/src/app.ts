@@ -7,10 +7,14 @@ import { usersRoutes } from "./routes/users";
 import { castsRoutes } from "./routes/casts";
 import { keysRoutes } from "./routes/keys";
 import { snapchainRoutes } from "./routes/snapchain";
+import { ensureInitialized } from "./bootstrap";
 import { NotFoundError, UpstreamError } from "./lib/errors";
 
 export const app = new Elysia()
   .use(cors())
+  .onBeforeHandle(async () => {
+    await ensureInitialized();
+  })
   .use(healthRoutes)
   .use(fidsRoutes)
   .use(signersRoutes)
