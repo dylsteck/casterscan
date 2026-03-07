@@ -15,7 +15,7 @@ Unified Farcaster API with Redis cache and request coalescing. Consolidates Neyn
 
 3. Or run both web and API:
    ```bash
-   bun run dev:all
+   bun run dev
    ```
 
 ## API
