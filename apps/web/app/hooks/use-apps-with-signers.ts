@@ -9,9 +9,9 @@ export function useAppsWithSigners(fid: string) {
       const response = await fetch(`/api/signers/enriched?fid=${fid}`);
       if (!response.ok) throw new Error('Failed to fetch enriched signers');
       
-      const appsData = await response.json();
+      const appsData = (await response.json()) as (Omit<AppWithSigners, "lastUsed"> & { lastUsed?: string | null })[];
       
-      return appsData.map((app: any) => ({
+      return appsData.map((app) => ({
         ...app,
         lastUsed: app.lastUsed ? new Date(app.lastUsed) : undefined,
       }));

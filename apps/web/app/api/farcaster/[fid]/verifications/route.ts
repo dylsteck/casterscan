@@ -10,7 +10,7 @@ export async function GET(
     const { fid } = await params
     const data = await apiFetch<{ verifications: unknown[] }>(`/v1/fids/${fid}/messages`)
     return Response.json({ messages: data.verifications }, {
-      headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` }
+      headers: { 'Cache-Control': `max-age=${CACHE_TTLS.FIFTEEN_MIN}` }
     })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch verifications' }, { status: 500 })

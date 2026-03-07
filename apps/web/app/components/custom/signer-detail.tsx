@@ -304,7 +304,7 @@ export function SignerDetail({ signerKey, fid, onBack, appInfo }: SignerDetailPr
                       
                       {formatted.embeds && formatted.embeds.length > 0 && (
                         <div className="mb-2">
-                          {formatted.embeds.map((embed: any, i: number) => (
+                          {(formatted.embeds as { url?: string; castId?: { hash: string; fid: number } }[]).map((embed, i) => (
                             <div key={i} className="text-xs text-gray-500">
                               {embed.url && (
                                 <a href={embed.url} target="_blank" rel="noopener noreferrer" className="text-black underline break-all">

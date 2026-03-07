@@ -10,7 +10,7 @@ export async function GET(
     const { fid } = await params
     const data = await apiFetch<{ links: unknown[] }>(`/v1/fids/${fid}/messages`)
     return Response.json({ messages: data.links }, {
-      headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` }
+      headers: { 'Cache-Control': `max-age=${CACHE_TTLS.FIFTEEN_MIN}` }
     })
   } catch (error) {
     return Response.json({ error: 'Failed to fetch links' }, { status: 500 })

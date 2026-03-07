@@ -10,9 +10,9 @@ export type HubCast = {
           embeds: {
               url: string;
           }[];
-          embedsDeprecated: any[];
-          mentions: any[];
-          mentionsPositions: any[];
+          embedsDeprecated: unknown[];
+          mentions: number[];
+          mentionsPositions: number[];
           parentUrl: string;
           text: string;
           type: string;
@@ -39,7 +39,7 @@ export type HubCast = {
 export type HubStreamCast = {
   author: FarcasterUser;
   castAddBody?: never;
-  embeds: any[];
+  embeds: { url?: string; castId?: { fid: number; hash: string } }[];
   hash: string;
   text: string;
   timestamp: string;
@@ -60,17 +60,17 @@ export type SnapchainEvent = {
   hash: string;
   timestamp: string;
   fid: number;
-  author: any;
+  author: { fid: number; username?: string; displayName?: string } | null;
   link: string;
   // Cast-specific fields
   text?: string;
-  embeds?: any[];
-  mentions?: any[];
-  parentCastId?: any;
+  embeds?: { url?: string }[];
+  mentions?: number[];
+  parentCastId?: { fid: number; hash: string };
   parentUrl?: string;
   // Reaction-specific fields
   reactionType?: string;
-  targetCastId?: any;
+  targetCastId?: { fid: number; hash: string };
   // Link-specific fields
   linkType?: string;
   targetFid?: number;
@@ -82,6 +82,18 @@ export type SnapchainEvent = {
   blockNumber?: number;
   // Other event fields
   eventType?: string;
+};
+
+export type PruneEvent = SnapchainEvent & {
+  pruneMessageBody?: {
+    message?: {
+      data?: {
+        fid?: number;
+        text?: string;
+        castAddBody?: { text?: string };
+      };
+    };
+  };
 };
 
 export type NeynarV1Cast = {
@@ -212,10 +224,10 @@ export type NeynarV2Cast = {
     replies: {
       count: number;
     };
-    mentioned_profiles: any[];
-    mentioned_profiles_ranges: any[];
-    mentioned_channels: any[];
-    mentioned_channels_ranges: any[];
+    mentioned_profiles: unknown[];
+    mentioned_profiles_ranges: { start: number; end: number }[];
+    mentioned_channels: unknown[];
+    mentioned_channels_ranges: { start: number; end: number }[];
     author_channel_context: {
       following: boolean;
     };
@@ -367,7 +379,7 @@ export type FarcasterCast = {
     };
     text: string;
     timestamp: number;
-    mentions: any[];
+    mentions: unknown[];
     embeds: {
       images: {
         type: string;
@@ -382,11 +394,11 @@ export type FarcasterCast = {
         };
         alt: string;
       }[];
-      urls: any[];
-      videos: any[];
-      unknowns: any[];
+      urls: unknown[];
+      videos: unknown[];
+      unknowns: unknown[];
       processedCastText: string;
-      groupInvites: any[];
+      groupInvites: unknown[];
     };
     ancestors: {
       count: number;
@@ -420,7 +432,7 @@ export type FarcasterCast = {
         castType: string;
         text: string;
         timestamp: number;
-        mentions: any[];
+        mentions: unknown[];
         ancestors: {
           count: number;
         };
@@ -512,7 +524,7 @@ export type FarcasterCast = {
 };
   
 export type FarcasterUser = {
-  collectionsOwned: any[];
+  collectionsOwned: unknown[];
   extras: {
       custodyAddress: string;
       ethWallets: string[];

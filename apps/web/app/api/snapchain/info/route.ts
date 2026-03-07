@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     
     return Response.json(data, {
       headers: {
-        'Cache-Control': `max-age=${CACHE_TTLS.LONG}`
+        'Cache-Control': `max-age=${CACHE_TTLS.SHORT}`
       }
     })
   } catch (error) {

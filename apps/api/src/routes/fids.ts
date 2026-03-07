@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
+import { fidSchema } from "../lib/schemas.js";
 import { getFidStats, getFidMessages, getFidSigners } from "../services/fid.js";
 import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const paramsSchema = z.object({ fid: z.string() });
+const paramsSchema = z.object({ fid: fidSchema });
 const signersQuerySchema = z.object({
   pageSize: z.string().optional(),
   pageToken: z.string().optional(),

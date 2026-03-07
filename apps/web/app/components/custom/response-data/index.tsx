@@ -4,7 +4,7 @@ import { useState } from "react";
 import CopyClipboardIcon from "../copy-clipboard-icon";
 import { ResponsiveDialog } from "../responsive-dialog";
 
-export default function ResponseData({ data, title, onOpen, onClose }: { data: any, title: string, onOpen?: () => void, onClose?: () => void }) {
+export default function ResponseData({ data, title, onOpen, onClose }: { data: unknown; title: string; onOpen?: () => void; onClose?: () => void }) {
     const [showModal, setShowModal] = useState(false);
 
     const handleOpen = () => {

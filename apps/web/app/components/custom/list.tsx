@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { type SnapchainEvent, type User } from '../../lib/types';
+import { type PruneEvent, type SnapchainEvent, type User } from '../../lib/types';
 import { renderCastText } from '../../lib/utils';
 import { MiniAppLink } from './mini-app-link';
 
@@ -41,10 +41,10 @@ const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) =
         return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
       default:
         if (event.eventType?.includes('PRUNE')) {
-          const pruneEvent = event as any;
-          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text || 
-                 pruneEvent.pruneMessageBody?.message?.data?.text || 
-                 pruneEvent.text || 
+          const pruneEvent = event as PruneEvent;
+          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text ||
+                 pruneEvent.pruneMessageBody?.message?.data?.text ||
+                 pruneEvent.text ||
                  'pruned content';
         }
         return `🔧 ${event.eventType || 'unknown event'}`;
@@ -91,8 +91,8 @@ const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) =
         </span>
       </th>
       <td className="px-2 py-2 w-16 text-center">
-        {event.eventType?.includes('PRUNE') && (event as any).pruneMessageBody?.message?.data?.fid 
-          ? (event as any).pruneMessageBody.message.data.fid 
+        {event.eventType?.includes('PRUNE') && (event as PruneEvent).pruneMessageBody?.message?.data?.fid != null
+          ? (event as PruneEvent).pruneMessageBody?.message?.data?.fid
           : event.fid}
       </td>
       <td className="px-2 py-2 flex-1">

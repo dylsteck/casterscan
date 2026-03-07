@@ -1,12 +1,13 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
+import { fidSchema, usernameSchema } from "../lib/schemas.js";
 import { getUser, getUserByUsername, getUsersBulk } from "../services/user.js";
 import { validateParams, validateBody, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const fidParamsSchema = z.object({ fid: z.string() });
-const usernameParamsSchema = z.object({ username: z.string() });
-const bulkBodySchema = z.object({ fids: z.array(z.string()) });
+const fidParamsSchema = z.object({ fid: fidSchema });
+const usernameParamsSchema = z.object({ username: usernameSchema });
+const bulkBodySchema = z.object({ fids: z.array(z.string()).max(100) });
 
 router.get(
   "/by-username/:username",

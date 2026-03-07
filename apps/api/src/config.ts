@@ -6,7 +6,13 @@ const configSchema = z.object({
     .union([z.string().url(), z.literal("")])
     .optional()
     .transform((s) => (s === "" ? undefined : s)),
-  NEYNAR_API_KEY: z.string().default(""),
+  NEYNAR_API_KEY: z
+    .string()
+    .refine(
+      (v) => process.env.NODE_ENV !== "production" || (v && v.length > 0),
+      { message: "NEYNAR_API_KEY is required in production" }
+    )
+    .default(""),
   SNAPCHAIN_URL: z.string().url().default("https://snap.farcaster.xyz:3381"),
   FARCASTER_API_URL: z.string().url().default("https://api.farcaster.xyz"),
   OPTIMISM_RPC_URL: z.string().url().default("https://mainnet.optimism.io"),

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { type SnapchainEvent, type User } from '../../lib/types';
+import { type PruneEvent, type SnapchainEvent, type User } from '../../lib/types';
 import { renderCastText } from '../../lib/utils';
 import { MiniAppLink } from './mini-app-link';
 
@@ -41,10 +41,10 @@ const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: bo
         return `⛓️ ${event.chainEventType} (block ${event.blockNumber})`;
       default:
         if (event.eventType?.includes('PRUNE')) {
-          const pruneEvent = event as any;
-          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text || 
-                 pruneEvent.pruneMessageBody?.message?.data?.text || 
-                 pruneEvent.text || 
+          const pruneEvent = event as PruneEvent;
+          return pruneEvent.pruneMessageBody?.message?.data?.castAddBody?.text ||
+                 pruneEvent.pruneMessageBody?.message?.data?.text ||
+                 pruneEvent.text ||
                  'pruned content';
         }
         return `🔧 ${event.eventType || 'unknown event'}`;
@@ -88,8 +88,8 @@ const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: bo
             {getEventTypeDisplay()}
           </span>
           <span className="text-xs text-gray-600">fid: {
-            event.eventType?.includes('PRUNE') && (event as any).pruneMessageBody?.message?.data?.fid 
-              ? (event as any).pruneMessageBody.message.data.fid 
+            event.eventType?.includes('PRUNE') && (event as PruneEvent).pruneMessageBody?.message?.data?.fid != null
+              ? (event as PruneEvent).pruneMessageBody?.message?.data?.fid
               : event.fid
           }</span>
         </div>

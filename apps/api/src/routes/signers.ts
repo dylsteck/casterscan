@@ -1,5 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
+import { fidSchema, signerKeySchema } from "../lib/schemas.js";
 import {
   getSignersEnriched,
   getSignerMessages,
@@ -8,10 +9,10 @@ import {
 import { validateParams, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const fidParamsSchema = z.object({ fid: z.string() });
+const fidParamsSchema = z.object({ fid: fidSchema });
 const fidSignerParamsSchema = z.object({
-  fid: z.string(),
-  signerKey: z.string(),
+  fid: fidSchema,
+  signerKey: signerKeySchema,
 });
 
 router.get("/:fid/signers/enriched", validateParams(fidParamsSchema), asyncHandler(async (req: Request, res: Response) => {

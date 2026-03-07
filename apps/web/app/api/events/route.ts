@@ -5,9 +5,9 @@ import {
 } from '@farcaster/hub-nodejs'
 import { bytesToHexString } from '@farcaster/hub-web'
 
-// Polyfill for server environment
+// Polyfill: @farcaster/hub-web expects `self` (browser global). In Node, use global.
 if (typeof global !== 'undefined' && !global.self) {
-  global.self = global as any
+  (global as { self?: typeof global }).self = global;
 }
 
 export async function GET(request: NextRequest) {

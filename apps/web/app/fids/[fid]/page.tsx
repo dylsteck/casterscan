@@ -35,7 +35,7 @@ export async function generateMetadata(props: { params: Promise<{ fid: string }>
       },
     },
     other: {
-      "fc:frame": JSON.stringify(frame('Inspect Profile', `${BASE_URL}/profiles/${fid}`)),
+      "fc:frame": JSON.stringify(frame('Inspect Profile', `${BASE_URL}/fids/${fid}`)),
     }
   } as Metadata;
 }

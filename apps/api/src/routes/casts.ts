@@ -1,14 +1,15 @@
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
+import { hashSchema, fidSchema } from "../lib/schemas.js";
 import { getCast, getCastFormat, type CastFormat } from "../services/cast.js";
 import { UpstreamError } from "../lib/errors.js";
 import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const hashParamsSchema = z.object({ hash: z.string() });
+const hashParamsSchema = z.object({ hash: hashSchema });
 const formatQuerySchema = z.object({
   format: z.enum(["neynar-hub", "farcaster-hub", "farcaster-api"]).optional(),
-  fid: z.string().optional(),
+  fid: fidSchema.optional(),
 });
 
 router.get(

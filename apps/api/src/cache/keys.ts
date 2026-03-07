@@ -1,29 +1,34 @@
+function sanitizeKeyPart(s: string): string {
+  return s.replace(/[\r\n:]/g, "");
+}
+
 export const cacheKeys = {
-  user: (fid: string) => `user:${fid}`,
+  user: (fid: string) => `user:${sanitizeKeyPart(fid)}`,
   userByUsername: (username: string) =>
-    `user:username:${username.toLowerCase()}`,
-  usersBulk: (fids: string[]) => `users:bulk:${[...fids].sort().join(",")}`,
+    `user:username:${sanitizeKeyPart(username.toLowerCase())}`,
+  usersBulk: (fids: string[]) =>
+    `users:bulk:${[...fids].map(sanitizeKeyPart).sort().join(",")}`,
   cast: (hash: string, format?: string) =>
-    format ? `cast:${hash}:${format}` : `cast:${hash}`,
-  fidMessages: (fid: string) => `fid:${fid}:messages`,
-  fidStats: (fid: string) => `fid:${fid}:stats`,
-  fidSigners: (fid: string) => `fid:${fid}:signers`,
-  fidSignersEnriched: (fid: string) => `fid:${fid}:signers:enriched`,
+    format ? `cast:${sanitizeKeyPart(hash)}:${format}` : `cast:${sanitizeKeyPart(hash)}`,
+  fidMessages: (fid: string) => `fid:${sanitizeKeyPart(fid)}:messages`,
+  fidStats: (fid: string) => `fid:${sanitizeKeyPart(fid)}:stats`,
+  fidSigners: (fid: string) => `fid:${sanitizeKeyPart(fid)}:signers`,
+  fidSignersEnriched: (fid: string) => `fid:${sanitizeKeyPart(fid)}:signers:enriched`,
   fidSignerMessages: (fid: string, signer: string) =>
-    `fid:${fid}:signers:${signer}:messages`,
+    `fid:${sanitizeKeyPart(fid)}:signers:${sanitizeKeyPart(signer)}:messages`,
   fidSignerStats: (fid: string, signer: string) =>
-    `fid:${fid}:signers:${signer}:stats`,
-  fidKeys: (fid: string) => `fid:${fid}:keys`,
+    `fid:${sanitizeKeyPart(fid)}:signers:${sanitizeKeyPart(signer)}:stats`,
+  fidKeys: (fid: string) => `fid:${sanitizeKeyPart(fid)}:keys`,
   snapchainInfo: () => "snapchain:info",
   snapchainEvent: (eventId: string, shardIndex: string) =>
-    `snapchain:event:${eventId}:${shardIndex}`,
+    `snapchain:event:${sanitizeKeyPart(eventId)}:${sanitizeKeyPart(shardIndex)}`,
 } as const;
 
 export const cacheTTL = {
   fidStats: 900,
   fidMessages: 900,
   fidSigners: 3600,
-  fidSignersEnriched: 900,
+  fidSignersEnriched: 3600,
   fidSignerMessages: 900,
   fidSignerStats: 900,
   fidKeys: 3600,
