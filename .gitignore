@@ -2,6 +2,12 @@
 
 # dependencies
 /node_modules
+/node_modules
+packages/*/node_modules
+packages/*/dist
+apps/*/node_modules
+apps/*/dist
+apps/*/.next
 /.pnp
 .pnp.js
 .yarn/install-state.gz
@@ -31,6 +37,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# turbo
+.turbo
 
 # typescript
 *.tsbuildinfo
