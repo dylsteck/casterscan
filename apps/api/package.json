@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/server.ts",
-    "build": "bun build src/server.ts src/index.ts --outdir=dist --target=bun",
+    "build": "bun build src/server.ts src/index.ts --outdir=dist --target=node",
     "start": "bun run dist/server.js",
     "test": "bun test"
   },
