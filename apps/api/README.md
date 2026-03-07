@@ -2,6 +2,12 @@
 
 Unified Farcaster API with Redis cache and request coalescing. Consolidates Neynar, Snapchain, Farcaster API, and Optimism RPC into a single REST API.
 
+## Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdylsteck%2Fcasterscan%2Ftree%2Fmain%2Fapps%2Fapi&project-name=casterscan-api&env=NEYNAR_API_KEY&envDescription=Get%20from%20neynar.com%20for%20user%2Fcast%20lookups&envLink=https%3A%2F%2Fneynar.com)
+
+Requires `NEYNAR_API_KEY` (get from [neynar.com](https://neynar.com)). Optional: `REDIS_URL` for caching — [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted) offers a free tier.
+
 ## Setup
 
 1. Set env vars (from root `.env.example`):

@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server'
 import { CACHE_TTLS } from '../../../lib/utils';
 import { apiFetch } from '@/app/lib/api';
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
   try {
     const data = await apiFetch('/v1/snapchain/info')
     
@@ -19,4 +18,4 @@ export const GET = withAxiom(async (request: NextRequest) => {
       { status: 500 }
     )
   }
-});
+}

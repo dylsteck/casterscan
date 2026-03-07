@@ -1,9 +1,8 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
 import { apiFetch } from "@/app/lib/api";
 import { NextRequest, NextResponse } from "next/server";
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const hash = url.searchParams.get('hash');
 
@@ -22,4 +21,4 @@ export const GET = withAxiom(async (request: NextRequest) => {
             hash: hash 
         }, { status: 200 });
     }
-});
+}

@@ -28,6 +28,14 @@ There are two goals for Casterscan's utility:
    - Web only: `bun run dev:web`
    - API only: `bun run dev:api`
 
+## Deployment
+
+Deploy with Vercel. Deploy the **API first**, then the **Web** (the web app needs the API URL).
+
+| [![Deploy API](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdylsteck%2Fcasterscan%2Ftree%2Fmain%2Fapps%2Fapi&project-name=casterscan-api&env=NEYNAR_API_KEY&envDescription=Get%20from%20neynar.com%20for%20user%2Fcast%20lookups&envLink=https%3A%2F%2Fneynar.com) | [![Deploy Web](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdylsteck%2Fcasterscan%2Ftree%2Fmain%2Fapps%2Fweb&project-name=casterscan-web&env=API_URL&envDescription=Deployed%20API%20URL) |
+| --- | --- |
+| **API** — Requires `NEYNAR_API_KEY` | **Web** — Requires `API_URL` |
+
 ## Monorepo structure
 
 - `apps/web` — Casterscan Next.js app

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { apiFetch } from '@/app/lib/api';
 import { CACHE_TTLS } from '@/app/lib/utils';
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (
+export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ fid: string }> }
-) => {
+) {
   try {
     const resolvedParams = await params;
     const { fid } = resolvedParams;
@@ -25,4 +24,4 @@ export const GET = withAxiom(async (
     console.error('Error fetching keys:', error);
     return NextResponse.json({ error: 'Failed to fetch keys' }, { status: 500 });
   }
-});
+}

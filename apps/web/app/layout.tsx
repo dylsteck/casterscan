@@ -6,9 +6,6 @@ import Script from "next/script";
 import { BANNER_IMG_URL, BASE_URL, frame, ICON_IMG_URL } from "./lib/utils";
 import MiniAppProvider from "./components/custom/mini-app-provider";
 import Providers from "./providers";
-import { WebVitals } from "@/app/lib/axiom/client";
-import { universalLogger } from "@/app/lib/axiom/universal";
-
 const PAGE = {
   title: "Casterscan",
   description: "A block explorer for Farcaster",
@@ -56,7 +53,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <WebVitals />
       <body className={GeistSans.className}>
         <Providers>
           <MiniAppProvider>

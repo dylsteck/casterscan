@@ -1,16 +1,7 @@
-import { logger } from "@/app/lib/axiom/server";
-import { transformMiddlewareRequest } from "@axiomhq/nextjs";
 import { NextResponse } from "next/server";
-import type { NextFetchEvent, NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
-  try {
-    logger.info(...transformMiddlewareRequest(request));
-    event.waitUntil(logger.flush());
-  } catch (error) {
-    console.warn('Axiom middleware logging failed:', error);
-  }
-  
+export default async function proxy(_request: NextRequest) {
   return NextResponse.next();
 }
 

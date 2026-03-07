@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server'
 import { CACHE_TTLS } from '../../../lib/utils';
 import { apiFetch } from '@/app/lib/api';
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const eventId = url.searchParams.get('event_id');
   const shardIndex = url.searchParams.get('shard_index') || '0';
@@ -24,4 +23,4 @@ export const GET = withAxiom(async (request: NextRequest) => {
     console.error('Error fetching event:', error);
     return Response.json({ error: 'Failed to fetch event' }, { status: 500 });
   }
-});
+}

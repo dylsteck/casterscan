@@ -1,12 +1,11 @@
 import { NextRequest } from 'next/server'
 import { apiFetch } from '@/app/lib/api';
 import { CACHE_TTLS } from '../../../../lib/utils'
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (
+export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ fid: string }> }
-) => {
+) {
   try {
     const { fid } = await params
     const data = await apiFetch<{ casts: unknown[] }>(`/v1/fids/${fid}/messages`)
@@ -16,4 +15,4 @@ export const GET = withAxiom(async (
   } catch (error) {
     return Response.json({ error: 'Failed to fetch casts' }, { status: 500 })
   }
-});
+}

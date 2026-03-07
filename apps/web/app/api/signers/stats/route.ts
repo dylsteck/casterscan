@@ -1,9 +1,8 @@
 import { NextRequest } from 'next/server'
 import { apiFetch } from '@/app/lib/api';
 import { CACHE_TTLS } from '../../../lib/utils'
-import { withAxiom } from '@/app/lib/axiom/server';
 
-export const GET = withAxiom(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
   try {
     const fid = request.nextUrl.searchParams.get('fid')
     const signer = request.nextUrl.searchParams.get('signer')
@@ -22,4 +21,4 @@ export const GET = withAxiom(async (request: NextRequest) => {
     console.error('Error fetching signer stats:', error);
     return Response.json({ error: 'Failed to fetch signer stats' }, { status: 500 });
   }
-});
+}

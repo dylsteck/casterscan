@@ -4,14 +4,13 @@ import {
   HubEventType,
 } from '@farcaster/hub-nodejs'
 import { bytesToHexString } from '@farcaster/hub-web'
-import { withAxiom } from '@/app/lib/axiom/server';
 
 // Polyfill for server environment
 if (typeof global !== 'undefined' && !global.self) {
   global.self = global as any
 }
 
-export const GET = withAxiom(async (request: NextRequest) => {
+export async function GET(request: NextRequest) {
   const encoder = new TextEncoder()
 
   const customReadable = new ReadableStream({
@@ -126,4 +125,4 @@ export const GET = withAxiom(async (request: NextRequest) => {
       'Access-Control-Allow-Headers': 'Cache-Control',
     },
   })
-});
+}
