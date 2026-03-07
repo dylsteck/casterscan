@@ -1,29 +1,44 @@
-import { Elysia, t } from "elysia";
+import { Router, type Request, type Response } from "express";
+import { z } from "zod";
 import { getFidStats, getFidMessages, getFidSigners } from "../services/fid";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
 
-const paramsSchema = t.Object({ fid: t.String() });
-const signersQuerySchema = t.Object({
-  pageSize: t.Optional(t.String()),
-  pageToken: t.Optional(t.String()),
-  reverse: t.Optional(t.String()),
-  signer: t.Optional(t.String()),
+const router = Router();
+const paramsSchema = z.object({ fid: z.string() });
+const signersQuerySchema = z.object({
+  pageSize: z.string().optional(),
+  pageToken: z.string().optional(),
+  reverse: z.string().optional(),
+  signer: z.string().optional(),
 });
 
-export const fidsRoutes = new Elysia()
-  .get("/v1/fids/:fid/stats", async ({ params }) => {
-    const data = await getFidStats(params.fid);
-    return data;
-  }, { params: paramsSchema })
-  .get("/v1/fids/:fid/messages", async ({ params }) => {
-    const data = await getFidMessages(params.fid);
-    return data;
-  }, { params: paramsSchema })
-  .get("/v1/fids/:fid/signers", async ({ params, query }) => {
-    const data = await getFidSigners(params.fid, {
-      pageSize: query.pageSize ? parseInt(query.pageSize) : undefined,
-      pageToken: query.pageToken,
-      reverse: query.reverse === "true",
-      signer: query.signer,
+router.get("/:fid/stats", validateParams(paramsSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { fid } = req.validatedParams as { fid: string };
+  const data = await getFidStats(fid);
+  res.json(data);
+}));
+
+router.get("/:fid/messages", validateParams(paramsSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { fid } = req.validatedParams as { fid: string };
+  const data = await getFidMessages(fid);
+  res.json(data);
+}));
+
+router.get(
+  "/:fid/signers",
+  validateParams(paramsSchema),
+  validateQuery(signersQuerySchema),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { fid } = req.validatedParams as { fid: string };
+    const query = req.validatedQuery as { pageSize?: string; pageToken?: string; reverse?: string; signer?: string };
+    const data = await getFidSigners(fid, {
+      pageSize: query?.pageSize ? parseInt(query.pageSize) : undefined,
+      pageToken: query?.pageToken,
+      reverse: query?.reverse === "true",
+      signer: query?.signer,
     });
-    return data;
-  }, { params: paramsSchema, query: signersQuerySchema });
+    res.json(data);
+  })
+);
+
+export default router;

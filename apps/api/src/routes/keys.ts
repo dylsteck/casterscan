@@ -1,16 +1,18 @@
-import { Elysia, t } from "elysia";
+import { Router, type Request, type Response } from "express";
+import { z } from "zod";
 import { getKeys } from "../services/keys";
+import { validateParams, asyncHandler } from "../lib/validate";
 
-const fidParamsSchema = t.Object({ fid: t.String() });
+const router = Router();
+const fidParamsSchema = z.object({ fid: z.string() });
 
-export const keysRoutes = new Elysia().get(
-  "/v1/fids/:fid/keys",
-  async ({ params }) => {
-    const data = await getKeys(params.fid);
-    return {
-      ...data,
-      fid: data.fid.toString(),
-    };
-  },
-  { params: fidParamsSchema }
-);
+router.get("/:fid/keys", validateParams(fidParamsSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { fid } = req.validatedParams as { fid: string };
+  const data = await getKeys(fid);
+  res.json({
+    ...data,
+    fid: data.fid.toString(),
+  });
+}));
+
+export default router;

@@ -1,20 +1,33 @@
-import { Elysia, t } from "elysia";
+import { Router, type Request, type Response } from "express";
+import { z } from "zod";
 import { getUser, getUserByUsername, getUsersBulk } from "../services/user";
+import { validateParams, validateBody, asyncHandler } from "../lib/validate";
 
-const fidParamsSchema = t.Object({ fid: t.String() });
-const usernameParamsSchema = t.Object({ username: t.String() });
-const bulkBodySchema = t.Object({ fids: t.Array(t.String()) });
+const router = Router();
+const fidParamsSchema = z.object({ fid: z.string() });
+const usernameParamsSchema = z.object({ username: z.string() });
+const bulkBodySchema = z.object({ fids: z.array(z.string()) });
 
-export const usersRoutes = new Elysia()
-  .get("/v1/users/:fid", async ({ params }) => {
-    const data = await getUser(params.fid);
-    return data;
-  }, { params: fidParamsSchema })
-  .get("/v1/users/by-username/:username", async ({ params }) => {
-    const data = await getUserByUsername(params.username);
-    return data;
-  }, { params: usernameParamsSchema })
-  .post("/v1/users/bulk", async ({ body }) => {
-    const data = await getUsersBulk(body.fids);
-    return data;
-  }, { body: bulkBodySchema });
+router.get(
+  "/by-username/:username",
+  validateParams(usernameParamsSchema),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { username } = req.validatedParams as { username: string };
+    const data = await getUserByUsername(username);
+    res.json(data);
+  })
+);
+
+router.post("/bulk", validateBody(bulkBodySchema), asyncHandler(async (req: Request, res: Response) => {
+  const { fids } = req.validatedBody as { fids: string[] };
+  const data = await getUsersBulk(fids);
+  res.json(data);
+}));
+
+router.get("/:fid", validateParams(fidParamsSchema), asyncHandler(async (req: Request, res: Response) => {
+  const { fid } = req.validatedParams as { fid: string };
+  const data = await getUser(fid);
+  res.json(data);
+}));
+
+export default router;

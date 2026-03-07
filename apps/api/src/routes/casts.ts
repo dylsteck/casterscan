@@ -1,22 +1,24 @@
-import { Elysia, t } from "elysia";
+import { Router, type Request, type Response } from "express";
+import { z } from "zod";
 import { getCast, getCastFormat, type CastFormat } from "../services/cast";
 import { UpstreamError } from "../lib/errors";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
 
-const hashParamsSchema = t.Object({ hash: t.String() });
-const formatQuerySchema = t.Object({
-  format: t.Optional(
-    t.Union([
-      t.Literal("neynar-hub"),
-      t.Literal("farcaster-hub"),
-      t.Literal("farcaster-api"),
-    ])
-  ),
-  fid: t.Optional(t.String()),
+const router = Router();
+const hashParamsSchema = z.object({ hash: z.string() });
+const formatQuerySchema = z.object({
+  format: z.enum(["neynar-hub", "farcaster-hub", "farcaster-api"]).optional(),
+  fid: z.string().optional(),
 });
 
-export const castsRoutes = new Elysia()
-  .get("/v1/casts/:hash", async ({ params, query }) => {
-    const { format, fid } = query;
+router.get(
+  "/:hash",
+  validateParams(hashParamsSchema),
+  validateQuery(formatQuerySchema),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { hash } = req.validatedParams as { hash: string };
+    const query = req.validatedQuery as { format?: CastFormat; fid?: string };
+    const { format, fid } = query ?? {};
 
     if (format) {
       if ((format === "neynar-hub" || format === "farcaster-hub") && !fid) {
@@ -26,17 +28,13 @@ export const castsRoutes = new Elysia()
           400
         );
       }
-      const data = await getCastFormat(
-        fid || "0",
-        params.hash,
-        format as CastFormat
-      );
-      return data;
+      const data = await getCastFormat(fid ?? "0", hash, format);
+      return res.json(data);
     }
 
-    const data = await getCast(params.hash);
-    return data;
-  }, {
-    params: hashParamsSchema,
-    query: formatQuerySchema,
-  });
+    const data = await getCast(hash);
+    res.json(data);
+  })
+);
+
+export default router;

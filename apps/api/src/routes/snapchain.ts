@@ -1,21 +1,27 @@
-import { Elysia, t } from "elysia";
+import { Router, type Request, type Response } from "express";
+import { z } from "zod";
 import { getInfo, getEvent } from "../services/snapchain";
+import { validateParams, validateQuery, asyncHandler } from "../lib/validate";
 
-const eventParamsSchema = t.Object({ eventId: t.String() });
-const eventQuerySchema = t.Object({
-  shard_index: t.Optional(t.String()),
-});
+const router = Router();
+const eventParamsSchema = z.object({ eventId: z.string() });
+const eventQuerySchema = z.object({ shard_index: z.string().optional() });
 
-export const snapchainRoutes = new Elysia()
-  .get("/v1/snapchain/info", async () => {
-    const data = await getInfo();
-    return data;
+router.get("/info", asyncHandler(async (_req: Request, res: Response) => {
+  const data = await getInfo();
+  res.json(data);
+}));
+
+router.get(
+  "/events/:eventId",
+  validateParams(eventParamsSchema),
+  validateQuery(eventQuerySchema),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { eventId } = req.validatedParams as { eventId: string };
+    const shardIndex = (req.validatedQuery as { shard_index?: string })?.shard_index ?? "0";
+    const data = await getEvent(eventId, shardIndex);
+    res.json(data);
   })
-  .get("/v1/snapchain/events/:eventId", async ({ params, query }) => {
-    const shardIndex = query.shard_index ?? "0";
-    const data = await getEvent(params.eventId, shardIndex);
-    return data;
-  }, {
-    params: eventParamsSchema,
-    query: eventQuerySchema,
-  });
+);
+
+export default router;
