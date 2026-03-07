@@ -6,7 +6,7 @@ This document provides in-depth context for AI agents working on the Casterscan 
 
 Casterscan is a real-time block explorer for Farcaster. It surfaces Farcaster data (casts, users, signers, keys) via a unified API and Next.js frontend. Live events stream from the Snapchain node at `snap.farcaster.xyz:3383`.
 
-**Production:** [casterscan.com](https://casterscan.com) | **API:** [casterscan-api.vercel.app](https://casterscan-api.vercel.app)
+**Production:** [casterscan.com](https://casterscan.com) | **API:** [api.casterscan.com](https://api.casterscan.com)
 
 ---
 
@@ -17,7 +17,7 @@ Browser → Next.js (apps/web) → Next.js API Routes (proxy) → apps/api (Expr
 ```
 
 - **Frontend never calls the API directly.** All requests go through Next.js API routes, which use `apiFetch(API_URL + path)` in `apps/web/app/lib/api.ts`.
-- **API base URL:** `http://localhost:4000` (dev) or `https://casterscan-api.vercel.app` (prod).
+- **API base URL:** `http://localhost:4000` (dev) or `https://api.casterscan.com` (prod).
 - API paths and response shapes must stay identical for the frontend to work without changes.
 
 ---
@@ -113,8 +113,16 @@ Express matches routes in declaration order. More specific paths must come first
 
 ### Deployment
 
-- **Vercel:** `vercel deploy --prod` from `apps/api`; `vercel.json` has `"framework": "express"`.
 - **Local:** `bun run dev:api` or `bun run dev` from root.
+
+### Vercel deploys
+
+| App | CWD | Command | Target |
+|-----|-----|---------|--------|
+| Web | repo root | `vercel deploy --prod` | casterscan.com |
+| API | `apps/api` | `vercel deploy --prod` | api.casterscan.com |
+
+Omit `--prod` for preview deployments.
 
 ---
 
@@ -123,7 +131,7 @@ Express matches routes in declaration order. More specific paths must come first
 | Var | App | Required | Description |
 |-----|-----|----------|-------------|
 | `NEYNAR_API_KEY` | api | Yes | Neynar API key for user/cast lookups |
-| `API_URL` | web | No | API base URL (default: localhost:4000 dev, casterscan-api.vercel.app prod) |
+| `API_URL` | web | No | API base URL (default: localhost:4000 dev, api.casterscan.com prod) |
 | `REDIS_URL` | api | No | Redis URL; cache disabled if unset |
 
 ---
