@@ -1,6 +1,5 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { neynar } from "@/app/lib/neynar";
-import { snapchain } from "@/app/lib/snapchain";
+import { dataLayerFetch } from "@/app/lib/data-layer";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -15,13 +14,9 @@ export const GET = withAxiom(async (request: NextRequest) => {
     }
 
     try {
-        if (type === 'neynar') {
-            const responseData = await neynar.getCastById({ fid: fid!, hash: hash! });
-            return NextResponse.json(responseData);
-        } else {
-            const responseData = await snapchain.getCastById({ fid, hash });
-            return NextResponse.json(responseData);
-        }
+        const format = type === 'neynar' ? 'neynar-hub' : 'farcaster-hub';
+        const responseData = await dataLayerFetch(`/v1/casts/${hash}?format=${format}&fid=${fid}`);
+        return NextResponse.json(responseData, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         console.error('Error fetching cast from API:', err);
         return NextResponse.json({ 

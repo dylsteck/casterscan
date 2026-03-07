@@ -1,5 +1,5 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { neynar } from "@/app/lib/neynar";
+import { dataLayerFetch } from "@/app/lib/data-layer";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -12,7 +12,7 @@ export const GET = withAxiom(async (request: NextRequest) => {
     }
 
     try {
-        const user = await neynar.getUser({ fid: fid! });
+        const user = await dataLayerFetch(`/v1/users/${fid}`);
         return NextResponse.json({ users: [user] }, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });

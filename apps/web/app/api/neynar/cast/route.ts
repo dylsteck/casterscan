@@ -1,5 +1,5 @@
 import { CACHE_TTLS } from "@/app/lib/utils";
-import { neynar, type NeynarCastOptions } from "@/app/lib/neynar";
+import { dataLayerFetch } from "@/app/lib/data-layer";
 import { NextRequest, NextResponse } from "next/server";
 import { withAxiom } from '@/app/lib/axiom/server';
 
@@ -8,8 +8,16 @@ export const GET = withAxiom(async (request: NextRequest) => {
     const identifier = url.searchParams.get('identifier');
     const type = url.searchParams.get('type');
 
+    if (!identifier || !type) {
+        return NextResponse.json({ error: "Missing required parameters" }, { status: 400 });
+    }
+
     try {
-        const cast = await neynar.getCast({ identifier: identifier!, type: type as NeynarCastOptions['type'] });
+        const hash = type === 'hash' ? identifier : identifier.match(/0x[a-fA-F0-9]+/)?.[0];
+        if (!hash) {
+            return NextResponse.json({ error: "Could not extract hash from identifier" }, { status: 400 });
+        }
+        const cast = await dataLayerFetch(`/v1/casts/${hash}`);
         return NextResponse.json({ cast }, { headers: { 'Cache-Control': `max-age=${CACHE_TTLS.LONG}` } });
     } catch (err) {
         return NextResponse.json({ error: "Failed to fetch cast" }, { status: 500 });

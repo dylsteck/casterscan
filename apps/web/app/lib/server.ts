@@ -2,12 +2,13 @@
 
 import { NeynarV2Cast, NeynarV2User, ProfileKeysPage } from './types';
 import { BASE_URL } from './utils';
-import { neynar } from './neynar';
-import { fetchKeysForFid, type FarcasterCast, type HubCast } from './farcaster';
+import { dataLayerFetch } from './data-layer';
 
 export async function getNeynarCast(identifier: string, type: 'url' | 'hash') {
   try {
-    return await neynar.getCast({ identifier, type });
+    const hash = type === 'hash' ? identifier : identifier.match(/0x[a-fA-F0-9]+/)?.[0];
+    if (!hash) throw new Error('Could not extract hash from identifier');
+    return await dataLayerFetch<NeynarV2Cast>(`/v1/casts/${hash}`);
   } catch (error) {
     console.error('Error fetching Neynar cast:', error);
     throw error;
@@ -66,7 +67,7 @@ export async function getHubCast(fid: number, hash: string, type: 'neynar' | 'fa
 
 export async function getNeynarUser(fid: string) {
   try {
-    return await neynar.getUser({ fid });
+    return await dataLayerFetch<NeynarV2User>(`/v1/users/${fid}`);
   } catch (error) {
     console.error('Error fetching Neynar user:', error);
     throw error;
@@ -75,7 +76,7 @@ export async function getNeynarUser(fid: string) {
 
 export async function getNeynarUserByUsername(username: string) {
   try {
-    return await neynar.getUserByUsername({ username });
+    return await dataLayerFetch<NeynarV2User>(`/v1/users/by-username/${encodeURIComponent(username)}`);
   } catch (error) {
     console.error('Error fetching Neynar user by username:', error);
     throw error;
@@ -84,8 +85,15 @@ export async function getNeynarUserByUsername(username: string) {
 
 export async function getFarcasterKeys(fid: string): Promise<ProfileKeysPage> {
   try {
-    const fidBigInt = BigInt(fid);
-    return await fetchKeysForFid(fidBigInt, 0, 250);
+    const data = await dataLayerFetch<{ fid: string; authAddresses: `0x${string}`[]; signerKeys: `0x${string}`[]; page: number; pageSize: number; hasMore: boolean }>(`/v1/fids/${fid}/keys`);
+    return {
+      fid: BigInt(data.fid),
+      authAddresses: data.authAddresses,
+      signerKeys: data.signerKeys,
+      page: data.page,
+      pageSize: data.pageSize,
+      hasMore: data.hasMore,
+    };
   } catch (error) {
     console.error('Error fetching Farcaster keys:', error);
     return {
