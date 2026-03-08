@@ -1,6 +1,8 @@
-import { getCached } from "../cache/cached.js";
+import { Effect } from "effect";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
-import { getUpstream } from "../upstream-instance.js";
+import { Cache } from "../effect/cache.js";
+import { runAppEffect } from "../effect/runtime.js";
+import { Upstream } from "../effect/upstream.js";
 
 const STATS_PAGE_SIZE = 1000;
 
@@ -27,14 +29,21 @@ async function countPaginatedMessages(
   }
 }
 
-export async function getFidStats(fid: string) {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getFidStatsEffect(fid: string): Effect.Effect<
+  {
+    casts: number;
+    reactions: number;
+    links: number;
+    verifications: number;
+  },
+  Error,
+  Cache | Upstream
+> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.fidStats(fid),
-    cacheTTL.fidStats,
-    async () => {
+    return yield* cache.getCached(cacheKeys.fidStats(fid), cacheTTL.fidStats, async () => {
       const [casts, reactions, links, verifications] = await Promise.all([
         countPaginatedMessages((pageToken) =>
           up.snapchain.getCastsByFid({ fid, pageSize: STATS_PAGE_SIZE, pageToken })
@@ -65,18 +74,29 @@ export async function getFidStats(fid: string) {
         links,
         verifications,
       };
-    }
-  );
+    });
+  });
 }
 
-export async function getFidMessages(fid: string) {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getFidStats(fid: string) {
+  return runAppEffect(getFidStatsEffect(fid));
+}
 
-  return getCached(
-    cacheKeys.fidMessages(fid),
-    cacheTTL.fidMessages,
-    async () => {
+export function getFidMessagesEffect(fid: string): Effect.Effect<
+  {
+    casts: unknown[];
+    reactions: unknown[];
+    links: unknown[];
+    verifications: unknown[];
+  },
+  Error,
+  Cache | Upstream
+> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
+
+    return yield* cache.getCached(cacheKeys.fidMessages(fid), cacheTTL.fidMessages, async () => {
       const [casts, reactions, links, verifications] = await Promise.all([
         up.snapchain.getAllCastsByFid(fid),
         up.snapchain.getAllReactionsByFid(fid, "None"),
@@ -90,25 +110,30 @@ export async function getFidMessages(fid: string) {
         links,
         verifications,
       };
-    }
-  );
+    });
+  });
 }
 
-export async function getFidSigners(fid: string, options?: { pageSize?: number; pageToken?: string; reverse?: boolean; signer?: string }) {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getFidMessages(fid: string) {
+  return runAppEffect(getFidMessagesEffect(fid));
+}
 
-  const normalizedOptions = {
-    pageSize: options?.pageSize ?? 1000,
-    pageToken: options?.pageToken,
-    reverse: options?.reverse ? true : undefined,
-    signer: options?.signer,
-  };
+export function getFidSignersEffect(
+  fid: string,
+  options?: { pageSize?: number; pageToken?: string; reverse?: boolean; signer?: string }
+) {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.fidSigners(fid, normalizedOptions),
-    cacheTTL.fidSigners,
-    () =>
+    const normalizedOptions = {
+      pageSize: options?.pageSize ?? 1000,
+      pageToken: options?.pageToken,
+      reverse: options?.reverse ? true : undefined,
+      signer: options?.signer,
+    };
+
+    return yield* cache.getCached(cacheKeys.fidSigners(fid, normalizedOptions), cacheTTL.fidSigners, () =>
       up.snapchain.getOnChainSignersByFid({
         fid,
         pageSize: normalizedOptions.pageSize,
@@ -116,5 +141,13 @@ export async function getFidSigners(fid: string, options?: { pageSize?: number; 
         reverse: normalizedOptions.reverse,
         signer: normalizedOptions.signer,
       })
-  );
+    );
+  });
+}
+
+export function getFidSigners(
+  fid: string,
+  options?: { pageSize?: number; pageToken?: string; reverse?: boolean; signer?: string }
+) {
+  return runAppEffect(getFidSignersEffect(fid, options));
 }

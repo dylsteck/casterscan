@@ -1,8 +1,9 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import { z } from "zod";
 import { hashSchema, fidSchema } from "../lib/schemas.js";
-import { getCast, getCastFormat, type CastFormat } from "../services/cast.js";
-import { validateParams, validateQuery, asyncHandler } from "../lib/validate.js";
+import { effectJson } from "../effect/express.js";
+import { getCastEffect, getCastFormatEffect, type CastFormat } from "../services/cast.js";
+import { validateParams, validateQuery } from "../lib/validate.js";
 
 const router = Router();
 const hashParamsSchema = z.object({ hash: hashSchema }).strict();
@@ -23,19 +24,16 @@ router.get(
   "/:hash",
   validateParams(hashParamsSchema),
   validateQuery(formatQuerySchema),
-  asyncHandler(async (req: Request, res: Response) => {
+  effectJson((req) => {
     const { hash } = req.validatedParams as { hash: string };
     const query = req.validatedQuery as { format?: CastFormat; fid?: string };
     const { format, fid } = query ?? {};
 
     if (format) {
-      const data = await getCastFormat(fid ?? "0", hash, format);
-      res.json(data);
-      return;
+      return getCastFormatEffect(fid ?? "0", hash, format);
     }
 
-    const data = await getCast(hash);
-    res.json(data);
+    return getCastEffect(hash);
   })
 );
 

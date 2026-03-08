@@ -1,36 +1,48 @@
-import { getCached } from "../cache/cached.js";
+import { Effect } from "effect";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
-import { getUpstream } from "../upstream-instance.js";
+import { Cache } from "../effect/cache.js";
+import { runAppEffect } from "../effect/runtime.js";
+import { Upstream } from "../effect/upstream.js";
 import type {
   SnapchainInfoResponse,
   SnapchainEventResponse,
 } from "../upstream/types.js";
 
-export async function getInfo(): Promise<SnapchainInfoResponse> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getInfoEffect(): Effect.Effect<SnapchainInfoResponse, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.snapchainInfo(),
-    cacheTTL.snapchainInfo,
-    () => up.snapchain.getInfo()
-  );
+    return yield* cache.getCached(cacheKeys.snapchainInfo(), cacheTTL.snapchainInfo, () =>
+      up.snapchain.getInfo()
+    );
+  });
 }
 
-export async function getEvent(
+export function getInfo(): Promise<SnapchainInfoResponse> {
+  return runAppEffect(getInfoEffect());
+}
+
+export function getEventEffect(
   eventId: string,
   shardIndex: string
-): Promise<SnapchainEventResponse> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+): Effect.Effect<SnapchainEventResponse, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.snapchainEvent(eventId, shardIndex),
-    cacheTTL.snapchainEvent,
-    () =>
-      up.snapchain.getEventById({
-        event_id: eventId,
-        shard_index: shardIndex,
-      })
-  );
+    return yield* cache.getCached(
+      cacheKeys.snapchainEvent(eventId, shardIndex),
+      cacheTTL.snapchainEvent,
+      () =>
+        up.snapchain.getEventById({
+          event_id: eventId,
+          shard_index: shardIndex,
+        })
+    );
+  });
+}
+
+export function getEvent(eventId: string, shardIndex: string): Promise<SnapchainEventResponse> {
+  return runAppEffect(getEventEffect(eventId, shardIndex));
 }

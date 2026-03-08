@@ -1,16 +1,16 @@
-import { getCached } from "../cache/cached.js";
+import { Effect } from "effect";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
-import { getUpstream } from "../upstream-instance.js";
+import { Cache } from "../effect/cache.js";
+import { runAppEffect } from "../effect/runtime.js";
+import { Upstream } from "../effect/upstream.js";
 import type { ProfileKeysPage } from "../upstream/types.js";
 
-export async function getKeys(fid: string): Promise<ProfileKeysPage> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getKeysEffect(fid: string): Effect.Effect<ProfileKeysPage, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.fidKeys(fid),
-    cacheTTL.fidKeys,
-    async () => {
+    return yield* cache.getCached(cacheKeys.fidKeys(fid), cacheTTL.fidKeys, async () => {
       const fidBigInt = BigInt(fid);
       const pages: ProfileKeysPage[] = [];
       let page = 0;
@@ -23,8 +23,8 @@ export async function getKeys(fid: string): Promise<ProfileKeysPage> {
         page++;
       }
 
-      const authAddresses = pages.flatMap((p) => p.authAddresses);
-      const signerKeys = pages.flatMap((p) => p.signerKeys);
+      const authAddresses = pages.flatMap((pageResult) => pageResult.authAddresses);
+      const signerKeys = pages.flatMap((pageResult) => pageResult.signerKeys);
 
       return {
         fid: fidBigInt,
@@ -34,6 +34,10 @@ export async function getKeys(fid: string): Promise<ProfileKeysPage> {
         pageSize: authAddresses.length + signerKeys.length,
         hasMore: false,
       };
-    }
-  );
+    });
+  });
+}
+
+export function getKeys(fid: string): Promise<ProfileKeysPage> {
+  return runAppEffect(getKeysEffect(fid));
 }

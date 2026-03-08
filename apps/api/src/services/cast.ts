@@ -1,6 +1,8 @@
-import { getCached } from "../cache/cached.js";
+import { Effect } from "effect";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
-import { getUpstream } from "../upstream-instance.js";
+import { Cache } from "../effect/cache.js";
+import { runAppEffect } from "../effect/runtime.js";
+import { Upstream } from "../effect/upstream.js";
 import type {
   NeynarV2Cast,
   NeynarHubCast,
@@ -9,33 +11,34 @@ import type {
 
 export type CastFormat = "neynar-hub" | "farcaster-hub" | "farcaster-api";
 
-export async function getCast(hash: string): Promise<NeynarV2Cast> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getCastEffect(hash: string): Effect.Effect<NeynarV2Cast, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.cast(hash),
-    cacheTTL.cast,
-    () =>
+    return yield* cache.getCached(cacheKeys.cast(hash), cacheTTL.cast, () =>
       up.neynar.getCast({
         identifier: hash,
         type: "hash",
       })
-  );
+    );
+  });
 }
 
-export async function getCastFormat(
+export function getCast(hash: string): Promise<NeynarV2Cast> {
+  return runAppEffect(getCastEffect(hash));
+}
+
+export function getCastFormatEffect(
   fid: string,
   hash: string,
   format: CastFormat
-): Promise<NeynarHubCast | SnapchainCastByIdResponse | unknown> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+): Effect.Effect<NeynarHubCast | SnapchainCastByIdResponse | unknown, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.cast(hash, format),
-    cacheTTL.cast,
-    async () => {
+    return yield* cache.getCached(cacheKeys.cast(hash, format), cacheTTL.cast, async () => {
       switch (format) {
         case "neynar-hub":
           return up.neynar.getCastById({ fid, hash });
@@ -46,6 +49,14 @@ export async function getCastFormat(
         default:
           throw new Error(`Unknown cast format: ${format}`);
       }
-    }
-  );
+    });
+  });
+}
+
+export function getCastFormat(
+  fid: string,
+  hash: string,
+  format: CastFormat
+): Promise<NeynarHubCast | SnapchainCastByIdResponse | unknown> {
+  return runAppEffect(getCastFormatEffect(fid, hash, format));
 }

@@ -1,40 +1,60 @@
-import { getCached } from "../cache/cached.js";
+import { Effect } from "effect";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
-import { getUpstream } from "../upstream-instance.js";
+import { Cache } from "../effect/cache.js";
+import { runAppEffect } from "../effect/runtime.js";
+import { Upstream } from "../effect/upstream.js";
 import type { NeynarV2User } from "../upstream/types.js";
 
-export async function getUser(fid: string): Promise<NeynarV2User> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getUserEffect(fid: string): Effect.Effect<NeynarV2User, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
-  return getCached(
-    cacheKeys.user(fid),
-    cacheTTL.user,
-    () => up.neynar.getUser({ fid })
-  );
+    return yield* cache.getCached(cacheKeys.user(fid), cacheTTL.user, () =>
+      up.neynar.getUser({ fid })
+    );
+  });
 }
 
-export async function getUserByUsername(username: string): Promise<NeynarV2User> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
-
-  return getCached(
-    cacheKeys.userByUsername(username),
-    cacheTTL.user,
-    () => up.neynar.getUserByUsername({ username })
-  );
+export function getUser(fid: string): Promise<NeynarV2User> {
+  return runAppEffect(getUserEffect(fid));
 }
 
-export async function getUsersBulk(fids: string[]): Promise<NeynarV2User[]> {
-  const up = getUpstream();
-  if (!up) throw new Error("Upstream not initialized");
+export function getUserByUsernameEffect(
+  username: string
+): Effect.Effect<NeynarV2User, Error, Cache | Upstream> {
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
 
+    return yield* cache.getCached(cacheKeys.userByUsername(username), cacheTTL.user, () =>
+      up.neynar.getUserByUsername({ username })
+    );
+  });
+}
+
+export function getUserByUsername(username: string): Promise<NeynarV2User> {
+  return runAppEffect(getUserByUsernameEffect(username));
+}
+
+export function getUsersBulkEffect(
+  fids: string[]
+): Effect.Effect<NeynarV2User[], Error, Cache | Upstream> {
   const sorted = [...fids].filter(Boolean).sort();
-  if (sorted.length === 0) return [];
+  if (sorted.length === 0) {
+    return Effect.succeed([]);
+  }
 
-  return getCached(
-    cacheKeys.usersBulk(sorted),
-    cacheTTL.usersBulk,
-    () => up.neynar.getUsers({ fids: sorted })
-  );
+  return Effect.gen(function* () {
+    const cache = yield* Cache;
+    const up = yield* Upstream;
+
+    return yield* cache.getCached(cacheKeys.usersBulk(sorted), cacheTTL.usersBulk, () =>
+      up.neynar.getUsers({ fids: sorted })
+    );
+  });
+}
+
+export function getUsersBulk(fids: string[]): Promise<NeynarV2User[]> {
+  return runAppEffect(getUsersBulkEffect(fids));
 }
