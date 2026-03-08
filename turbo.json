@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["NEYNAR_API_KEY", "REDIS_URL"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
