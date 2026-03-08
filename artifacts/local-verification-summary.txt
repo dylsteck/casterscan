@@ -1,0 +1,26 @@
+Casterscan local verification
+Branch: feat/effect-api-cleanup
+
+Checks passed:
+- bun run lint (0 errors, 3 warnings)
+- bun run build
+- local dev stack started successfully
+- web: http://localhost:3000
+- api: http://localhost:4000
+
+Validated endpoints:
+- GET /ping -> {"ok":true}
+- GET /health -> {"ok":true}
+- GET /v1/snapchain/info -> 200 JSON
+- GET /v1/fids/3/stats -> 200 JSON
+- GET /v1/fids/3/keys -> 200 JSON
+- GET /v1/fids/3/signers?pageSize=1 -> 200 JSON
+- GET /v1/fids/3/signers?pageSize=2 -> 200 JSON
+- GET /v1/does-not-exist -> 404 {"error":"Not found"}
+- GET /api/snapchain/info -> 200 JSON via Next proxy
+- GET / -> rendered (home_ok)
+
+Notes:
+- Effect is now wired beneath Express in apps/api.
+- Remaining lint issues are warnings only.
+- Browser screenshot capture was unreliable in this headless container.
