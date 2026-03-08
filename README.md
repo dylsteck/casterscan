@@ -22,7 +22,9 @@ There are two goals for Casterscan's utility:
 ## How to run locally
 
 1. Install dependencies: `bun install`
-2. Copy `.env.example` to `.env.local` and add your `NEYNAR_API_KEY` and `API_URL` (default `http://localhost:4000`)
+2. Set up app-specific env files:
+   - Copy `apps/api/.env.example` to `apps/api/.env` and set `NEYNAR_API_KEY` (optionally `REDIS_URL`).
+   - Copy `apps/web/.env.example` to `apps/web/.env.local` and set `API_URL` if you are not using the default local API at `http://localhost:4000`.
 3. Run the development server:
    - Both: `bun run dev`
    - Web only: `bun run dev:web`
@@ -38,8 +40,12 @@ Deploy with Vercel. Deploy the **API first**, then the **Web** (the web app need
 
 ## Monorepo structure
 
-- `apps/web` — Casterscan Next.js app
-- `apps/api` — Farcaster API (Express + Redis)
+Casterscan is a Bun workspace/Turbo monorepo:
+
+- `apps/web` — Next.js frontend and API proxy routes
+- `apps/api` — Express API, upstream clients, and cache integration
+- `packages/*` — shared packages (when present)
+- `package.json` / `turbo.json` — workspace scripts and task orchestration
 
 Have any questions/comments or want to keep up with/contribute to Casterscan? 
 - [Message me on Farcaster](https://farcaster.xyz/dylsteck.eth)

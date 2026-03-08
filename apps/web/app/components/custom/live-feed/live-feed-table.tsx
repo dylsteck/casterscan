@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 import { Skeleton } from '../Skeleton';
 import type { StreamEvent } from '../../../hooks/use-event-stream';
 import {
@@ -21,26 +22,6 @@ export function LiveFeedTable({ events }: LiveFeedTableProps) {
     pageIndex: 0,
     pageSize: 50,
   });
-  const [lastEventCount, setLastEventCount] = useState<number>(0);
-  const [hasNewData, setHasNewData] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (events.length > lastEventCount && lastEventCount > 0) {
-      if (pagination.pageIndex > 0) {
-        setHasNewData(true);
-      }
-      setLastEventCount(events.length);
-    } else if (events.length !== lastEventCount) {
-      setLastEventCount(events.length);
-      setHasNewData(false);
-    }
-  }, [events.length, lastEventCount, pagination.pageIndex]);
-
-  useEffect(() => {
-    if (pagination.pageIndex === 0) {
-      setHasNewData(false);
-    }
-  }, [pagination.pageIndex]);
 
   const columns = useMemo<ColumnDef<StreamEvent, any>[]>(
     () => [
@@ -50,9 +31,9 @@ export function LiveFeedTable({ events }: LiveFeedTableProps) {
         cell: ({ getValue }) => {
           const fid = getValue() as number;
           return (
-            <a href={`/fids/${fid}`} className="text-[#71579E] hover:underline cursor-pointer block truncate max-w-full">
+            <Link href={`/fids/${fid}`} className="text-[#71579E] hover:underline cursor-pointer block truncate max-w-full">
               {fid}
-            </a>
+            </Link>
           );
         },
       },
@@ -69,13 +50,9 @@ export function LiveFeedTable({ events }: LiveFeedTableProps) {
         accessorKey: 'link',
         header: 'link',
         cell: ({ getValue }) => (
-          <a 
-            href={getValue() as string}
-            rel="noopener noreferrer"
-            className="text-[#71579E] hover:underline text-sm"
-          >
+          <Link href={getValue() as string} className="text-[#71579E] hover:underline text-sm">
             link =&gt;
-          </a>
+          </Link>
         ),
       },
       {

@@ -1,13 +1,12 @@
-import { FlatCompat } from '@eslint/eslintrc'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+import prettier from 'eslint-config-prettier'
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-})
-
-const eslintConfig = [{
-  ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"]
-}, ...compat.config({
-  extends: ['next/core-web-vitals', 'prettier'],
-})]
+const eslintConfig = [
+  ...nextVitals,
+  prettier,
+  {
+    ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts'],
+  },
+]
 
 export default eslintConfig

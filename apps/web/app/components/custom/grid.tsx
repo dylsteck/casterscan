@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import React from 'react';
 import { motion } from 'framer-motion';
-import { type PruneEvent, type SnapchainEvent, type User } from '../../lib/types';
+import { type PruneEvent, type SnapchainEvent } from '../../lib/types';
 import { renderCastText } from '../../lib/utils';
-import { MiniAppLink } from './mini-app-link';
 
-const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: boolean; isNew?: boolean }) => {
+const GridRow = ({ event, isFirst }: { event: SnapchainEvent; isFirst: boolean }) => {
   const getRelativeTime = (timestamp: string) => {
     const now = new Date();
     const past = new Date(timestamp);
@@ -121,9 +119,7 @@ const GridRow = ({ event, isFirst, isNew }: { event: SnapchainEvent; isFirst: bo
   );
 };
 
-const Grid = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?: SnapchainEvent[] }) => {
-  const newEventIds = new Set(newEvents.map(e => e.id));
-
+const Grid = ({ events }: { events: SnapchainEvent[] }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-l border-r border-gray-300">
       {events.map((event, index) => (
@@ -131,7 +127,6 @@ const Grid = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?
           event={event} 
           isFirst={index === 0} 
           key={`${event.id}-${index}`}
-          isNew={newEventIds.has(event.id)}
         />
       ))}
     </div>

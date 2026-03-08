@@ -12,7 +12,7 @@ export default function Feed() {
   const [currentPage, setCurrentPage] = React.useState(0);
   const itemsPerPage = 50;
 
-  const { data, isLoading, error, newEvents, refresh } = useEvents(currentPage, itemsPerPage);
+  const { data, isLoading, error, refresh } = useEvents(currentPage, itemsPerPage);
 
   React.useEffect(() => {
     if (window.innerWidth < 768) {
@@ -145,7 +145,7 @@ export default function Feed() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {filter === 'list' ? <List events={events} newEvents={newEvents} /> : <Grid events={events} newEvents={newEvents} />}
+            {filter === 'list' ? <List events={events} /> : <Grid events={events} />}
           </motion.div>
         )}
       </AnimatePresence>

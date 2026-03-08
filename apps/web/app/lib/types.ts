@@ -588,12 +588,3 @@ type FarcasterUserViewerContext = {
 };
 
 export type KeyType = 'AUTH' | 'SIGNER';
-
-export type ProfileKeysPage = {
-  fid: bigint;
-  authAddresses: `0x${string}`[];
-  signerKeys: `0x${string}`[];
-  page: number;
-  pageSize: number;
-  hasMore: boolean;
-};

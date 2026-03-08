@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { useQueryState } from 'nuqs';
-import CopyClipboardIcon from './copy-clipboard-icon';
-import { SignerDetail } from './signer-detail';
-import { AppWithSigners, formatSignerStats, timeAgo } from '../../lib/signer-helpers';
+import { AppWithSigners, timeAgo } from '../../lib/signer-helpers';
 
 interface AppDetailViewProps {
   app: AppWithSigners;
@@ -17,7 +15,12 @@ interface AppDetailViewProps {
 }
 
 export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewProps) {
-  const [selectedSignerKey, setSelectedSignerKey] = useQueryState('signer');
+  const [, setSelectedSignerKey] = useQueryState('signer');
+  const sortedSigners = [...app.signers].sort((a, b) => {
+    const aLastUsed = a.messageStats?.lastUsed ? new Date(a.messageStats.lastUsed).getTime() : 0;
+    const bLastUsed = b.messageStats?.lastUsed ? new Date(b.messageStats.lastUsed).getTime() : 0;
+    return bLastUsed - aLastUsed;
+  });
 
   return (
     <div className="w-screen h-screen flex justify-center items-start">
@@ -37,9 +40,9 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
             </h2>
             {app.profile?.username && (
               <p className="text-gray-600">
-                @<a href={`/usernames/${app.profile.username}`} target="_blank" className="text-black underline">
+                @<Link href={`/usernames/${app.profile.username}`} className="text-black underline">
                   {app.profile.username}
-                </a>
+                </Link>
               </p>
             )}
             {app.profile?.profile?.bio?.text && (
@@ -56,13 +59,7 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
         <div>
           {app.signers.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {app.signers
-                .sort((a, b) => {
-                  const aLastUsed = a.messageStats?.lastUsed ? new Date(a.messageStats.lastUsed).getTime() : 0;
-                  const bLastUsed = b.messageStats?.lastUsed ? new Date(b.messageStats.lastUsed).getTime() : 0;
-                  return bLastUsed - aLastUsed;
-                })
-                .map((signer, index) => (
+              {sortedSigners.map((signer, index) => (
                   <button
                     key={index}
                     onClick={() => signer.messageStats && signer.messageStats.total > 0 ? setSelectedSignerKey(signer.key) : undefined}

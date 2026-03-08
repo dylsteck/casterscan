@@ -1,6 +1,6 @@
 'use server';
 
-import { NeynarV2Cast, NeynarV2User, ProfileKeysPage } from './types';
+import { NeynarV2Cast, NeynarV2User } from './types';
 import { apiFetch } from './api';
 
 export async function getNeynarCast(identifier: string, type: 'url' | 'hash') {
@@ -48,29 +48,5 @@ export async function getNeynarUserByUsername(username: string) {
   } catch (error) {
     console.error('Error fetching Neynar user by username:', error);
     throw error;
-  }
-}
-
-export async function getFarcasterKeys(fid: string): Promise<ProfileKeysPage> {
-  try {
-    const data = await apiFetch<{ fid: string; authAddresses: `0x${string}`[]; signerKeys: `0x${string}`[]; page: number; pageSize: number; hasMore: boolean }>(`/v1/fids/${fid}/keys`);
-    return {
-      fid: BigInt(data.fid),
-      authAddresses: data.authAddresses,
-      signerKeys: data.signerKeys,
-      page: data.page,
-      pageSize: data.pageSize,
-      hasMore: data.hasMore,
-    };
-  } catch (error) {
-    console.error('Error fetching Farcaster keys:', error);
-    return {
-      fid: BigInt(fid),
-      authAddresses: [],
-      signerKeys: [],
-      page: 0,
-      pageSize: 250,
-      hasMore: false,
-    };
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link';
 import React from 'react';
 import { NeynarV2User } from '../../../lib/types';
 import { AppWithSigners } from '../../../lib/signer-helpers';
@@ -53,9 +54,9 @@ export function ProfileAddresses({ neynarUser, appsWithSigners }: ProfileAddress
               <td className="py-2 px-1 text-sm">auth</td>
               <td className="py-2 px-1 text-sm">
                 {authItem.app?.fid ? (
-                  <a href={`/fids/${authItem.app.fid}`} className="text-black cursor-pointer">
+                  <Link href={`/fids/${authItem.app.fid}`} className="text-black cursor-pointer">
                     {getAppName(authItem.app.fid)}
-                  </a>
+                  </Link>
                 ) : ''}
               </td>
             </tr>

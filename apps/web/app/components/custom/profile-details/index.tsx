@@ -10,10 +10,10 @@ import { ProfileOverview } from './profile-overview';
 import { ProfileAddresses } from './profile-addresses';
 import { ProfileSigners } from './profile-signers';
 import { ProfileRawData } from './profile-raw-data';
-import { NeynarV2User, ProfileKeysPage } from '../../../lib/types';
+import { NeynarV2User } from '../../../lib/types';
 import { useAppsWithSigners } from '../../../hooks/use-apps-with-signers';
 
-export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: string, neynarUser: NeynarV2User, keysData: ProfileKeysPage }) {
+export default function ProfileDetails({ fid, neynarUser }: { fid: string, neynarUser: NeynarV2User }) {
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsStringLiteral(['overview', 'addresses', 'signers', 'rawdata']).withDefault('overview'));
   const [selectedSignerKey, setSelectedSignerKey] = useQueryState('signer');
   const [selectedAppFid, setSelectedAppFid] = useQueryState('signer_fid');

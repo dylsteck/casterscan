@@ -10,11 +10,12 @@ Requires `NEYNAR_API_KEY` (get from [neynar.com](https://neynar.com)). Optional:
 
 ## Setup
 
-1. Set env vars (from root `.env.example`):
+1. Copy `apps/api/.env.example` to `apps/api/.env`, then set:
    - `NEYNAR_API_KEY` (required for user/cast lookups)
    - `REDIS_URL` (optional; cache disabled if unset)
+   - `ALLOWED_ORIGINS` (optional; comma-separated CORS override)
 
-2. Run locally:
+2. Run locally from the repo root:
    ```bash
    bun run dev:api
    ```

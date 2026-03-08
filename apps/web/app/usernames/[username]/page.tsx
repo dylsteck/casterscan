@@ -1,5 +1,5 @@
 import ProfileDetails from '@/app/components/custom/profile-details/index';
-import { getNeynarUserByUsername, getFarcasterKeys } from '@/app/lib/server';
+import { getNeynarUserByUsername } from '@/app/lib/server';
 import { notFound } from 'next/navigation';
 
 export default async function UsernamePage(props: { params: Promise<{ username: string }> }) {
@@ -13,13 +13,7 @@ export default async function UsernamePage(props: { params: Promise<{ username: 
       notFound();
     }
 
-    const keysData = await getFarcasterKeys(user.fid.toString());
-
-    if (!keysData) {
-      notFound();
-    }
-
-    return <ProfileDetails fid={user.fid.toString()} neynarUser={user} keysData={keysData} />;
+    return <ProfileDetails fid={user.fid.toString()} neynarUser={user} />;
   } catch (error) {
     notFound();
   }

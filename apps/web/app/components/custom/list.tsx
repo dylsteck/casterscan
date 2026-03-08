@@ -1,11 +1,9 @@
 import Link from 'next/link';
-import React from 'react';
 import { motion } from 'framer-motion';
-import { type PruneEvent, type SnapchainEvent, type User } from '../../lib/types';
+import { type PruneEvent, type SnapchainEvent } from '../../lib/types';
 import { renderCastText } from '../../lib/utils';
-import { MiniAppLink } from './mini-app-link';
 
-const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) => {
+const ListRow = ({ event }: { event: SnapchainEvent }) => {
   const getRelativeTime = (timestamp: string) => {
     const now = new Date();
     const past = new Date(timestamp);
@@ -119,9 +117,7 @@ const ListRow = ({ event, isNew }: { event: SnapchainEvent; isNew?: boolean }) =
   );
 };
 
-const List = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?: SnapchainEvent[] }) => {
-  const newEventIds = new Set(newEvents.map(e => e.id));
-
+const List = ({ events }: { events: SnapchainEvent[] }) => {
   return (
     <div className="overflow-x-auto w-full pl-2">
       <table className="min-w-full text-sm text-left table-fixed">
@@ -140,7 +136,6 @@ const List = ({ events, newEvents = [] }: { events: SnapchainEvent[]; newEvents?
             <ListRow 
               event={event} 
               key={`${event.id}-${index}`}
-              isNew={newEventIds.has(event.id)}
             />
           ))}
         </tbody>
