@@ -2,7 +2,7 @@
 
 import { sdk } from "@farcaster/miniapp-sdk";
 import type { Context } from "@farcaster/miniapp-sdk";
-import React, { createContext, useState, useContext, useMemo } from "react";
+import React, { createContext, useState, useContext, useMemo, useCallback } from "react";
 
 interface MiniAppContextType {
   context: Context.MiniAppContext | undefined;
@@ -27,6 +27,9 @@ export default function MiniAppProvider({ children }: { children: React.ReactNod
     const [ready, setReady] = useState<boolean>(false);
     const [canAddMiniApp, setCanAddMiniApp] = useState<boolean>(false);
     const [isInMiniApp, setIsInMiniApp] = useState<boolean>(false);
+    const getCapabilities = useCallback(async () => {
+      return await sdk.getCapabilities();
+    }, []);
 
     React.useEffect(() => {
         const init = async () => {
@@ -64,11 +67,7 @@ export default function MiniAppProvider({ children }: { children: React.ReactNod
         setCanAddMiniApp(capabilities.includes('actions.addMiniApp'));
       };
       checkCanAdd();
-    }, [context]);
-
-    const getCapabilities = async () => {
-      return await sdk.getCapabilities();
-    };
+    }, [context, getCapabilities]);
 
     const value = useMemo(() => ({
       context,
@@ -76,7 +75,7 @@ export default function MiniAppProvider({ children }: { children: React.ReactNod
       getCapabilities,
       canAddMiniApp,
       isInMiniApp
-    }), [context, ready, canAddMiniApp, isInMiniApp]);
+    }), [context, ready, getCapabilities, canAddMiniApp, isInMiniApp]);
 
     return(
         <MiniAppContext.Provider value={value}>

@@ -1,10 +1,16 @@
 import React from 'react';
 
-function LoadingTableRow() {
+interface LoadingRow {
+  id: number;
+  timestamp: number;
+}
+
+function LoadingTableRow({ timestamp }: { timestamp: number }) {
   const [style, setStyle] = React.useState({
     opacity: 0,
     transform: "translateY(20px)",
   });
+  const rowRef = React.useRef<HTMLTableRowElement>(null);
 
   React.useEffect(() => {
     const animation: Keyframe[] = [
@@ -16,7 +22,7 @@ function LoadingTableRow() {
       easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
       fill: "forwards" as FillMode,
     };
-    const row = document.getElementById(`row-${Date.now()}`);
+    const row = rowRef.current;
     if (row) row.animate(animation, timing);
     setStyle({ opacity: 1, transform: "translateY(0)" });
   }, []);
@@ -27,12 +33,9 @@ function LoadingTableRow() {
     return `${seconds} seconds ago`;
   };
 
-  const isoTimestamp = new Date().toISOString();
-  const timestamp = Date.parse(isoTimestamp);
-
   return (
     <tr
-      id={`row-${Date.now()}`}
+      ref={rowRef}
       className="bg-white font-normal"
       style={style}
     >
@@ -47,13 +50,16 @@ function LoadingTableRow() {
 }
 
 export default function LoadingTable() {
-  const [rows, setRows] = React.useState<React.ReactNode[]>([]);
+  const [rows, setRows] = React.useState<LoadingRow[]>([]);
 
   React.useEffect(() => {
     const addRow = () => {
       setRows((prevRows) => [
         ...prevRows,
-        <LoadingTableRow key={prevRows.length} />,
+        {
+          id: prevRows.length,
+          timestamp: Date.now(),
+        },
       ]);
     };
 
@@ -76,7 +82,9 @@ export default function LoadingTable() {
           </tr>
         </thead>
         <tbody>
-          {rows}
+          {rows.map((row) => (
+            <LoadingTableRow key={row.id} timestamp={row.timestamp} />
+          ))}
           <div id="bottom" />
         </tbody>
       </table>
