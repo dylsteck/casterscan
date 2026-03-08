@@ -57,7 +57,7 @@ export class Neynar {
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new UpstreamError("neynar", `Resource not found: ${endpoint}`);
+          throw new UpstreamError("neynar", `Resource not found: ${endpoint}`, response.status);
         }
         if (response.status === 400) {
           throw new UpstreamError("neynar", `Bad request: ${endpoint}`, response.status);

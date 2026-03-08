@@ -35,7 +35,7 @@ export class Farcaster {
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new UpstreamError("farcaster", `Resource not found: ${endpoint}`);
+          throw new UpstreamError("farcaster", `Resource not found: ${endpoint}`, response.status);
         }
         if (response.status === 400) {
           throw new UpstreamError("farcaster", `Bad request: ${endpoint}`, response.status);

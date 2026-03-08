@@ -9,11 +9,11 @@ import {
 import { validateParams, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const fidParamsSchema = z.object({ fid: fidSchema });
+const fidParamsSchema = z.object({ fid: fidSchema }).strict();
 const fidSignerParamsSchema = z.object({
   fid: fidSchema,
   signerKey: signerKeySchema,
-});
+}).strict();
 
 router.get("/:fid/signers/enriched", validateParams(fidParamsSchema), asyncHandler(async (req: Request, res: Response) => {
   const { fid } = req.validatedParams as { fid: string };

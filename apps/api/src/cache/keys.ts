@@ -2,6 +2,13 @@ function sanitizeKeyPart(s: string): string {
   return s.replace(/[\r\n:]/g, "");
 }
 
+type FidSignersCacheOptions = {
+  pageSize?: number;
+  pageToken?: string;
+  reverse?: boolean;
+  signer?: string;
+};
+
 export const cacheKeys = {
   user: (fid: string) => `user:${sanitizeKeyPart(fid)}`,
   userByUsername: (username: string) =>
@@ -12,7 +19,17 @@ export const cacheKeys = {
     format ? `cast:${sanitizeKeyPart(hash)}:${format}` : `cast:${sanitizeKeyPart(hash)}`,
   fidMessages: (fid: string) => `fid:${sanitizeKeyPart(fid)}:messages`,
   fidStats: (fid: string) => `fid:${sanitizeKeyPart(fid)}:stats`,
-  fidSigners: (fid: string) => `fid:${sanitizeKeyPart(fid)}:signers`,
+  fidSigners: (fid: string, options?: FidSignersCacheOptions) => {
+    const normalizedPageSize = options?.pageSize ?? 1000;
+    const queryParts = [
+      `pageSize=${normalizedPageSize}`,
+      options?.pageToken ? `pageToken=${options.pageToken}` : null,
+      options?.reverse ? "reverse=true" : null,
+      options?.signer ? `signer=${options.signer}` : null,
+    ].filter(Boolean) as string[];
+
+    return `fid:${sanitizeKeyPart(fid)}:signers:${queryParts.map(sanitizeKeyPart).join(":")}`;
+  },
   fidSignersEnriched: (fid: string) => `fid:${sanitizeKeyPart(fid)}:signers:enriched`,
   fidSignerMessages: (fid: string, signer: string) =>
     `fid:${sanitizeKeyPart(fid)}:signers:${sanitizeKeyPart(signer)}:messages`,

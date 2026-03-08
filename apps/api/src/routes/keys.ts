@@ -5,7 +5,7 @@ import { getKeys } from "../services/keys.js";
 import { validateParams, asyncHandler } from "../lib/validate.js";
 
 const router = Router();
-const fidParamsSchema = z.object({ fid: fidSchema });
+const fidParamsSchema = z.object({ fid: fidSchema }).strict();
 
 router.get("/:fid/keys", validateParams(fidParamsSchema), asyncHandler(async (req: Request, res: Response) => {
   const { fid } = req.validatedParams as { fid: string };
