@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.22",
     "geist": "^1.5.1",
+    "jankmeter": "^0.1.4",
     "lucide-react": "^0.544.0",
     "next": "16.1.6",
     "nuqs": "^2.6.0",

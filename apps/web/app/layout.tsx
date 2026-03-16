@@ -6,6 +6,7 @@ import Script from "next/script";
 import { BANNER_IMG_URL, BASE_URL, frame, ICON_IMG_URL } from "./lib/utils";
 import MiniAppProvider from "./components/custom/mini-app-provider";
 import Providers from "./providers";
+import { JankMeter } from 'jankmeter/next';
 const PAGE = {
   title: "Casterscan",
   description: "A block explorer for Farcaster",
@@ -58,6 +59,7 @@ export default function RootLayout({
           <MiniAppProvider>
             <div className="min-h-screen">
               <Header />
+              <JankMeter />
               {children}
             </div>
           </MiniAppProvider>
