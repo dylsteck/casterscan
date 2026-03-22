@@ -147,7 +147,7 @@ export async function getSignersEnriched(fid: string) {
 
       for (const { appFid, signerKey, signer } of appSignerPairs) {
         if (!appsMap[appFid]) {
-          const metadata = decodeSignerMetadata(signer.signerEventBody.metadata);
+          const metadata = decodeSignerMetadata(signer.signerEventBody!.metadata);
           appsMap[appFid] = {
             fid: metadata!.requestFid,
             signers: [],
@@ -174,12 +174,12 @@ export async function getSignersEnriched(fid: string) {
 
         const processedSigner = {
           key: signerKey,
-          keyType: signer.signerEventBody.keyType,
-          eventType: signer.signerEventBody.eventType,
+          keyType: signer.signerEventBody!.keyType,
+          eventType: signer.signerEventBody!.eventType,
           blockNumber: signer.blockNumber,
           transactionHash: signer.transactionHash,
           blockTimestamp: signer.blockTimestamp,
-          metadata: decodeSignerMetadata(signer.signerEventBody.metadata),
+          metadata: decodeSignerMetadata(signer.signerEventBody!.metadata),
           messageStats: signerStats,
         };
 
