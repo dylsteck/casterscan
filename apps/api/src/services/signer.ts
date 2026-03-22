@@ -68,6 +68,24 @@ export async function getSignersEnriched(fid: string) {
           (s) => s.signerEventBody?.eventType === "SIGNER_EVENT_TYPE_ADD"
         ) ?? [];
 
+      const appSignerPairs: Array<{ appFid: string; signerKey: string; signer: typeof addSigners[0] }> = [];
+      const signerKeyToAppFids: Record<string, Set<string>> = {};
+
+      for (const signer of addSigners) {
+        if (!signer.signerEventBody) continue;
+        const metadata = decodeSignerMetadata(signer.signerEventBody.metadata);
+        if (!metadata || metadata.requestFid === 0) continue;
+
+        const appFid = metadata.requestFid.toString();
+        const signerKey = signer.signerEventBody.key;
+
+        appSignerPairs.push({ appFid, signerKey, signer });
+        if (!signerKeyToAppFids[signerKey]) {
+          signerKeyToAppFids[signerKey] = new Set();
+        }
+        signerKeyToAppFids[signerKey].add(appFid);
+      }
+
       const messagesBySigner: Record<
         string,
         { casts: number; reactions: number; links: number; verifications: number; total: number; lastUsed: string | null }
@@ -81,32 +99,37 @@ export async function getSignersEnriched(fid: string) {
 
       for (const message of allUserMessages) {
         const signerKey = message.signer;
-        if (!messagesBySigner[signerKey]) {
-          messagesBySigner[signerKey] = {
-            casts: 0,
-            reactions: 0,
-            links: 0,
-            verifications: 0,
-            total: 0,
-            lastUsed: null,
-          };
-        }
+        if (!signerKeyToAppFids[signerKey]) continue;
 
-        if (message.type === "cast") messagesBySigner[signerKey].casts++;
-        else if (message.type === "reaction") messagesBySigner[signerKey].reactions++;
-        else if (message.type === "link") messagesBySigner[signerKey].links++;
-        else if (message.type === "verification") messagesBySigner[signerKey].verifications++;
+        for (const appFid of signerKeyToAppFids[signerKey]) {
+          const compositeKey = `${appFid}:${signerKey}`;
+          if (!messagesBySigner[compositeKey]) {
+            messagesBySigner[compositeKey] = {
+              casts: 0,
+              reactions: 0,
+              links: 0,
+              verifications: 0,
+              total: 0,
+              lastUsed: null,
+            };
+          }
 
-        messagesBySigner[signerKey].total++;
+          if (message.type === "cast") messagesBySigner[compositeKey].casts++;
+          else if (message.type === "reaction") messagesBySigner[compositeKey].reactions++;
+          else if (message.type === "link") messagesBySigner[compositeKey].links++;
+          else if (message.type === "verification") messagesBySigner[compositeKey].verifications++;
 
-        const timestamp = getTimestamp(message);
-        if (timestamp) {
-          const messageDate = farcasterTimeToDate(timestamp);
-          if (
-            !messagesBySigner[signerKey].lastUsed ||
-            messageDate > new Date(messagesBySigner[signerKey].lastUsed!)
-          ) {
-            messagesBySigner[signerKey].lastUsed = messageDate.toISOString();
+          messagesBySigner[compositeKey].total++;
+
+          const timestamp = getTimestamp(message);
+          if (timestamp) {
+            const messageDate = farcasterTimeToDate(timestamp);
+            if (
+              !messagesBySigner[compositeKey].lastUsed ||
+              messageDate > new Date(messagesBySigner[compositeKey].lastUsed!)
+            ) {
+              messagesBySigner[compositeKey].lastUsed = messageDate.toISOString();
+            }
           }
         }
       }
@@ -122,18 +145,11 @@ export async function getSignersEnriched(fid: string) {
         }
       > = {};
 
-      for (const signer of addSigners) {
-        if (!signer.signerEventBody) continue;
-
-        const metadata = decodeSignerMetadata(signer.signerEventBody.metadata);
-        if (!metadata || metadata.requestFid === 0) continue;
-
-        const appFid = metadata.requestFid.toString();
-        const signerKey = signer.signerEventBody.key;
-
+      for (const { appFid, signerKey, signer } of appSignerPairs) {
         if (!appsMap[appFid]) {
+          const metadata = decodeSignerMetadata(signer.signerEventBody.metadata);
           appsMap[appFid] = {
-            fid: metadata.requestFid,
+            fid: metadata!.requestFid,
             signers: [],
             totalMessages: 0,
             lastUsed: null,
@@ -146,7 +162,8 @@ export async function getSignersEnriched(fid: string) {
           };
         }
 
-        const signerStats = messagesBySigner[signerKey] ?? {
+        const compositeKey = `${appFid}:${signerKey}`;
+        const signerStats = messagesBySigner[compositeKey] ?? {
           casts: 0,
           reactions: 0,
           links: 0,
@@ -162,7 +179,7 @@ export async function getSignersEnriched(fid: string) {
           blockNumber: signer.blockNumber,
           transactionHash: signer.transactionHash,
           blockTimestamp: signer.blockTimestamp,
-          metadata,
+          metadata: decodeSignerMetadata(signer.signerEventBody.metadata),
           messageStats: signerStats,
         };
 
