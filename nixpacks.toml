@@ -1,0 +1,8 @@
+[phases.install]
+cmds = ["bun install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["bun run build"]
+
+[start]
+cmd = "node .output/server/index.mjs"
