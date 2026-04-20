@@ -1,46 +1,66 @@
 # Casterscan
 
-A block explorer for Farcaster | [casterscan.com](https://casterscan.com)
-<br/><br/>
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dylsteck/casterscan)
+A real-time block explorer for Farcaster.
 
-![Casterscan as of 9/7/25](https://i.imgur.com/ryRhP0P.png)
+Production: [casterscan.com](https://casterscan.com)
 
-## What is Casterscan?
+![Casterscan](https://i.imgur.com/ryRhP0P.png)
 
-Casterscan is a block explorer for Farcaster. It currently lets you view:
-- a firehose of the latest casts, either as a list or grid
-- the details of any cast(text, embeds, responses per API/Snapchain provider)
+## Architecture
 
-![Casterscan user signer data on /fids/[fid] as of 9/7/25](https://i.imgur.com/6zFB2dK.png)
+Casterscan now runs as one TanStack Start app (Vite + Nitro) with both UI routes and API routes in the same runtime.
 
-There are two goals for Casterscan's utility:
-- make it easy to access Farcaster data
-- give each atomic unit of data available on [Snapchain](https://snapchain.farcaster.xyz) its own URL
+```text
+Browser → TanStack Start routes + /api/* server routes → upstream services (Neynar, Snapchain, Farcaster API, Optimism RPC)
+```
 
+Key notes:
+- No separate `apps/web` + `apps/api` setup anymore.
+- Public app routes remain the same (`/`, `/casts/$hash`, `/fids/$fid`, etc.).
+- Public API surface is `/api/*` only.
+- Package manager is `bun`.
 
-## How to run locally
+## Local Development
 
-1. Install dependencies: `bun install`
-2. Copy `.env.example` to `.env.local` and add your `NEYNAR_API_KEY` and `API_URL` (default `http://localhost:4000`)
-3. Run the development server:
-   - Both: `bun run dev`
-   - Web only: `bun run dev:web`
-   - API only: `bun run dev:api`
+1. Install dependencies:
+   - `bun install`
+2. Create env file:
+   - `cp .env.example .env.local`
+3. Set required env vars (`NEYNAR_API_KEY` at minimum).
+4. Run dev server:
+   - `bun run dev`
+5. Build + run production output locally:
+   - `bun run build`
+   - `bun run start`
 
-## Deployment
+## Environment Variables
 
-Deploy with Vercel. Deploy the **API first**, then the **Web** (the web app needs the API URL).
+Required:
+- `NEYNAR_API_KEY`: Neynar API key for user/cast lookups.
 
-| [![Deploy API](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdylsteck%2Fcasterscan%2Ftree%2Fmain%2Fapps%2Fapi&project-name=casterscan-api&env=NEYNAR_API_KEY&envDescription=Get%20from%20neynar.com%20for%20user%2Fcast%20lookups&envLink=https%3A%2F%2Fneynar.com) | [![Deploy Web](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdylsteck%2Fcasterscan%2Ftree%2Fmain%2Fapps%2Fweb&project-name=casterscan-web&env=API_URL&envDescription=Deployed%20API%20URL) |
-| --- | --- |
-| **API** — Requires `NEYNAR_API_KEY` | **Web** — Requires `API_URL` |
+Optional:
+- `REDIS_URL`: enables Redis caching.
+- `BASE_URL`: canonical app URL used in metadata and frame URLs.
+- `VITE_GOOGLE_ANALYTICS_ID`: Google Analytics ID.
 
-## Monorepo structure
+## Deployment (Coolify + Nixpacks)
 
-- `apps/web` — Casterscan Next.js app
-- `apps/api` — Farcaster API (Express + Redis)
+This repo includes a `nixpacks.toml` configured for a non-static TanStack Start Nitro deployment:
+- install: `bun install --frozen-lockfile`
+- build: `bun run build`
+- start: `node .output/server/index.mjs`
 
-Have any questions/comments or want to keep up with/contribute to Casterscan? 
-- [Message me on Farcaster](https://farcaster.xyz/dylsteck.eth)
-- [Create an issue](https://github.com/dylsteck/casterscan/issues/new)
+Coolify should expose port `3000` (Nitro default when `PORT` is unset).
+
+## Scripts
+
+- `bun run dev` — run TanStack Start dev server on port `3000`.
+- `bun run build` — build client + server (Nitro output in `.output/`).
+- `bun run start` — start Nitro server.
+- `bun run lint` — run ESLint.
+
+## Contributing
+
+Questions or ideas:
+- [Message Dylan on Farcaster](https://farcaster.xyz/dylsteck.eth)
+- [Open an issue](https://github.com/dylsteck/casterscan/issues/new)
