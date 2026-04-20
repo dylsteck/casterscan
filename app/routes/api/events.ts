@@ -1,11 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { bytesToHexString } from "@farcaster/hub-web";
-import { HubEventType, getSSLHubRpcClient } from "@farcaster/hub-nodejs";
-
-// Polyfill: @farcaster/hub-web expects `self` (browser global). In Node, use global.
-if (typeof global !== "undefined" && !(global as typeof global & { self?: typeof global }).self) {
-  (global as typeof global & { self?: typeof global }).self = global;
-}
+import { bytesToHexString, HubEventType, getSSLHubRpcClient } from "@farcaster/hub-nodejs";
 
 export const Route = createFileRoute("/api/events")({
   server: {

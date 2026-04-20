@@ -1,9 +1,7 @@
-import casterscanIcon from '@/public/casterscan-icon-transparent.png';
-
 export default function CasterscanIcon() {
   return (
     <img
-      src={casterscanIcon.src}
+      src="/casterscan-icon-transparent.png"
       alt="Casterscan Icon"
       className="size-7"
     />
