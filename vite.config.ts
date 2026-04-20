@@ -17,7 +17,7 @@ export default defineConfig({
         routesDirectory: "routes",
       },
     }),
-    nitro({ preset: "node-server" }),
+    nitro({ preset: "node-server", noExternals: ["ws"] }),
     viteReact(),
   ],
 });
