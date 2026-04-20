@@ -8,5 +8,6 @@ RUN bun run build
 FROM node:22-alpine
 WORKDIR /app
 COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/node_modules/ws /app/.output/server/node_modules/ws
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
