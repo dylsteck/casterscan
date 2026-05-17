@@ -96,7 +96,7 @@ export type PruneEvent = SnapchainEvent & {
   };
 };
 
-export type NeynarV1Cast = {
+export type HypersnapV1Cast = {
   author: User;
   embeds: { url: string }[];
   hash: string;
@@ -109,7 +109,7 @@ export type NeynarV1Cast = {
   type?: "cast-mention" | "cast-reply";
 };
 
-export type NeynarV2Cast = {
+export type HypersnapV2Cast = {
     object: "cast";
     hash: string;
     author: {
@@ -233,7 +233,7 @@ export type NeynarV2Cast = {
     };
 };
 
-export type NeynarV2User = {
+export type HypersnapV2User = {
   object: "user";
   fid: number;
   username: string;

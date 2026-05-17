@@ -189,7 +189,7 @@ export async function getSignersEnriched(fid: string) {
 
       if (apps.length > 0) {
         try {
-          const users = await up.neynar.getUsers({
+          const users = await up.hypersnap.getUsers({
             fids: apps.map((app) => app.fid.toString()),
           });
 

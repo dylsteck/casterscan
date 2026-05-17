@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { NeynarV2Cast } from '../lib/types';
+import type { HypersnapV2Cast } from '../lib/types';
 import { getDefaultClient, LOCAL_STORAGE_KEYS, type DefaultClient } from '../lib/local-storage';
 
-export function useCastLink(neynarCast: NeynarV2Cast): string {
+export function useCastLink(hypersnapCast: HypersnapV2Cast): string {
   const [mounted, setMounted] = useState(false);
   const [defaultClient, setDefaultClient] = useState<DefaultClient>('farcaster');
 
-  const baseLink = `https://base.app/post/${neynarCast?.hash}`;
-  const farcasterLink = `https://farcaster.xyz/${neynarCast.author.username}/${neynarCast?.hash}`
+  const baseLink = `https://base.app/post/${hypersnapCast?.hash}`;
+  const farcasterLink = `https://farcaster.xyz/${hypersnapCast.author.username}/${hypersnapCast?.hash}`
 
   useEffect(() => {
     setMounted(true);

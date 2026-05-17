@@ -13,10 +13,10 @@ export const useFarcasterCast = (hash: string, options?: { enabled?: boolean }) 
   });
 };
 
-export const useNeynarHubCast = (fid: number, hash: string, options?: { enabled?: boolean }) => {
+export const useHypersnapHubCast = (fid: number, hash: string, options?: { enabled?: boolean }) => {
   return useQuery({
-    queryKey: ['neynar-hub-cast', fid, hash],
-    queryFn: async () => apiClient.getSnapchainCast(fid.toString(), hash, 'neynar'),
+    queryKey: ['hypersnap-hub-cast', fid, hash],
+    queryFn: async () => apiClient.getSnapchainCast(fid.toString(), hash, 'hypersnap'),
     enabled: options?.enabled ?? true,
     staleTime: CACHE_TTLS.REACT_QUERY.STALE_TIME,
     refetchOnWindowFocus: false,

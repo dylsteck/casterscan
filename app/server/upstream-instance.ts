@@ -10,7 +10,10 @@ export function getUpstream() {
 
 export function initUpstream(config: Config) {
   const upstreamConfig: UpstreamConfig = {
-    neynar: { apiKey: config.NEYNAR_API_KEY },
+    hypersnap: {
+      baseUrl: config.HYPERSNAP_API_BASE_URL,
+      apiKey: config.HYPERSNAP_API_KEY,
+    },
     snapchain: { baseUrl: config.SNAPCHAIN_URL },
     farcaster: { baseUrl: config.FARCASTER_API_URL },
     optimismRpcUrl: config.OPTIMISM_RPC_URL,

@@ -26,8 +26,8 @@ import { Route as ApiSnapchainCastRouteImport } from './routes/api/snapchain/cas
 import { Route as ApiSignersStatsRouteImport } from './routes/api/signers/stats'
 import { Route as ApiSignersMessagesRouteImport } from './routes/api/signers/messages'
 import { Route as ApiSignersEnrichedRouteImport } from './routes/api/signers/enriched'
-import { Route as ApiNeynarUserRouteImport } from './routes/api/neynar/user'
-import { Route as ApiNeynarCastRouteImport } from './routes/api/neynar/cast'
+import { Route as ApiHypersnapUserRouteImport } from './routes/api/hypersnap/user'
+import { Route as ApiHypersnapCastRouteImport } from './routes/api/hypersnap/cast'
 import { Route as ApiFarcasterUserRouteImport } from './routes/api/farcaster/user'
 import { Route as ApiFarcasterCastRouteImport } from './routes/api/farcaster/cast'
 import { Route as ApiFidFidStatsRouteImport } from './routes/api/fid/$fid/stats'
@@ -124,14 +124,14 @@ const ApiSignersEnrichedRoute = ApiSignersEnrichedRouteImport.update({
   path: '/api/signers/enriched',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiNeynarUserRoute = ApiNeynarUserRouteImport.update({
-  id: '/api/neynar/user',
-  path: '/api/neynar/user',
+const ApiHypersnapUserRoute = ApiHypersnapUserRouteImport.update({
+  id: '/api/hypersnap/user',
+  path: '/api/hypersnap/user',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiNeynarCastRoute = ApiNeynarCastRouteImport.update({
-  id: '/api/neynar/cast',
-  path: '/api/neynar/cast',
+const ApiHypersnapCastRoute = ApiHypersnapCastRouteImport.update({
+  id: '/api/hypersnap/cast',
+  path: '/api/hypersnap/cast',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiFarcasterUserRoute = ApiFarcasterUserRouteImport.update({
@@ -196,8 +196,8 @@ export interface FileRoutesByFullPath {
   '/usernames/$username': typeof UsernamesUsernameRoute
   '/api/farcaster/cast': typeof ApiFarcasterCastRoute
   '/api/farcaster/user': typeof ApiFarcasterUserRoute
-  '/api/neynar/cast': typeof ApiNeynarCastRoute
-  '/api/neynar/user': typeof ApiNeynarUserRoute
+  '/api/hypersnap/cast': typeof ApiHypersnapCastRoute
+  '/api/hypersnap/user': typeof ApiHypersnapUserRoute
   '/api/signers/enriched': typeof ApiSignersEnrichedRoute
   '/api/signers/messages': typeof ApiSignersMessagesRoute
   '/api/signers/stats': typeof ApiSignersStatsRoute
@@ -226,8 +226,8 @@ export interface FileRoutesByTo {
   '/usernames/$username': typeof UsernamesUsernameRoute
   '/api/farcaster/cast': typeof ApiFarcasterCastRoute
   '/api/farcaster/user': typeof ApiFarcasterUserRoute
-  '/api/neynar/cast': typeof ApiNeynarCastRoute
-  '/api/neynar/user': typeof ApiNeynarUserRoute
+  '/api/hypersnap/cast': typeof ApiHypersnapCastRoute
+  '/api/hypersnap/user': typeof ApiHypersnapUserRoute
   '/api/signers/enriched': typeof ApiSignersEnrichedRoute
   '/api/signers/messages': typeof ApiSignersMessagesRoute
   '/api/signers/stats': typeof ApiSignersStatsRoute
@@ -257,8 +257,8 @@ export interface FileRoutesById {
   '/usernames/$username': typeof UsernamesUsernameRoute
   '/api/farcaster/cast': typeof ApiFarcasterCastRoute
   '/api/farcaster/user': typeof ApiFarcasterUserRoute
-  '/api/neynar/cast': typeof ApiNeynarCastRoute
-  '/api/neynar/user': typeof ApiNeynarUserRoute
+  '/api/hypersnap/cast': typeof ApiHypersnapCastRoute
+  '/api/hypersnap/user': typeof ApiHypersnapUserRoute
   '/api/signers/enriched': typeof ApiSignersEnrichedRoute
   '/api/signers/messages': typeof ApiSignersMessagesRoute
   '/api/signers/stats': typeof ApiSignersStatsRoute
@@ -289,8 +289,8 @@ export interface FileRouteTypes {
     | '/usernames/$username'
     | '/api/farcaster/cast'
     | '/api/farcaster/user'
-    | '/api/neynar/cast'
-    | '/api/neynar/user'
+    | '/api/hypersnap/cast'
+    | '/api/hypersnap/user'
     | '/api/signers/enriched'
     | '/api/signers/messages'
     | '/api/signers/stats'
@@ -319,8 +319,8 @@ export interface FileRouteTypes {
     | '/usernames/$username'
     | '/api/farcaster/cast'
     | '/api/farcaster/user'
-    | '/api/neynar/cast'
-    | '/api/neynar/user'
+    | '/api/hypersnap/cast'
+    | '/api/hypersnap/user'
     | '/api/signers/enriched'
     | '/api/signers/messages'
     | '/api/signers/stats'
@@ -349,8 +349,8 @@ export interface FileRouteTypes {
     | '/usernames/$username'
     | '/api/farcaster/cast'
     | '/api/farcaster/user'
-    | '/api/neynar/cast'
-    | '/api/neynar/user'
+    | '/api/hypersnap/cast'
+    | '/api/hypersnap/user'
     | '/api/signers/enriched'
     | '/api/signers/messages'
     | '/api/signers/stats'
@@ -380,8 +380,8 @@ export interface RootRouteChildren {
   UsernamesUsernameRoute: typeof UsernamesUsernameRoute
   ApiFarcasterCastRoute: typeof ApiFarcasterCastRoute
   ApiFarcasterUserRoute: typeof ApiFarcasterUserRoute
-  ApiNeynarCastRoute: typeof ApiNeynarCastRoute
-  ApiNeynarUserRoute: typeof ApiNeynarUserRoute
+  ApiHypersnapCastRoute: typeof ApiHypersnapCastRoute
+  ApiHypersnapUserRoute: typeof ApiHypersnapUserRoute
   ApiSignersEnrichedRoute: typeof ApiSignersEnrichedRoute
   ApiSignersMessagesRoute: typeof ApiSignersMessagesRoute
   ApiSignersStatsRoute: typeof ApiSignersStatsRoute
@@ -518,18 +518,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSignersEnrichedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/neynar/user': {
-      id: '/api/neynar/user'
-      path: '/api/neynar/user'
-      fullPath: '/api/neynar/user'
-      preLoaderRoute: typeof ApiNeynarUserRouteImport
+    '/api/hypersnap/user': {
+      id: '/api/hypersnap/user'
+      path: '/api/hypersnap/user'
+      fullPath: '/api/hypersnap/user'
+      preLoaderRoute: typeof ApiHypersnapUserRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/neynar/cast': {
-      id: '/api/neynar/cast'
-      path: '/api/neynar/cast'
-      fullPath: '/api/neynar/cast'
-      preLoaderRoute: typeof ApiNeynarCastRouteImport
+    '/api/hypersnap/cast': {
+      id: '/api/hypersnap/cast'
+      path: '/api/hypersnap/cast'
+      fullPath: '/api/hypersnap/cast'
+      preLoaderRoute: typeof ApiHypersnapCastRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/farcaster/user': {
@@ -612,8 +612,8 @@ const rootRouteChildren: RootRouteChildren = {
   UsernamesUsernameRoute: UsernamesUsernameRoute,
   ApiFarcasterCastRoute: ApiFarcasterCastRoute,
   ApiFarcasterUserRoute: ApiFarcasterUserRoute,
-  ApiNeynarCastRoute: ApiNeynarCastRoute,
-  ApiNeynarUserRoute: ApiNeynarUserRoute,
+  ApiHypersnapCastRoute: ApiHypersnapCastRoute,
+  ApiHypersnapUserRoute: ApiHypersnapUserRoute,
   ApiSignersEnrichedRoute: ApiSignersEnrichedRoute,
   ApiSignersMessagesRoute: ApiSignersMessagesRoute,
   ApiSignersStatsRoute: ApiSignersStatsRoute,

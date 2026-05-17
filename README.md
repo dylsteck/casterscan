@@ -11,7 +11,7 @@ Production: [casterscan.com](https://casterscan.com)
 Casterscan now runs as one TanStack Start app (Vite + Nitro) with both UI routes and API routes in the same runtime.
 
 ```text
-Browser → TanStack Start routes + /api/* server routes → upstream services (Neynar, Snapchain, Farcaster API, Optimism RPC)
+Browser → TanStack Start routes + /api/* server routes → upstream services (Hypersnap, Snapchain, Farcaster API, Optimism RPC)
 ```
 
 Key notes:
@@ -26,7 +26,7 @@ Key notes:
    - `bun install`
 2. Create env file:
    - `cp .env.example .env.local`
-3. Set required env vars (`NEYNAR_API_KEY` at minimum).
+3. Set required env vars (`HYPERSNAP_API_KEY` at minimum, or legacy `NEYNAR_API_KEY`).
 4. Run dev server:
    - `bun run dev`
 5. Build + run production output locally:
@@ -36,7 +36,8 @@ Key notes:
 ## Environment Variables
 
 Required:
-- `NEYNAR_API_KEY`: Neynar API key for user/cast lookups.
+- `HYPERSNAP_API_KEY`: API key for Hypersnap-compatible user/cast lookups (optional in dev; legacy `NEYNAR_API_KEY` is accepted if unset).
+- `HYPERSNAP_API_BASE_URL`: Override Hypersnap HTTP base (defaults to `https://haatz.quilibrium.com`).
 
 Optional:
 - `REDIS_URL`: enables Redis caching.

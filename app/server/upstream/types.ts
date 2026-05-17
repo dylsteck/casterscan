@@ -1,5 +1,5 @@
-// Neynar types
-export type NeynarV2Cast = {
+// Hypersnap types (Neynar-compatible v2 API shape)
+export type HypersnapV2Cast = {
   object: "cast";
   hash: string;
   author: {
@@ -54,7 +54,7 @@ export type NeynarV2Cast = {
   author_channel_context?: { following: boolean };
 };
 
-export type NeynarV2User = {
+export type HypersnapV2User = {
   object: "user";
   fid: number;
   username: string;
@@ -85,7 +85,7 @@ export type NeynarV2User = {
   power_badge: boolean;
 };
 
-export type NeynarHubCast = {
+export type HypersnapHubCast = {
   data: {
     type: string;
     fid: number;
@@ -109,15 +109,15 @@ export type NeynarHubCast = {
   signer: string;
 };
 
-export type NeynarCastOptions = {
+export type HypersnapCastOptions = {
   identifier: string;
   type: "url" | "hash";
 };
 
-export type NeynarUserOptions = { fid: string };
-export type NeynarUsersOptions = { fids: string[] };
-export type NeynarUserByUsernameOptions = { username: string };
-export type NeynarCastByIdOptions = { fid: string; hash: string };
+export type HypersnapUserOptions = { fid: string };
+export type HypersnapUsersOptions = { fids: string[] };
+export type HypersnapUserByUsernameOptions = { username: string };
+export type HypersnapCastByIdOptions = { fid: string; hash: string };
 
 // Snapchain types
 export type SnapchainCastId = {
