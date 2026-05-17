@@ -31,7 +31,7 @@ export type HypersnapV2Cast = {
     power_badge: boolean;
   };
   app: unknown;
-  thread_hash: string;
+  thread_hash?: string | null;
   parent_hash: string | null;
   parent_url: string | null;
   root_parent_url: string | null;

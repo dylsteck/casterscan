@@ -181,8 +181,8 @@ export type HypersnapV2Cast = {
       display_name: string;
       pfp_url: string;
       custody_address: string;
-    };
-    thread_hash: string;
+    } | null;
+    thread_hash?: string | null;
     parent_hash: string | null;
     parent_url: string | null;
     root_parent_url: string | null;

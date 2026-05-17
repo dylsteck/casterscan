@@ -52,10 +52,10 @@ export default function CastDetails({ hash, hypersnapCast }: { hash: string; hyp
               </span>
             </li>
             <li className="flex justify-between items-center mb-1">
-              <span className="font-semibold mr-1">parent cast hash</span>
+              <span className="font-semibold mr-1">thread hash</span>
               <span className="flex items-center text-right">
-                {hypersnapCast.thread_hash}
-                <CopyClipboardIcon value={hypersnapCast.thread_hash} className="ml-1 flex-shrink-0" />
+                {hypersnapCast.thread_hash ?? "—"}
+                <CopyClipboardIcon value={hypersnapCast.thread_hash ?? ""} className="ml-1 flex-shrink-0" />
               </span>
             </li>
             <li className="flex justify-between items-center mb-1">
@@ -74,27 +74,31 @@ export default function CastDetails({ hash, hypersnapCast }: { hash: string; hyp
                 <CopyClipboardIcon value={hypersnapCast.author.fid.toString()} className="ml-1 flex-shrink-0" />
               </span>
             </li>
-            <li className="flex justify-between items-center mb-1">
-              <span className="font-semibold mr-1">app name</span>
-              <span className="flex items-center text-right">
-                <div className="flex flex-row gap-1.5 items-center">
-                  <img src={hypersnapCast.app.pfp_url} className="size-4 rounded-full" alt={`PFP for ${hypersnapCast.app.display_name}`} />
-                  <span>
-                    {hypersnapCast.app.display_name}
+            {hypersnapCast.app && (
+              <>
+                <li className="flex justify-between items-center mb-1">
+                  <span className="font-semibold mr-1">app name</span>
+                  <span className="flex items-center text-right">
+                    <div className="flex flex-row gap-1.5 items-center">
+                      <img src={hypersnapCast.app.pfp_url} className="size-4 rounded-full" alt={`PFP for ${hypersnapCast.app.display_name}`} />
+                      <span>
+                        {hypersnapCast.app.display_name}
+                      </span>
+                    </div>
+                    <CopyClipboardIcon value={hypersnapCast.app.display_name} className="ml-1 flex-shrink-0" />
                   </span>
-                </div>
-                <CopyClipboardIcon value={hypersnapCast.app.display_name} className="ml-1 flex-shrink-0" />
-              </span>
-            </li>
-            <li className="flex justify-between items-center mb-1">
-              <span className="font-semibold mr-1">app fid</span>
-              <span className="flex items-center text-right">
-                <a href={`/fids/${hypersnapCast.app.fid}`} className="underline">
-                  {hypersnapCast.app.fid}
-                </a>
-                <CopyClipboardIcon value={hypersnapCast.app.fid.toString()} className="ml-1 flex-shrink-0" />
-              </span>
-            </li>
+                </li>
+                <li className="flex justify-between items-center mb-1">
+                  <span className="font-semibold mr-1">app fid</span>
+                  <span className="flex items-center text-right">
+                    <a href={`/fids/${hypersnapCast.app.fid}`} className="underline">
+                      {hypersnapCast.app.fid}
+                    </a>
+                    <CopyClipboardIcon value={hypersnapCast.app.fid.toString()} className="ml-1 flex-shrink-0" />
+                  </span>
+                </li>
+              </>
+            )}
             <li className="flex justify-between items-center mb-1">
               <span className="font-semibold mr-1">timestamp</span>
               <span className="flex items-center text-right">

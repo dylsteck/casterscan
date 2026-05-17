@@ -98,12 +98,15 @@ export const hypersnapCastResponseSchema = z.object({
     display_name: z.string(),
     pfp_url: z.string().optional(),
   }).passthrough(),
-  app: z.object({
-    fid: z.number(),
-    username: z.string().optional(),
-    display_name: z.string().optional(),
-    pfp_url: z.string().optional(),
-  }).passthrough(),
+  app: z
+    .object({
+      fid: z.number(),
+      username: z.string().optional(),
+      display_name: z.string().optional(),
+      pfp_url: z.string().optional(),
+    })
+    .passthrough()
+    .nullish(),
   reactions: z.object({
     likes_count: z.number(),
     recasts_count: z.number(),
@@ -112,7 +115,7 @@ export const hypersnapCastResponseSchema = z.object({
     count: z.number(),
   }).passthrough(),
   embeds: z.array(z.object({ url: z.string().optional() }).passthrough()),
-  thread_hash: z.string(),
+  thread_hash: z.string().nullish(),
 }).passthrough();
 
 export const keysResponseSchema = z.object({
