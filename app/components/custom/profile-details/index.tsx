@@ -49,7 +49,11 @@ export default function ProfileDetails({ fid, hypersnapUser, keysData }: { fid: 
       <AppDetailView 
         app={selectedApp} 
         fid={fid} 
-        onBack={() => setSelectedAppFid(null)}
+        onBack={() => {
+          setSelectedSignerKey(null);
+          setSelectedAppFid(null);
+        }}
+        onSignerSelect={setSelectedSignerKey}
         userProfile={{
           username: hypersnapUser.username,
           fid: hypersnapUser.fid.toString()
