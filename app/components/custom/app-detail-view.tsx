@@ -2,20 +2,20 @@
 
 import { timeAgo } from '../../lib/signer-helpers';
 import type { AppWithSigners } from '../../lib/signer-helpers';
-import { useOptionalUrlQueryState } from '@/app/hooks/use-url-query-state';
 
 interface AppDetailViewProps {
   app: AppWithSigners;
   fid: string;
   onBack: () => void;
+  /** Parent `ProfileDetails` setter for the `signer` query param (single source of truth). */
+  onSignerSelect: (signerKey: string) => void;
   userProfile?: {
     username?: string;
     fid?: string;
   };
 }
 
-export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewProps) {
-  const [selectedSignerKey, setSelectedSignerKey] = useOptionalUrlQueryState('signer');
+export function AppDetailView({ app, fid, onBack, onSignerSelect, userProfile }: AppDetailViewProps) {
 
   return (
     <div className="w-screen h-screen flex justify-center items-start">
@@ -62,7 +62,7 @@ export function AppDetailView({ app, fid, onBack, userProfile }: AppDetailViewPr
                 .map((signer, index) => (
                   <button
                     key={index}
-                    onClick={() => signer.messageStats && signer.messageStats.total > 0 ? setSelectedSignerKey(signer.key) : undefined}
+                    onClick={() => signer.messageStats && signer.messageStats.total > 0 ? onSignerSelect(signer.key) : undefined}
                     className={`border border-black p-2 text-left w-full ${signer.messageStats && signer.messageStats.total > 0 ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default'}`}
                   >
                     <div className="font-mono text-xs text-gray-500 break-all mb-2">
