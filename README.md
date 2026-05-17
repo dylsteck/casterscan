@@ -41,14 +41,9 @@ Optional:
 - `BASE_URL`: canonical app URL used in metadata and frame URLs.
 - `VITE_GOOGLE_ANALYTICS_ID`: Google Analytics ID.
 
-## Deployment (Coolify + Nixpacks)
+## Deployment (Docker / Coolify)
 
-This repo includes a `nixpacks.toml` configured for a non-static TanStack Start Nitro deployment:
-- install: `bun install --frozen-lockfile`
-- build: `bun run build`
-- start: `node .output/server/index.mjs`
-
-Coolify should expose port `3000` (Nitro default when `PORT` is unset).
+The root **`Dockerfile`** builds a production image (Bun installs and runs `bun run build`, then Node Alpine runs `node .output/server/index.mjs`). Point Coolify (or any Docker host) at that Dockerfile and expose port **3000** (or set `PORT` per your platform).
 
 ## Scripts
 

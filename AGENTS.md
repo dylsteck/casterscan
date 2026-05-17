@@ -36,7 +36,7 @@ There is no separate `apps/web` and `apps/api` runtime anymore.
 | `app/contracts/*` | Shared API validation contracts (Zod) |
 | `app/lib/*` | Shared app helpers and typed client/server wrappers |
 | `public/*` | Static assets |
-| `nixpacks.toml` | Coolify deployment build/start config |
+| `Dockerfile` | Production image: Bun multi-stage build, Node runtime, `node .output/server/index.mjs` |
 
 ## Public Routes
 
@@ -100,13 +100,12 @@ Do not reintroduce `/v1/*` as a public app API.
 | `bun run start` | Run Nitro output (`node .output/server/index.mjs`) |
 | `bun run lint` | ESLint |
 
-## Deployment (Coolify)
+## Deployment (Coolify / Docker)
 
-- Deploy as a non-static Node app.
-- Nixpacks config is in `nixpacks.toml`.
-- Build output is `.output/*`.
-- Start command is `node .output/server/index.mjs`.
-- Expected app port is `3000` (or `PORT` if provided by platform).
+- Deploy as a non-static Node app using the root **`Dockerfile`** (Bun build stage, Node Alpine runtime).
+- Build output is `.output/*` (produced inside the image by `bun run build`).
+- Container start command is `node .output/server/index.mjs` (see `Dockerfile` `CMD`).
+- Exposed port defaults to `3000` (or `PORT` if provided by the platform).
 
 ## Design System Notes
 
