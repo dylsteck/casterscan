@@ -4,11 +4,6 @@ import { Farcaster } from "./farcaster.js";
 import { fetchKeysForFid } from "./keys.js";
 
 export type UpstreamConfig = {
-  hypersnap?: {
-    baseUrl?: string;
-    apiKey?: string;
-    timeout?: number;
-  };
   snapchain?: {
     baseUrl?: string;
     timeout?: number;
@@ -22,7 +17,7 @@ export type UpstreamConfig = {
 };
 
 export function createUpstream(config: UpstreamConfig = {}) {
-  const hypersnap = new HypersnapClient(config.hypersnap ?? {});
+  const hypersnap = new HypersnapClient();
   const snapchain = new Snapchain(config.snapchain ?? {});
   const farcaster = new Farcaster(config.farcaster ?? {});
 

@@ -6,8 +6,6 @@ const configSchema = z.object({
     .union([z.string().url(), z.literal("")])
     .optional()
     .transform((s) => (s === "" ? undefined : s)),
-  HYPERSNAP_API_BASE_URL: z.string().url().default("https://haatz.quilibrium.com"),
-  HYPERSNAP_API_KEY: z.string().default(""),
   SNAPCHAIN_URL: z.string().url().default("https://snap.farcaster.xyz:3381"),
   FARCASTER_API_URL: z.string().url().default("https://api.farcaster.xyz"),
   OPTIMISM_RPC_URL: z.string().url().default("https://mainnet.optimism.io"),
@@ -21,13 +19,5 @@ export function loadConfig(): Config {
     console.error("Config validation failed:", parsed.error.flatten());
     process.exit(1);
   }
-  const hypersnapApiKey =
-    parsed.data.HYPERSNAP_API_KEY || process.env.NEYNAR_API_KEY || "";
-  if (process.env.NODE_ENV === "production" && !hypersnapApiKey) {
-    console.error(
-      "Config validation failed: HYPERSNAP_API_KEY (or legacy NEYNAR_API_KEY) is required in production"
-    );
-    process.exit(1);
-  }
-  return { ...parsed.data, HYPERSNAP_API_KEY: hypersnapApiKey };
+  return parsed.data;
 }

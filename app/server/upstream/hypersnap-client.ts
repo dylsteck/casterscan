@@ -12,7 +12,10 @@ import { UpstreamError } from "../lib/errors.js";
 
 const BULK_FID_LIMIT = 100;
 
-/** Typed path segments for the Hypersnap HTTP API (Neynar-compatible v2 + hub v1 on the same host). */
+/** Public Hypersnap HTTP mirror (Neynar-compatible v2 + hub v1 on the same host). */
+export const HYPERSNAP_BASE_URL = "https://haatz.quilibrium.com" as const;
+
+/** Typed path segments for the Hypersnap HTTP API. */
 export const hypersnapPaths = {
   v2: {
     farcasterCast: "/v2/farcaster/cast",
@@ -28,26 +31,15 @@ export type HypersnapPath =
   | (typeof hypersnapPaths.v2)[keyof typeof hypersnapPaths.v2]
   | (typeof hypersnapPaths.hub)[keyof typeof hypersnapPaths.hub];
 
-export type HypersnapClientConfig = {
-  /** Defaults to public Hypersnap mirror. */
-  baseUrl?: string;
-  apiKey?: string;
-  timeout?: number;
-};
-
 export class HypersnapClient {
-  private readonly baseUrl: string;
-  private readonly apiKey: string;
   private readonly timeout: number;
 
-  constructor(config: HypersnapClientConfig = {}) {
-    this.baseUrl = (config.baseUrl ?? "https://haatz.quilibrium.com").replace(/\/$/, "");
-    this.apiKey = config.apiKey ?? "";
+  constructor(config: { timeout?: number } = {}) {
     this.timeout = config.timeout ?? 15000;
   }
 
   private async getJson<T>(path: HypersnapPath, params?: Record<string, string>): Promise<T> {
-    const url = new URL(`${this.baseUrl}${path}`);
+    const url = new URL(`${HYPERSNAP_BASE_URL}${path}`);
 
     try {
       if (params) {
@@ -56,15 +48,10 @@ export class HypersnapClient {
         }
       }
 
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (this.apiKey) {
-        headers["x-api-key"] = this.apiKey;
-      }
-
       const response = await fetch(url.toString(), {
-        headers,
+        headers: {
+          "Content-Type": "application/json",
+        },
         signal: AbortSignal.timeout(this.timeout),
       });
 

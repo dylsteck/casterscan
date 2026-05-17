@@ -86,8 +86,6 @@ Do not reintroduce `/v1/*` as a public app API.
 
 | Var | Required | Description |
 |-----|----------|-------------|
-| `HYPERSNAP_API_KEY` | Yes | API key for Hypersnap-compatible user/cast lookups (falls back to `NEYNAR_API_KEY` if unset) |
-| `HYPERSNAP_API_BASE_URL` | No | Hypersnap HTTP base URL (defaults to `https://haatz.quilibrium.com`) |
 | `REDIS_URL` | No | Redis cache backend (cache falls back when unset) |
 | `BASE_URL` | No | Canonical base URL used for metadata/frames |
 | `VITE_GOOGLE_ANALYTICS_ID` | No | Client analytics ID |

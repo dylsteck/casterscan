@@ -26,18 +26,15 @@ Key notes:
    - `bun install`
 2. Create env file:
    - `cp .env.example .env.local`
-3. Set required env vars (`HYPERSNAP_API_KEY` at minimum, or legacy `NEYNAR_API_KEY`).
-4. Run dev server:
+3. Run dev server:
    - `bun run dev`
-5. Build + run production output locally:
+4. Build + run production output locally:
    - `bun run build`
    - `bun run start`
 
 ## Environment Variables
 
-Required:
-- `HYPERSNAP_API_KEY`: API key for Hypersnap-compatible user/cast lookups (optional in dev; legacy `NEYNAR_API_KEY` is accepted if unset).
-- `HYPERSNAP_API_BASE_URL`: Override Hypersnap HTTP base (defaults to `https://haatz.quilibrium.com`).
+User and cast enrichment calls the public Hypersnap mirror at `https://haatz.quilibrium.com` from the server; no API key is required for that.
 
 Optional:
 - `REDIS_URL`: enables Redis caching.
