@@ -2,6 +2,7 @@
 
 import React from 'react';
 import CopyClipboardIcon from '../copy-clipboard-icon';
+import { readExperimentalUserScore } from '../../../lib/experimental-user-score';
 import type { HypersnapV2User } from '../../../lib/types';
 
 interface ProfileOverviewProps {
@@ -9,6 +10,9 @@ interface ProfileOverviewProps {
 }
 
 export function ProfileOverview({ hypersnapUser }: ProfileOverviewProps) {
+  const experimentalScore = readExperimentalUserScore(hypersnapUser.experimental);
+  const displayScore = hypersnapUser.score ?? experimentalScore;
+
   return (
     <div className="p-2 border border-black" style={{ wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-all' }}>
       <ul className="list-none">
@@ -127,12 +131,12 @@ export function ProfileOverview({ hypersnapUser }: ProfileOverviewProps) {
           </li>
         )}
 
-        {(hypersnapUser.score !== undefined || hypersnapUser.experimental?.neynar_user_score !== undefined) && (
+        {displayScore !== undefined && (
           <li className="flex justify-between items-center mb-1">
             <span className="font-semibold mr-1">Hypersnap score</span>
             <span className="flex items-center text-right">
-              {(hypersnapUser.score !== undefined ? hypersnapUser.score : hypersnapUser.experimental?.neynar_user_score)?.toFixed(2)}
-              <CopyClipboardIcon value={(hypersnapUser.score !== undefined ? hypersnapUser.score : hypersnapUser.experimental?.neynar_user_score)?.toString() || ''} className="ml-1 flex-shrink-0" />
+              {displayScore.toFixed(2)}
+              <CopyClipboardIcon value={displayScore.toString()} className="ml-1 flex-shrink-0" />
             </span>
           </li>
         )}

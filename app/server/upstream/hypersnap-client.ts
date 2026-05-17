@@ -12,7 +12,7 @@ import { UpstreamError } from "../lib/errors.js";
 
 const BULK_FID_LIMIT = 100;
 
-/** Public Hypersnap HTTP mirror (Neynar-compatible v2 + hub v1 on the same host). */
+/** Public Hypersnap HTTP mirror (v2 Farcaster-style REST + hub castById on the same host). */
 export const HYPERSNAP_BASE_URL = "https://haatz.quilibrium.com" as const;
 
 /** Typed path segments for the Hypersnap HTTP API. */

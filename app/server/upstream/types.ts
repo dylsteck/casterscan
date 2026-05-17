@@ -1,4 +1,4 @@
-// Hypersnap types (Neynar-compatible v2 API shape)
+// Hypersnap types (v2 cast/user JSON shape from the public mirror)
 export type HypersnapV2Cast = {
   object: "cast";
   hash: string;

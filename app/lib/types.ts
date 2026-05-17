@@ -311,9 +311,7 @@ export type HypersnapV2User = {
       fid: number;
     };
   }[];
-  experimental?: {
-    neynar_user_score?: number;
-  };
+  experimental?: Record<string, unknown>;
   viewer_context?: {
     following: boolean;
     followed_by: boolean;
