@@ -1,15 +1,15 @@
 import CastDetails from "@/app/components/custom/cast-details";
-import { getNeynarCast } from "@/app/lib/server";
+import { getHypersnapCast } from "@/app/lib/server";
 import { BASE_URL, SEO, frame } from "@/app/lib/utils";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/casts/$hash")({
   loader: async ({ params }) => {
-    const neynarCast = await getNeynarCast(params.hash, "hash");
-    if (!neynarCast) {
+    const hypersnapCast = await getHypersnapCast(params.hash, "hash");
+    if (!hypersnapCast) {
       throw notFound();
     }
-    return { neynarCast };
+    return { hypersnapCast };
   },
   head: ({ params }) => ({
     meta: [
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/casts/$hash")({
 
 function CastRouteComponent() {
   const { hash } = Route.useParams();
-  const { neynarCast } = Route.useLoaderData();
+  const { hypersnapCast } = Route.useLoaderData();
 
-  return <CastDetails hash={hash} neynarCast={neynarCast} />;
+  return <CastDetails hash={hash} hypersnapCast={hypersnapCast} />;
 }

@@ -4,9 +4,9 @@ import {
   fidStatsResponseSchema,
   infoResponseSchema,
   keysResponseSchema,
-  neynarCastQuerySchema,
-  neynarCastResponseSchema,
-  neynarUserResponseSchema,
+  hypersnapCastQuerySchema,
+  hypersnapCastResponseSchema,
+  hypersnapUserResponseSchema,
   signerMessagesQuerySchema,
   signerStatsQuerySchema,
   signerStatsResponseSchema,
@@ -38,15 +38,20 @@ export const apiClient = {
   },
   getSignersEnriched: (fid: string) => fetchApi(`/api/signers/enriched?fid=${fid}`, { parse: (v) => v as unknown[] }),
   getFarcasterCast: (hash: string) => fetchApi(`/api/farcaster/cast?hash=${hash}`, { parse: (v) => v as unknown }),
-  getSnapchainCast: (fid: string, hash: string, type: "neynar" | "farcaster") => {
+  getSnapchainCast: (fid: string, hash: string, type: "hypersnap" | "farcaster") => {
     const q = snapchainCastQuerySchema.parse({ fid, hash, type });
     return fetchApi(`/api/snapchain/cast?fid=${q.fid}&hash=${q.hash}&type=${q.type}`, { parse: (v) => v as unknown });
   },
-  getNeynarUser: (fid: string) => fetchApi(`/api/neynar/user?fid=${fid}`, { parse: (v) => ({ users: [neynarUserResponseSchema.parse((v as { users: unknown[] }).users?.[0])] }) }),
-  getNeynarCast: (identifier: string, type: "url" | "hash") => {
-    const q = neynarCastQuerySchema.parse({ identifier, type });
-    return fetchApi(`/api/neynar/cast?identifier=${encodeURIComponent(q.identifier)}&type=${q.type}`, {
-      parse: (v) => ({ cast: neynarCastResponseSchema.parse((v as { cast: unknown }).cast) }),
+  getHypersnapUser: (fid: string) =>
+    fetchApi(`/api/hypersnap/user?fid=${fid}`, {
+      parse: (v) => ({
+        users: [hypersnapUserResponseSchema.parse((v as { users: unknown[] }).users?.[0])],
+      }),
+    }),
+  getHypersnapCast: (identifier: string, type: "url" | "hash") => {
+    const q = hypersnapCastQuerySchema.parse({ identifier, type });
+    return fetchApi(`/api/hypersnap/cast?identifier=${encodeURIComponent(q.identifier)}&type=${q.type}`, {
+      parse: (v) => ({ cast: hypersnapCastResponseSchema.parse((v as { cast: unknown }).cast) }),
     });
   },
   getFidKeys: (fid: string) => fetchApi(`/api/farcaster/${fid}/keys`, keysResponseSchema),

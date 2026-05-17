@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/snapchain/cast")({
         try {
           const { fid, hash, type } = parseQuery(request, snapchainCastQuerySchema);
           await ensureInitialized();
-          const format = type === "neynar" ? "neynar-hub" : "farcaster-hub";
+          const format = type === "hypersnap" ? "hypersnap-hub" : "farcaster-hub";
           const data = await getCastFormat(fid, hash, format);
           return jsonWithCache(data, CACHE_TTLS.LONG);
         } catch (error) {

@@ -1,10 +1,10 @@
 import ProfileDetails from "@/app/components/custom/profile-details";
-import { getFarcasterKeys, getNeynarUserByUsername } from "@/app/lib/server";
+import { getFarcasterKeys, getHypersnapUserByUsername } from "@/app/lib/server";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/usernames/$username")({
   loader: async ({ params }) => {
-    const user = await getNeynarUserByUsername(params.username);
+    const user = await getHypersnapUserByUsername(params.username);
     if (!user?.fid) {
       throw notFound();
     }
@@ -21,5 +21,5 @@ export const Route = createFileRoute("/usernames/$username")({
 
 function UsernameRouteComponent() {
   const { user, keysData } = Route.useLoaderData();
-  return <ProfileDetails fid={user.fid.toString()} neynarUser={user} keysData={keysData} />;
+  return <ProfileDetails fid={user.fid.toString()} hypersnapUser={user} keysData={keysData} />;
 }

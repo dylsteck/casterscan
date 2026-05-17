@@ -1,4 +1,4 @@
-import type { NeynarV2User } from './types';
+import type { HypersnapV2User } from './types';
 
 export interface SignerEvent {
   type: string;
@@ -46,7 +46,7 @@ export interface ProcessedSigner {
 
 export interface AppWithSigners {
   fid: number;
-  profile?: NeynarV2User;
+  profile?: HypersnapV2User;
   signers: ProcessedSigner[];
   totalMessages: number;
   lastUsed?: Date;

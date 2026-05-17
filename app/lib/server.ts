@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import type { NeynarV2Cast, NeynarV2User, ProfileKeysPage } from "./types";
+import type { HypersnapV2Cast, HypersnapV2User, ProfileKeysPage } from "./types";
 
-const getNeynarCastServerFn = createServerFn({ method: "GET" })
+const getHypersnapCastServerFn = createServerFn({ method: "GET" })
   .inputValidator((data: { identifier: string; type: "url" | "hash" }) => data)
   .handler(async ({ data }) => {
     const { ensureInitialized } = await import("@/app/server/bootstrap.js");
@@ -31,21 +31,21 @@ const getFarcasterCastServerFn = createServerFn({ method: "GET" })
   });
 
 const getHubCastServerFn = createServerFn({ method: "GET" })
-  .inputValidator((data: { fid: number; hash: string; type: "neynar" | "farcaster" }) => data)
+  .inputValidator((data: { fid: number; hash: string; type: "hypersnap" | "farcaster" }) => data)
   .handler(async ({ data }) => {
     const { ensureInitialized } = await import("@/app/server/bootstrap.js");
     const { getCastFormat } = await import("@/app/server/services/cast.js");
     await ensureInitialized();
 
     try {
-      const format = data.type === "neynar" ? "neynar-hub" : "farcaster-hub";
+      const format = data.type === "hypersnap" ? "hypersnap-hub" : "farcaster-hub";
       return await getCastFormat(data.fid.toString(), data.hash, format);
     } catch {
       return null;
     }
   });
 
-const getNeynarUserServerFn = createServerFn({ method: "GET" })
+const getHypersnapUserServerFn = createServerFn({ method: "GET" })
   .inputValidator((data: { fid: string }) => data)
   .handler(async ({ data }) => {
     const { ensureInitialized } = await import("@/app/server/bootstrap.js");
@@ -54,7 +54,7 @@ const getNeynarUserServerFn = createServerFn({ method: "GET" })
     return getUser(data.fid);
   });
 
-const getNeynarUserByUsernameServerFn = createServerFn({ method: "GET" })
+const getHypersnapUserByUsernameServerFn = createServerFn({ method: "GET" })
   .inputValidator((data: { username: string }) => data)
   .handler(async ({ data }) => {
     const { ensureInitialized } = await import("@/app/server/bootstrap.js");
@@ -76,24 +76,28 @@ const getFarcasterKeysServerFn = createServerFn({ method: "GET" })
     };
   });
 
-export async function getNeynarCast(identifier: string, type: "url" | "hash"): Promise<NeynarV2Cast> {
-  return getNeynarCastServerFn({ data: { identifier, type } }) as Promise<NeynarV2Cast>;
+export async function getHypersnapCast(identifier: string, type: "url" | "hash"): Promise<HypersnapV2Cast> {
+  return getHypersnapCastServerFn({ data: { identifier, type } }) as Promise<HypersnapV2Cast>;
 }
 
 export async function getFarcasterCast(hash: string): Promise<unknown | null> {
   return getFarcasterCastServerFn({ data: { hash } });
 }
 
-export async function getHubCast(fid: number, hash: string, type: "neynar" | "farcaster"): Promise<unknown | null> {
+export async function getHubCast(
+  fid: number,
+  hash: string,
+  type: "hypersnap" | "farcaster"
+): Promise<unknown | null> {
   return getHubCastServerFn({ data: { fid, hash, type } });
 }
 
-export async function getNeynarUser(fid: string): Promise<NeynarV2User> {
-  return getNeynarUserServerFn({ data: { fid } }) as Promise<NeynarV2User>;
+export async function getHypersnapUser(fid: string): Promise<HypersnapV2User> {
+  return getHypersnapUserServerFn({ data: { fid } }) as Promise<HypersnapV2User>;
 }
 
-export async function getNeynarUserByUsername(username: string): Promise<NeynarV2User> {
-  return getNeynarUserByUsernameServerFn({ data: { username } }) as Promise<NeynarV2User>;
+export async function getHypersnapUserByUsername(username: string): Promise<HypersnapV2User> {
+  return getHypersnapUserByUsernameServerFn({ data: { username } }) as Promise<HypersnapV2User>;
 }
 
 export async function getFarcasterKeys(fid: string): Promise<ProfileKeysPage> {

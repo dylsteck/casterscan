@@ -6,7 +6,7 @@ export const eventIdSchema = z.string().regex(/^[a-zA-Z0-9_-]+$/, "eventId conta
 export const usernameSchema = z.string().max(50).regex(/^[a-zA-Z0-9_.-]+$/, "username contains invalid chars");
 export const signerKeySchema = z.string().max(200).regex(/^[a-zA-Z0-9+/=_-]+$/, "signerKey contains invalid chars");
 
-export const castFormatSchema = z.enum(["neynar-hub", "farcaster-hub", "farcaster-api"]);
+export const castFormatSchema = z.enum(["hypersnap-hub", "farcaster-hub", "farcaster-api"]);
 
 export const fidStatsResponseSchema = z.object({
   casts: z.number(),
@@ -64,10 +64,10 @@ export const castQuerySchema = z.object({ hash: hashSchema });
 export const snapchainCastQuerySchema = z.object({
   fid: fidSchema,
   hash: hashSchema,
-  type: z.enum(["neynar", "farcaster"]),
+  type: z.enum(["hypersnap", "farcaster"]),
 });
 
-export const neynarCastQuerySchema = z.object({
+export const hypersnapCastQuerySchema = z.object({
   identifier: z.string().min(1),
   type: z.enum(["url", "hash"]),
 });
@@ -81,14 +81,14 @@ export const farcasterFidQuerySchema = z.object({
 
 export const genericArrayResponseSchema = z.array(z.record(z.string(), z.unknown()));
 export const genericObjectResponseSchema = z.record(z.string(), z.unknown());
-export const neynarUserResponseSchema = z.object({
+export const hypersnapUserResponseSchema = z.object({
   fid: z.number(),
   username: z.string(),
   display_name: z.string().optional(),
   pfp_url: z.string().optional(),
 }).passthrough();
 
-export const neynarCastResponseSchema = z.object({
+export const hypersnapCastResponseSchema = z.object({
   hash: z.string(),
   text: z.string(),
   timestamp: z.string(),
@@ -98,12 +98,15 @@ export const neynarCastResponseSchema = z.object({
     display_name: z.string(),
     pfp_url: z.string().optional(),
   }).passthrough(),
-  app: z.object({
-    fid: z.number(),
-    username: z.string().optional(),
-    display_name: z.string().optional(),
-    pfp_url: z.string().optional(),
-  }).passthrough(),
+  app: z
+    .object({
+      fid: z.number(),
+      username: z.string().optional(),
+      display_name: z.string().optional(),
+      pfp_url: z.string().optional(),
+    })
+    .passthrough()
+    .nullish(),
   reactions: z.object({
     likes_count: z.number(),
     recasts_count: z.number(),
@@ -112,7 +115,7 @@ export const neynarCastResponseSchema = z.object({
     count: z.number(),
   }).passthrough(),
   embeds: z.array(z.object({ url: z.string().optional() }).passthrough()),
-  thread_hash: z.string(),
+  thread_hash: z.string().nullish(),
 }).passthrough();
 
 export const keysResponseSchema = z.object({
@@ -127,6 +130,6 @@ export const keysResponseSchema = z.object({
 export type InfoResponse = z.infer<typeof infoResponseSchema>;
 export type FidStatsResponse = z.infer<typeof fidStatsResponseSchema>;
 export type SignerStatsResponse = z.infer<typeof signerStatsResponseSchema>;
-export type NeynarUserResponse = z.infer<typeof neynarUserResponseSchema>;
-export type NeynarCastResponse = z.infer<typeof neynarCastResponseSchema>;
+export type HypersnapUserResponse = z.infer<typeof hypersnapUserResponseSchema>;
+export type HypersnapCastResponse = z.infer<typeof hypersnapCastResponseSchema>;
 export type KeysResponse = z.infer<typeof keysResponseSchema>;

@@ -9,11 +9,11 @@ import { ProfileOverview } from './profile-overview';
 import { ProfileAddresses } from './profile-addresses';
 import { ProfileSigners } from './profile-signers';
 import { ProfileRawData } from './profile-raw-data';
-import type { NeynarV2User, ProfileKeysPage } from '../../../lib/types';
+import type { HypersnapV2User, ProfileKeysPage } from '../../../lib/types';
 import { useAppsWithSigners } from '../../../hooks/use-apps-with-signers';
 import { useOptionalUrlQueryState, useUrlQueryState } from '@/app/hooks/use-url-query-state';
 
-export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: string, neynarUser: NeynarV2User, keysData: ProfileKeysPage }) {
+export default function ProfileDetails({ fid, hypersnapUser, keysData }: { fid: string; hypersnapUser: HypersnapV2User; keysData: ProfileKeysPage }) {
   const [activeTab, setActiveTab] = useUrlQueryState<'overview' | 'addresses' | 'signers' | 'rawdata'>('tab', 'overview');
   const [selectedSignerKey, setSelectedSignerKey] = useOptionalUrlQueryState('signer');
   const [selectedAppFid, setSelectedAppFid] = useOptionalUrlQueryState('signer_fid');
@@ -51,8 +51,8 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
         fid={fid} 
         onBack={() => setSelectedAppFid(null)}
         userProfile={{
-          username: neynarUser.username,
-          fid: neynarUser.fid.toString()
+          username: hypersnapUser.username,
+          fid: hypersnapUser.fid.toString()
         }}
       />
     );
@@ -62,7 +62,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
     <div className="w-screen h-screen flex justify-center items-start">
       <div className="w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col gap-4">
         <ProfileHeader 
-          neynarUser={neynarUser}
+          hypersnapUser={hypersnapUser}
           appsLoading={appsLoading}
           totalStats={totalStats}
         />
@@ -74,11 +74,11 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
           />
           
           {activeTab === 'overview' && (
-            <ProfileOverview neynarUser={neynarUser} />
+            <ProfileOverview hypersnapUser={hypersnapUser} />
           )}
           
           {activeTab === 'addresses' && (
-            <ProfileAddresses neynarUser={neynarUser} appsWithSigners={appsWithSigners} />
+            <ProfileAddresses hypersnapUser={hypersnapUser} appsWithSigners={appsWithSigners} />
           )}
           
           {activeTab === 'signers' && (
@@ -91,7 +91,7 @@ export default function ProfileDetails({ fid, neynarUser, keysData }: { fid: str
           )}
           
           {activeTab === 'rawdata' && (
-            <ProfileRawData neynarUser={neynarUser} />
+            <ProfileRawData hypersnapUser={hypersnapUser} />
           )}
         </div>
       </div>

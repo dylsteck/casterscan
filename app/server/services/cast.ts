@@ -2,14 +2,14 @@ import { getCached } from "../cache/cached.js";
 import { cacheKeys, cacheTTL } from "../cache/keys.js";
 import { getUpstream } from "../upstream-instance.js";
 import type {
-  NeynarV2Cast,
-  NeynarHubCast,
+  HypersnapV2Cast,
+  HypersnapHubCast,
   SnapchainCastByIdResponse,
 } from "../upstream/types.js";
 
-export type CastFormat = "neynar-hub" | "farcaster-hub" | "farcaster-api";
+export type CastFormat = "hypersnap-hub" | "farcaster-hub" | "farcaster-api";
 
-export async function getCast(hash: string): Promise<NeynarV2Cast> {
+export async function getCast(hash: string): Promise<HypersnapV2Cast> {
   const up = getUpstream();
   if (!up) throw new Error("Upstream not initialized");
 
@@ -17,7 +17,7 @@ export async function getCast(hash: string): Promise<NeynarV2Cast> {
     cacheKeys.cast(hash),
     cacheTTL.cast,
     () =>
-      up.neynar.getCast({
+      up.hypersnap.getCast({
         identifier: hash,
         type: "hash",
       })
@@ -28,7 +28,7 @@ export async function getCastFormat(
   fid: string,
   hash: string,
   format: CastFormat
-): Promise<NeynarHubCast | SnapchainCastByIdResponse | unknown> {
+): Promise<HypersnapHubCast | SnapchainCastByIdResponse | unknown> {
   const up = getUpstream();
   if (!up) throw new Error("Upstream not initialized");
 
@@ -37,8 +37,8 @@ export async function getCastFormat(
     cacheTTL.cast,
     async () => {
       switch (format) {
-        case "neynar-hub":
-          return up.neynar.getCastById({ fid, hash });
+        case "hypersnap-hub":
+          return up.hypersnap.getCastById({ fid, hash });
         case "farcaster-hub":
           return up.snapchain.getCastById({ fid, hash });
         case "farcaster-api":

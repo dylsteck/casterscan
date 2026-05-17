@@ -1,15 +1,15 @@
 import ProfileDetails from "@/app/components/custom/profile-details";
-import { getFarcasterKeys, getNeynarUser } from "@/app/lib/server";
+import { getFarcasterKeys, getHypersnapUser } from "@/app/lib/server";
 import { BASE_URL, SEO, frame } from "@/app/lib/utils";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/fids/$fid")({
   loader: async ({ params }) => {
-    const [neynarUser, keysData] = await Promise.all([getNeynarUser(params.fid), getFarcasterKeys(params.fid)]);
-    if (!neynarUser || !keysData) {
+    const [hypersnapUser, keysData] = await Promise.all([getHypersnapUser(params.fid), getFarcasterKeys(params.fid)]);
+    if (!hypersnapUser || !keysData) {
       throw notFound();
     }
-    return { neynarUser, keysData };
+    return { hypersnapUser, keysData };
   },
   head: ({ params }) => ({
     meta: [
@@ -27,6 +27,6 @@ export const Route = createFileRoute("/fids/$fid")({
 
 function FidRouteComponent() {
   const { fid } = Route.useParams();
-  const { neynarUser, keysData } = Route.useLoaderData();
-  return <ProfileDetails fid={fid} neynarUser={neynarUser} keysData={keysData} />;
+  const { hypersnapUser, keysData } = Route.useLoaderData();
+  return <ProfileDetails fid={fid} hypersnapUser={hypersnapUser} keysData={keysData} />;
 }

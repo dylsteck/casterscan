@@ -1,4 +1,4 @@
-import { neynarUserResponseSchema, userQuerySchema } from "@/app/contracts/api";
+import { hypersnapUserResponseSchema, userQuerySchema } from "@/app/contracts/api";
 import { CACHE_TTLS } from "@/app/lib/utils";
 import { ensureInitialized } from "@/app/server/bootstrap.js";
 import { getUser } from "@/app/server/services/user.js";
@@ -12,7 +12,7 @@ export const Route = createFileRoute("/api/farcaster/user")({
         try {
           const { fid } = parseQuery(request, userQuerySchema);
           await ensureInitialized();
-          const user = neynarUserResponseSchema.parse(await getUser(fid));
+          const user = hypersnapUserResponseSchema.parse(await getUser(fid));
           return jsonWithCache(user, CACHE_TTLS.LONG);
         } catch (error) {
           return handleRouteError(error);

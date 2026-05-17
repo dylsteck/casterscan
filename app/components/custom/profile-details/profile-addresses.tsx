@@ -1,15 +1,15 @@
 'use client'
 
 import React from 'react';
-import type { NeynarV2User } from '../../../lib/types';
+import type { HypersnapV2User } from '../../../lib/types';
 import type { AppWithSigners } from '../../../lib/signer-helpers';
 
 interface ProfileAddressesProps {
-  neynarUser: NeynarV2User;
+  hypersnapUser: HypersnapV2User;
   appsWithSigners?: AppWithSigners[];
 }
 
-export function ProfileAddresses({ neynarUser, appsWithSigners }: ProfileAddressesProps) {
+export function ProfileAddresses({ hypersnapUser, appsWithSigners }: ProfileAddressesProps) {
   const getAppName = (fid: number) => {
     const app = appsWithSigners?.find(app => app.fid === fid);
     return app?.profile?.display_name || app?.profile?.username || fid.toString();
@@ -26,12 +26,12 @@ export function ProfileAddresses({ neynarUser, appsWithSigners }: ProfileAddress
         </thead>
         <tbody>
           <tr className="border-b border-gray-200">
-            <td className="py-2 px-1 font-mono text-sm break-all">{neynarUser.custody_address}</td>
+            <td className="py-2 px-1 font-mono text-sm break-all">{hypersnapUser.custody_address}</td>
             <td className="py-2 px-1 text-sm">custody</td>
             <td className="py-2 px-1 text-sm"></td>
           </tr>
           
-          {neynarUser.verified_addresses?.eth_addresses?.map((address, index) => (
+          {hypersnapUser.verified_addresses?.eth_addresses?.map((address, index) => (
             <tr key={`verified-eth-${index}`} className="border-b border-gray-200">
               <td className="py-2 px-1 font-mono text-sm break-all">{address}</td>
               <td className="py-2 px-1 text-sm">verified eth</td>
@@ -39,7 +39,7 @@ export function ProfileAddresses({ neynarUser, appsWithSigners }: ProfileAddress
             </tr>
           ))}
 
-          {neynarUser.verified_addresses?.sol_addresses?.map((address, index) => (
+          {hypersnapUser.verified_addresses?.sol_addresses?.map((address, index) => (
             <tr key={`verified-sol-${index}`} className="border-b border-gray-200">
               <td className="py-2 px-1 font-mono text-sm break-all">{address}</td>
               <td className="py-2 px-1 text-sm">verified sol</td>
@@ -47,7 +47,7 @@ export function ProfileAddresses({ neynarUser, appsWithSigners }: ProfileAddress
             </tr>
           ))}
 
-          {neynarUser.auth_addresses?.map((authItem, index) => (
+          {hypersnapUser.auth_addresses?.map((authItem, index) => (
             <tr key={`auth-${index}`} className="border-b border-gray-200">
               <td className="py-2 px-1 font-mono text-sm break-all">{authItem.address}</td>
               <td className="py-2 px-1 text-sm">auth</td>

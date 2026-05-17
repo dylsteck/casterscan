@@ -10,7 +10,6 @@ export function getUpstream() {
 
 export function initUpstream(config: Config) {
   const upstreamConfig: UpstreamConfig = {
-    neynar: { apiKey: config.NEYNAR_API_KEY },
     snapchain: { baseUrl: config.SNAPCHAIN_URL },
     farcaster: { baseUrl: config.FARCASTER_API_URL },
     optimismRpcUrl: config.OPTIMISM_RPC_URL,

@@ -1,10 +1,10 @@
 'use client'
 
 import React from 'react';
-import type { NeynarV2User } from '../../../lib/types';
+import type { HypersnapV2User } from '../../../lib/types';
 
 interface ProfileHeaderProps {
-  neynarUser: NeynarV2User;
+  hypersnapUser: HypersnapV2User;
   appsLoading: boolean;
   totalStats: {
     casts: number;
@@ -14,15 +14,15 @@ interface ProfileHeaderProps {
   } | null;
 }
 
-export function ProfileHeader({ neynarUser, appsLoading, totalStats }: ProfileHeaderProps) {
+export function ProfileHeader({ hypersnapUser, appsLoading, totalStats }: ProfileHeaderProps) {
   return (
     <div className="flex items-start gap-4 mt-6 mb-4">
-      <img src={neynarUser.pfp_url} alt={`${neynarUser.username}'s PFP`} className="w-16 h-16 rounded-full" />
+      <img src={hypersnapUser.pfp_url} alt={`${hypersnapUser.username}'s PFP`} className="w-16 h-16 rounded-full" />
       <div className="flex-1">
-        <h1 className="text-2xl font-bold">{neynarUser.display_name}</h1>
-        <p className="text-gray-600">@{neynarUser.username}</p>
-        {neynarUser.profile?.bio?.text && (
-          <p className="text-sm text-gray-500 mt-1">{neynarUser.profile.bio.text}</p>
+        <h1 className="text-2xl font-bold">{hypersnapUser.display_name}</h1>
+        <p className="text-gray-600">@{hypersnapUser.username}</p>
+        {hypersnapUser.profile?.bio?.text && (
+          <p className="text-sm text-gray-500 mt-1">{hypersnapUser.profile.bio.text}</p>
         )}
         
         {appsLoading ? (

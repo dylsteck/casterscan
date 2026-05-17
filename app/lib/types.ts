@@ -96,7 +96,7 @@ export type PruneEvent = SnapchainEvent & {
   };
 };
 
-export type NeynarV1Cast = {
+export type HypersnapV1Cast = {
   author: User;
   embeds: { url: string }[];
   hash: string;
@@ -109,7 +109,7 @@ export type NeynarV1Cast = {
   type?: "cast-mention" | "cast-reply";
 };
 
-export type NeynarV2Cast = {
+export type HypersnapV2Cast = {
     object: "cast";
     hash: string;
     author: {
@@ -181,8 +181,8 @@ export type NeynarV2Cast = {
       display_name: string;
       pfp_url: string;
       custody_address: string;
-    };
-    thread_hash: string;
+    } | null;
+    thread_hash?: string | null;
     parent_hash: string | null;
     parent_url: string | null;
     root_parent_url: string | null;
@@ -233,7 +233,7 @@ export type NeynarV2Cast = {
     };
 };
 
-export type NeynarV2User = {
+export type HypersnapV2User = {
   object: "user";
   fid: number;
   username: string;
@@ -311,9 +311,7 @@ export type NeynarV2User = {
       fid: number;
     };
   }[];
-  experimental?: {
-    neynar_user_score?: number;
-  };
+  experimental?: Record<string, unknown>;
   viewer_context?: {
     following: boolean;
     followed_by: boolean;
